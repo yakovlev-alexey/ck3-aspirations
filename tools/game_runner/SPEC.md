@@ -34,7 +34,7 @@ A07: existing build tests and dev/release checks pass; release contains no bridg
 
 ## Current status
 
-CLI/native implementation is present. Standard-library tests and real CK3 1.20.0.4 smoke acceptance have passed; detailed final evidence is recorded in the ignored task report. MCP acceptance A06 is a separate adapter task. This fixture does not certify unfinished gameplay core.
+CLI/native implementation is present. Standard-library tests and real CK3 1.20.0.4 smoke acceptance have passed; detailed final evidence is recorded in the ignored task report. The local MCP adapter implements A06 with real-subprocess tests; measured live acceptance is recorded in the ignored task report. This fixture does not certify unfinished gameplay core.
 
 ## Stable native IDs
 
@@ -89,6 +89,49 @@ Resolve `python` to the existing host runtime. No SDK, package install, global M
 
 Version1 has no verified alternate-profile launch flag. Before any CK3 process launch, the Windows backend resolves actual redirected Documents with `SHGetFolderPathW(CSIDL_PERSONAL)` and requires configured `user_data` to equal its `Paradox Interactive/Crusader Kings III` directory. Launcher-specific/alternate profile overrides are unsupported and rejected.
 
-The backend reads `pdx_settings.txt` without changing it and structurally parses the `game` → `autosave` → `value` preference. It requires exactly `NEVER`; missing, duplicate, malformed or unsafe settings are rejected before process launch. `NEVER` in comments or another section cannot satisfy this preflight. This protects real autosave files when a1–30-day operation or a retained MCP session crosses an autosave boundary.
+The backend reads `pdx_settings.txt` without changing it and structurally parses the `game` → `autosave` → `value` preference. It requires exactly `NO_AUTOSAVE` (the native No Autosave option); missing, duplicate, malformed or unsafe settings are rejected before process launch. `NO_AUTOSAVE` in comments or another section cannot satisfy this preflight. This protects real autosave files when a1–30-day operation or a retained MCP session crosses an autosave boundary.
 
-Prepare a disposable test session by selecting autosave `NEVER` in CK3 settings before launching automation. If the overall test owner changes this preference for a short test, take a current targeted backup, change only this exact owned preference and restore its original value after closing the owned game. The runner never changes it automatically. Existing October1→2 smoke evidence predates this safety preflight and does not establish arbitrary-boundary autosave behavior. The current host value is YEARLY, so Task2 must prepare/restore that preference for its live acceptance. No destructive autosave probe is authorized or needed.
+Prepare a disposable test session by selecting No Autosave in CK3 settings before launching automation. If the overall test owner changes this preference for a short test, take a current targeted backup, change only this exact owned preference and restore its original value after closing the owned game. The runner never changes it automatically. Existing October1→2 smoke evidence predates this safety preflight and does not establish arbitrary-boundary autosave behavior. No destructive autosave probe is authorized or needed.
+
+## MCP stdio interface
+
+Start from the repository directory with the existing Python runtime:
+
+```powershell
+python -m tools.game_runner --config '<absolute configuration JSON path>' mcp
+```
+
+This is a local subprocess transport implementing **MCP 2025-11-25** explicitly, following the official [lifecycle](https://modelcontextprotocol.io/specification/2025-11-25/basic/lifecycle), [stdio transport](https://modelcontextprotocol.io/specification/2025-11-25/basic/transports) and [tools](https://modelcontextprotocol.io/specification/2025-11-25/server/tools) contracts. This statement does not claim that version is the newest specification. No SDK, network listener or global MCP registration is provided. Use the same configuration schema above and a client launch command/argument array such as:
+
+```json
+{
+  "command": "<absolute existing python.exe path>",
+  "args": ["-m", "tools.game_runner", "--config", "<absolute configuration JSON path>", "mcp"],
+  "cwd": "<absolute repository path>"
+}
+```
+
+`cwd` is illustrative client configuration; actual client launch settings vary. Configure the repository working directory or equivalent module search path. All stdout is newline-delimited UTF-8 JSON-RPC 2.0; diagnostics go to stderr. Initialize with `protocolVersion`, object `capabilities`, and `clientInfo` containing string `name`/`version`. The server negotiates only `2025-11-25`, returning that supported version if the client's requested version differs; an incompatible client must disconnect. Then send `notifications/initialized`. Tools cannot execute before this notification. `ping` returns an empty object. `tools/list` returns one fixed page and advertises only tools, with `listChanged: false`.
+
+| Tool | Arguments | Runner operation |
+| --- | --- | --- |
+| `aspirations_run_scenario` | Required `scenario: "automation-smoke"`; optional integer `repeat: 1..10`, default 1 | `run_scenario` |
+| `aspirations_observe` | Empty object or omitted arguments | `observe` |
+| `aspirations_advance_days` | Required integer `days: 1..30` | `advance_days` |
+
+Tool argument schemas use JSON Schema 2020-12; additional properties, booleans/fractions in integer positions, and out-of-range values are rejected before runner input. Envelope errors/unknown methods/unknown tools use JSON-RPC errors. Tool validation and backend failures return `isError: true`; a passed runner report returns `isError: false`. The unchanged report is both `structuredContent` and serialized text `content`. No arbitrary script, shell, path, console or filesystem tool is exposed. Observe may launch/bootstrap a disposable session, so it is not advertised as a side-effect-free operation.
+
+For example, send each object below as one physical line:
+
+```json
+{"jsonrpc":"2.0","id":1,"method":"initialize","params":{"protocolVersion":"2025-11-25","capabilities":{},"clientInfo":{"name":"local-client","version":"1"}}}
+{"jsonrpc":"2.0","method":"notifications/initialized"}
+{"jsonrpc":"2.0","id":2,"method":"tools/list"}
+{"jsonrpc":"2.0","id":3,"method":"tools/call","params":{"name":"aspirations_run_scenario","arguments":{"scenario":"automation-smoke","repeat":1}}}
+```
+
+Implementation limits: each input line is at most 65,536 bytes including newline. Oversized or unterminated lines receive an error and close the connection; malformed JSON/UTF-8, duplicate JSON keys, non-finite numbers and batch arrays are rejected. Request IDs are non-null strings/integers and cannot be reused; reconnect after 10,000 requests. Notifications receive no replies and never invoke tools. The dispatch loop runs one call at a time in arrival order; all calls reuse one runner and its user-data ownership lock. Another CLI/server cannot acquire that lock. There is no progress reporting, asynchronous task API or interruptible cancellation: notifications arriving during a call are read after its bounded native work finishes. Client timeouts must allow configured startup/native waits across the requested repeat count (not a single 15-second request timeout). Close stdin for clean shutdown; EOF finishes any current bounded operation, calls `close()` and exits. A cleanup/transport failure exits nonzero and reports on stderr; forcibly terminating the server cannot guarantee cleanup.
+
+A retained server keeps its disposable session until EOF, so autosave NO_AUTOSAVE must remain configured throughout. Overall live-test cleanup restores only the test-owned autosave preference and original launcher selection after shutdown, audits staged save/request/lock/process absence, and preserves source baseline/user saves. A single live MCP smoke invocation verifies the full client→stdio→runner→native→measured-report path; Task1's separate triple CLI proof remains the restart acceptance evidence.
+
+CK3 1.20.0.4 accepts the persisted enum `NO_AUTOSAVE`, verified by the native settings UI. The previously assumed `NEVER` enum is invalid and falls back to YEARLY; it is now rejected. Windows input validation repeats the read-only profile check after startup settling and before console/key batches, including before a retained-session day tick. A normalized or externally changed unsafe preference therefore stops work before further input. Deterministic regressions cover post-load and pre-tick rewrites; live evidence confirms no enum fallback with the accepted setting. This establishes the controlled launch route, not a destructive arbitrary-boundary autosave probe.

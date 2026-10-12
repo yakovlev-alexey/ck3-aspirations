@@ -146,7 +146,7 @@ Review changes by story ownership: a gameplay diff should normally contain the s
 
 ## Commands and failure boundaries
 
-PowerShell 7 and Git already installed on the host are sufficient. No package manager, Pester, Python, runtime framework or third-party dependency is required. Run from any caller directory: each command defaults `RepositoryRoot` to its script's parent. An explicit `-RepositoryRoot` is available for disposable tooling fixtures.
+For these packaging commands, PowerShell 7 and Git already installed on the host are sufficient. No package manager, Pester, Python, runtime framework or third-party dependency is required. Run from any caller directory: each command defaults `RepositoryRoot` to its script's parent. An explicit `-RepositoryRoot` is available for disposable tooling fixtures.
 
 ```powershell
 pwsh -NoProfile -File tools/tests/run.ps1
@@ -175,6 +175,8 @@ The initial repository-bootstrap task supplied contracts and tested packaging co
 
 ## Local game automation
 
-`tools/game_runner/` owns the Python standard-library CLI, wire/parser, Windows input adapter and its living specification. `tools/game_runner/tests/` owns automation acceptance and deterministic failure-boundary tests. Native bridge files remain in `src/core/tests/game/` and are assembled only for dev. This tool adds no player-facing runtime framework or release dependency. Its package-local `.gitignore` excludes Python caches.
+`tools/game_runner/` owns the Python standard-library CLI, local MCP stdio adapter, wire/parser, Windows input adapter and its living specification. `tools/game_runner/tests/` owns automation acceptance and deterministic failure-boundary tests. Native bridge files remain in `src/core/tests/game/` and are assembled only for dev. This tool adds no player-facing runtime framework or release dependency. Its package-local `.gitignore` excludes Python caches.
 
 Keep configuration, disposable baseline copies, reports, fresh logs, screenshots and MODLOG updates under ignored `.local/automation/` or `.local/MODLOG.md`. A uniquely named save staged under selected user data is temporary runner-owned state; it is removed on close. The original baseline and all other saves remain untouched. CLI and MCP share the same exclusive ownership lock and runner. See the [runner contract](../tools/game_runner/SPEC.md) for exact commands and the host-independent configuration schema.
+
+The optional automation commands use an existing Python runtime; the packaging commands above use PowerShell/.NET only. MCP explicitly supports protocol 2025-11-25 and only the three bounded runner operations. Subprocess lifecycle, strict argument schemas, protocol/tool errors and EOF cleanup are tested without a real game; final integration uses one measured native smoke call. Serial dispatch has no progress or interruptible cancellation. See the [MCP interface and limits](../tools/game_runner/SPEC.md#mcp-stdio-interface).

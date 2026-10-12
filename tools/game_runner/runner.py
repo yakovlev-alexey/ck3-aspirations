@@ -245,7 +245,7 @@ class GameRunner:
             self._snapshot_logs("failure")
             try:
                 self.backend.screenshot(self._directory() / "failure.png")
-            except (ImportError, OSError, RuntimeError):
+            except (ImportError, OSError, RuntimeError, ValueError):
                 pass
             self.backend.stop()
             self.session = None

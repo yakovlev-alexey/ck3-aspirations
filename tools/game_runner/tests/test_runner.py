@@ -288,6 +288,19 @@ class RunnerIOTests(unittest.TestCase):
         self.assertNotEqual(first["evidence"], second["evidence"])
         self.assertEqual(first_path.read_bytes(), original)
 
+    def test_profile_rejection_and_screenshot_failure_stop_owned_session(self):
+        def reject(*args):
+            raise ValueError("unsafe runtime profile")
+        self.backend.validate = reject
+        self.backend.screenshot = reject
+        report = self.runner.run_scenario("automation-smoke")
+        self.assertEqual(report["status"], "transport_error")
+        self.assertFalse(self.backend.running)
+        self.assertIsNone(self.runner.session)
+        self.runner.close()
+        self.assertFalse((self.root / ".asp-automation.lock").exists())
+        self.assertEqual(list((self.root / "save games").iterdir()), [])
+
     def test_timeout_then_observe_starts_fresh_session(self):
         self.backend.fail_once = True
         self.assertEqual(self.runner.observe()["status"], "timeout")

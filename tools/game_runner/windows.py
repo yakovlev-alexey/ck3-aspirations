@@ -73,8 +73,8 @@ def require_safe_profile(user_data, documents):
         autosave = settings["game"]["autosave"]["value"]
     except (KeyError, TypeError) as error:
         raise ValueError("Missing game.autosave preference; launch rejected") from error
-    if autosave != "NEVER":
-        raise ValueError("Set CK3 game.autosave to NEVER for the disposable automation session; launch rejected to preserve user saves")
+    if autosave != "NO_AUTOSAVE":
+        raise ValueError("Set CK3 game.autosave to NO_AUTOSAVE for the disposable automation session; launch rejected to preserve user saves")
 
 
 class WindowsBackend:
@@ -156,6 +156,8 @@ class WindowsBackend:
         pid = wintypes.DWORD()
         self.user32.GetWindowThreadProcessId(foreground, ctypes.byref(pid))
         validate_foreground(self.hwnd, self.process.pid, foreground, pid.value)
+        # Recheck after load and before every input, including a retained-session tick.
+        self.preflight()
 
     def _input(self, vk=0, char=0, flags=0, release=False):
         if not release:

@@ -13,9 +13,20 @@ def main():
     scenario.add_argument("scenario", choices=["automation-smoke"])
     scenario.add_argument("--repeat", type=int, default=1, choices=range(1, 11))
     commands.add_parser("observe")
+    commands.add_parser("mcp", help="Serve MCP 2025-11-25 over local stdio")
     advance = commands.add_parser("advance-days")
     advance.add_argument("days", type=int, choices=range(1, 31))
     args = parser.parse_args()
+    if args.command == "mcp":
+        from contextlib import redirect_stdout
+        from .mcp_server import serve
+        try:
+            with redirect_stdout(sys.stderr):
+                runner = GameRunner(Config.load(args.config))
+        except (RuntimeError, ValueError, OSError) as error:
+            print("MCP configuration failed: " + str(error), file=sys.stderr)
+            return 1
+        return serve(runner)
     runner = None
     try:
         runner = GameRunner(Config.load(args.config))
