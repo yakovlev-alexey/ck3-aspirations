@@ -165,9 +165,66 @@ try {
         Add-Content -LiteralPath (Join-Path $root 'packaging/descriptor.mod') 'unexpected_path="C:/private/location"'
         Run-Tool build $root @('-Profile','release') $true | Out-Null
     }
+    # R1 catches metadata hidden after a valid-looking tags block, and incomplete grammar.
+    $descriptorCases = [ordered]@{
+        'T11 inline path' = 'tags={ "Gameplay" } path="D:/example/local-mod"'
+        'T12 inline archive' = 'tags={ "Gameplay" } archive="local.zip"'
+        'T13 inline unknown field' = 'tags={ "Gameplay" } unexpected_path="D:/example/local-mod"'
+        'T14 inline duplicate scalar field' = 'tags={ "Gameplay" } version="9.9.9"'
+        'T15 duplicate tags field' = 'tags={ "Gameplay" } tags={ "Events" }'
+        'T16 unclosed tags block' = 'tags={ "Gameplay"'
+        'T17 unparsed trailing text' = 'tags={ "Gameplay" } stray text'
+        'T18 malformed tags value' = 'tags={ "Gameplay" unquoted }'
+    }
+    foreach ($caseName in $descriptorCases.Keys) {
+        Case $caseName {
+            $root = New-Fixture ($caseName.Replace(' ', '-'))
+            $descriptor = Join-Path $root 'packaging/descriptor.mod'
+            $content = [IO.File]::ReadAllText($descriptor).Replace('tags={ "Gameplay" }', $descriptorCases[$caseName])
+            Write-Text $descriptor $content
+            Run-Tool build $root @('-Profile','release') $true | Out-Null
+        }
+    }
+    Case 'T19 misplaced debug localization rejected in release and usable in dev' {
+        $root = New-Fixture T19
+        $loc = Join-Path $root 'src/core/game/localization/english/asp_core_l_english.yml'
+        [IO.Directory]::CreateDirectory([IO.Path]::GetDirectoryName($loc)) | Out-Null
+        [IO.File]::WriteAllText($loc, "l_english:`n asp_test_core_label:0 `"Debug only`"`n", [Text.UTF8Encoding]::new($true))
+        Run-Tool build $root @('-Profile','dev') | Out-Null
+        Run-Tool check $root @('-Profile','dev') | Out-Null
+        Run-Tool build $root @('-Profile','release') $true | Out-Null
+    }
+    Case 'T20 additional language header rejected' {
+        $root = New-Fixture T20
+        $loc = Join-Path $root 'src/core/game/localization/english/asp_core_l_english.yml'
+        [IO.Directory]::CreateDirectory([IO.Path]::GetDirectoryName($loc)) | Out-Null
+        [IO.File]::WriteAllText($loc, "l_english:`n asp_core_label:0 `"English`"`nl_french:`n asp_core_other:0 `"French`"`n", [Text.UTF8Encoding]::new($true))
+        Run-Tool build $root @('-Profile','release') $true | Out-Null
+        Run-Tool build $root @('-Profile','dev') $true | Out-Null
+    }
+    Case 'T21 multiline tags and inline scalar metadata remain valid' {
+        $root = New-Fixture T21
+        $descriptor = Join-Path $root 'packaging/descriptor.mod'
+        Write-Text $descriptor "name=`"Aspirations`" version=`"0.1.0`"`nsupported_version=`"1.20.*`"`ntags={`n # ordinary multiline list`n `"Gameplay`"`n `"Events`"`n}`nremote_file_id=`"3487654321`"`n"
+        Run-Tool build $root @('-Profile','release') | Out-Null
+        Run-Tool check $root @('-Profile','release') | Out-Null
+        Run-Tool build $root @('-Profile','dev') | Out-Null
+        Run-Tool check $root @('-Profile','dev') | Out-Null
+        $dev = [IO.File]::ReadAllText((Join-Path $root '.build/dev/mod/descriptor.mod'))
+        Assert ($dev.Contains('version="0.1.0"')) 'T21: inline metadata lost in dev'
+        Assert ($dev.Contains('Aspirations (Development)')) 'T21: dev name missing'
+        Assert (-not $dev.Contains('remote_file_id')) 'T21: Workshop ID leaked to dev'
+    }
+    Case 'T22 escaped closing quote cannot hide an unterminated tag' {
+        $root = New-Fixture T22
+        $descriptor = Join-Path $root 'packaging/descriptor.mod'
+        $content = [IO.File]::ReadAllText($descriptor).Replace('tags={ "Gameplay" }', 'tags={ "Gameplay\" }')
+        Write-Text $descriptor $content
+        Run-Tool build $root @('-Profile','release') $true | Out-Null
+    }
 } finally {
     # Never recursively remove a linked fixture. Leave disposable roots ignored for inspection.
     Write-Host "Fixtures: $testRoot"
 }
 if ($failures.Count) { Write-Host "$($failures.Count) test cases failed"; exit 1 }
-Write-Host 'All 10 tooling cases passed'; exit 0
+Write-Host 'All 22 tooling cases passed'; exit 0

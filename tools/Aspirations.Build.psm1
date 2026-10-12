@@ -101,23 +101,52 @@ function Get-Descriptor {
     Assert-NoReparsePath $path
     if (-not [IO.File]::Exists($path)) { throw 'Missing packaging/descriptor.mod' }
     $text = [IO.File]::ReadAllText($path, $script:Utf8).Replace("`r`n", "`n")
-    if ($text -match '(?im)^\s*(path|archive)\s*=') { throw 'Portable descriptor must not contain path or archive metadata.' }
+    # Consume the entire portable descriptor stream; line breaks are only whitespace.
     $allowedKeys = @('name','version','supported_version','tags','remote_file_id','picture')
-    foreach ($field in [regex]::Matches($text, '(?m)^\s*([A-Za-z_][A-Za-z0-9_]*)\s*=')) {
-        if ($field.Groups[1].Value -cnotin $allowedKeys) { throw "Unrecognized portable descriptor field: $($field.Groups[1].Value)" }
-    }
     $fields = @{}
-    foreach ($key in @('name','version','supported_version','remote_file_id','picture')) {
-        $matches = [regex]::Matches($text, '(?m)^\s*' + $key + '\s*=\s*"([^"\r\n]+)"\s*(?:#.*)?$')
-        if ($matches.Count -gt 1) { throw "Duplicate descriptor field: $key" }
-        if ($matches.Count -eq 1) { $fields[$key] = $matches[0].Groups[1].Value }
-        elseif ($text -match ('(?m)^\s*' + $key + '\s*=')) { throw "Malformed descriptor field: $key" }
+    $spans = [Collections.Generic.List[object]]::new()
+    $offset = 0
+    $triviaPattern = '\G(?:\s+|#[^\r\n]*(?:\r?\n|$))*'
+    while ($offset -lt $text.Length) {
+        $trivia = [regex]::Match($text.Substring($offset), $triviaPattern)
+        $offset += $trivia.Length
+        if ($offset -eq $text.Length) { break }
+        $start = $offset
+        $field = [regex]::Match($text.Substring($offset), '\G([A-Za-z_][A-Za-z0-9_]*)\s*=\s*')
+        if (-not $field.Success) { throw "Malformed descriptor content at offset $offset." }
+        $key = $field.Groups[1].Value
+        if ($key -cnotin $allowedKeys) { throw "Unrecognized portable descriptor field: $key" }
+        if ($fields.ContainsKey($key)) { throw "Duplicate descriptor field: $key" }
+        $offset += $field.Length
+        if ($key -ceq 'tags') {
+            if ($offset -eq $text.Length -or $text[$offset] -ne '{') { throw 'Descriptor tags must be a quoted-string list.' }
+            $offset++
+            $tags = [Collections.Generic.List[string]]::new()
+            while ($true) {
+                $trivia = [regex]::Match($text.Substring($offset), $triviaPattern)
+                $offset += $trivia.Length
+                if ($offset -eq $text.Length) { throw 'Unclosed descriptor tags block.' }
+                if ($text[$offset] -eq '}') { $offset++; break }
+                $tag = [regex]::Match($text.Substring($offset), '\G"((?:\\[^\r\n]|[^"\\\r\n])+)"')
+                if (-not $tag.Success) { throw 'Malformed descriptor tag; each tag must be quoted.' }
+                $tags.Add($tag.Groups[1].Value)
+                $offset += $tag.Length
+            }
+            if ($tags.Count -eq 0) { throw 'Descriptor must have at least one tag.' }
+            $fields[$key] = @($tags)
+        } else {
+            $value = [regex]::Match($text.Substring($offset), '\G"((?:\\[^\r\n]|[^"\\\r\n])+)"')
+            if (-not $value.Success) { throw "Malformed descriptor field: $key" }
+            $fields[$key] = $value.Groups[1].Value
+            $offset += $value.Length
+        }
+        $spans.Add([pscustomobject]@{ Key = $key; Start = $start; Length = $offset - $start })
     }
     foreach ($key in @('name','version','supported_version')) { if (-not $fields.ContainsKey($key)) { throw "Missing descriptor field: $key" } }
     if ($fields.name -ne 'Aspirations') { throw 'Release descriptor name must be Aspirations.' }
     if ($fields.version -notmatch '^\d+\.\d+\.\d+(?:-[A-Za-z0-9.-]+)?$') { throw 'Descriptor version must be a portable semantic version.' }
     if ($fields.supported_version -notmatch '^\d+\.\d+\.(?:\d+|\*)$') { throw 'Invalid supported_version.' }
-    if ($text -notmatch '(?s)\btags\s*=\s*\{\s*"[^"\r\n]+"') { throw 'Descriptor must have at least one tag.' }
+    if (-not $fields.ContainsKey('tags')) { throw 'Descriptor must have at least one tag.' }
     if ($fields.ContainsKey('remote_file_id')) {
         $id = $fields.remote_file_id
         if ($id -notmatch '^[1-9][0-9]{5,19}$' -or $id -match '^([0-9])\1+$' -or $id -in @('123456','123456789','1234567890','12345678901234567890')) {
@@ -126,8 +155,10 @@ function Get-Descriptor {
     }
     if ($fields.ContainsKey('picture')) { Assert-RelativePath $fields.picture }
     if ($Profile -eq 'dev') {
-        $text = [regex]::Replace($text, '(?m)^\s*name\s*=.*$', 'name="Aspirations (Development)"')
-        $text = [regex]::Replace($text, '(?m)^\s*remote_file_id\s*=.*\n?', '')
+        foreach ($span in @($spans | Sort-Object Start -Descending)) {
+            if ($span.Key -eq 'name') { $text = $text.Remove($span.Start, $span.Length).Insert($span.Start, 'name="Aspirations (Development)"') }
+            elseif ($span.Key -eq 'remote_file_id') { $text = $text.Remove($span.Start, $span.Length) }
+        }
     }
     return [pscustomobject]@{ Text = $text.TrimEnd() + "`n"; Version = $fields.version; Picture = $(if ($fields.ContainsKey('picture')) { $fields.picture } else { $null }) }
 }
@@ -170,11 +201,15 @@ function Test-NativeContent {
         Assert-RelativePath $relative
         if ($relative -eq 'descriptor.mod' -or ($Descriptor.Picture -and $relative -ceq $Descriptor.Picture)) { continue }
         if ($relative -notmatch '^(common|events|localization|gfx)/' -or $relative -match '(^|/)\.' -or $relative -match '\.(md|ps1|psm1|zip|exe|dll|ck3|log)$') { throw "Unexpected native package file: $relative" }
+        if ($Profile -eq 'release' -and $relative -match '(?i)debug') { throw "Dev fixture filename in release content: $relative" }
         if ($relative.StartsWith('localization/')) {
             if ($relative -notmatch '^localization/english/[^/]+_l_english\.yml$') { throw "English localization only: $relative" }
             $bytes = [IO.File]::ReadAllBytes($file)
             if ($bytes.Length -lt 3 -or $bytes[0] -ne 239 -or $bytes[1] -ne 187 -or $bytes[2] -ne 191) { throw "Localization requires UTF-8 BOM: $relative" }
             $text = $script:Utf8.GetString($bytes, 3, $bytes.Length - 3)
+            if ($Profile -eq 'release' -and $text -match '\basp_test_') { throw "Dev fixture namespace in release localization: $relative" }
+            $headers = [regex]::Matches($text, '(?m)^[ \t]*(l_[A-Za-z_]+):[ \t]*(?:#.*)?\r?$')
+            if ($headers.Count -ne 1 -or $headers[0].Groups[1].Value -cne 'l_english') { throw "Localization must contain exactly one l_english language header: $relative" }
             if ($text -notmatch '\A(?:[ \t]*#.*\r?\n|\s*\r?\n)*l_english:\s*(?:#.*)?(?:\r?\n|$)') { throw "Missing l_english header: $relative" }
             foreach ($match in [regex]::Matches($text, '(?m)^\s*(asp_[A-Za-z0-9_]+):\d*\s')) {
                 if (-not $identifiers.Add('localization:' + $match.Groups[1].Value)) { throw "Duplicate mod-owned localization ID: $($match.Groups[1].Value)" }
