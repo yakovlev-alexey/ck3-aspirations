@@ -102,6 +102,12 @@ class MCPTests(unittest.TestCase):
             self.assertEqual(json.loads(reply["result"]["content"][0]["text"]), report)
             self.assertFalse(reply["result"]["isError"])
 
+    def test_core_regression_is_a_bounded_registered_scenario(self):
+        _, replies = self.exchange([INIT, READY,
+            request(2, "tools/call", name="aspirations_run_scenario", arguments={"scenario": "core-regression"})])
+        self.assertEqual(replies[-1]["result"]["structuredContent"],
+                         {"status": "passed", "scenario": "core-regression", "repeat": 1})
+
     def test_requires_initialize_and_ready_before_side_effects(self):
         _, replies = self.exchange([request(2, "tools/call", name="aspirations_observe"), INIT,
                                    request(3, "tools/call", name="aspirations_observe"), READY,

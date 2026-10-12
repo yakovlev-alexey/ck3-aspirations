@@ -1,0 +1,166 @@
+﻿# Disposable fixture setup, never shipped in release.
+asp_test_create_story_effect = {
+    create_character = {
+        name = asp_test_target_name
+        age = 30
+        gender = male
+        random_traits = no
+        culture = root.culture
+        faith = root.faith
+        employer = root
+        save_scope_as = asp_test_target
+    }
+    clear_saved_scope = asp_new_story
+    create_story = { type = asp_core_debug save_scope_as = asp_new_story }
+    scope:asp_new_story = {
+        asp_initialize_story_effect = { FAMILY = vengeance CLASS = $CLASS$ TARGET = scope:asp_test_target }
+    }
+}
+
+asp_test_clear_stories_effect = {
+    every_owned_story = {
+        type = asp_core_debug
+        if = {
+            limit = { asp_is_active_story_trigger = yes }
+            asp_resolve_story_effect = { OUTCOME = impossible REWARDS = none }
+        }
+        else = { end_story = yes }
+    }
+    set_variable = { name = asp_test_terminal_callbacks value = 0 }
+}
+
+# These effects are shared by manual debug events and the registered core-regression run.
+asp_test_c01_effect = {
+    asp_test_clear_stories_effect = yes
+    debug_log = "ASP_TEST C01 BEGIN"
+    while = { count = 3 asp_test_create_story_effect = { CLASS = ambition } }
+    while = { count = 5 asp_test_create_story_effect = { CLASS = desire } }
+    set_variable = { name = asp_test_cap_id value = var:asp_next_instance_id }
+    asp_test_create_story_effect = { CLASS = ambition }
+    asp_test_create_story_effect = { CLASS = desire }
+    set_variable = { name = asp_test_c01_ambitions value = asp_active_ambitions }
+    set_variable = { name = asp_test_c01_desires value = asp_active_desires }
+    set_variable = { name = asp_test_c01_rejected value = 0 }
+    if = { limit = { var:asp_next_instance_id = var:asp_test_cap_id } set_variable = { name = asp_test_c01_rejected value = 1 } }
+    set_variable = { name = asp_test_c01 value = 0 }
+    if = {
+        limit = { var:asp_test_c01_ambitions = 3 var:asp_test_c01_desires = 5 var:asp_test_c01_rejected = 1 }
+        set_variable = { name = asp_test_c01 value = 1 }
+        debug_log = "ASP_TEST C01 PASS: active_ambitions = 3 active_desires = 5 extra attempts rejected"
+    }
+    else = { debug_log = "ASP_TEST C01 FAIL: exact counts or rejection identity changed" }
+}
+
+asp_test_c02_effect = {
+    asp_test_clear_stories_effect = yes
+    debug_log = "ASP_TEST C02 BEGIN"
+    add_stress = { value = 50 subtract = stress }
+    set_variable = { name = asp_test_stress_before value = stress }
+    asp_test_create_story_effect = { CLASS = ambition }
+    scope:asp_new_story = { save_scope_as = asp_test_resolution_story }
+    set_variable = { name = asp_test_slots_before value = asp_active_ambitions }
+    scope:asp_test_resolution_story = { asp_resolve_story_effect = { OUTCOME = fulfilled REWARDS = normal } }
+    scope:asp_test_resolution_story ?= { asp_resolve_story_effect = { OUTCOME = fulfilled REWARDS = normal } }
+    set_variable = { name = asp_test_stress_delta value = { value = stress subtract = var:asp_test_stress_before } }
+    set_variable = { name = asp_test_c02_before value = var:asp_test_stress_before }
+    set_variable = { name = asp_test_c02_delta value = var:asp_test_stress_delta }
+    set_variable = { name = asp_test_c02_callbacks value = var:asp_test_terminal_callbacks }
+    set_variable = { name = asp_test_c02_slots_before value = var:asp_test_slots_before }
+    set_variable = { name = asp_test_c02_slots_after value = asp_active_ambitions }
+    set_variable = { name = asp_test_c02 value = 0 }
+    if = {
+        limit = {
+            var:asp_test_c02_before > 20
+            var:asp_test_c02_delta = -20
+            var:asp_test_c02_callbacks = 1
+            var:asp_test_ending_stress = stress
+            var:asp_test_c02_slots_before = 1
+            var:asp_test_c02_slots_after = 0
+            NOT = { exists = scope:asp_test_resolution_story }
+        }
+        set_variable = { name = asp_test_c02 value = 1 }
+        debug_log = "ASP_TEST C02 PASS: terminal_callbacks = 1 slot_delta = -1 stress_delta = -20"
+    }
+    else = { debug_log = "ASP_TEST C02 FAIL: callback slot or stress delta" }
+}
+
+asp_test_c09_c10_effect = {
+    asp_test_clear_stories_effect = yes
+    debug_log = "ASP_TEST C09 BEGIN"
+    add_stress = { value = 50 subtract = stress }
+    asp_test_create_story_effect = { CLASS = ambition }
+    set_variable = { name = asp_test_forgiveness_before value = stress }
+    scope:asp_new_story = { asp_resolve_story_effect = { OUTCOME = forgiven REWARDS = normal } }
+    set_variable = { name = asp_test_forgiveness_delta value = { value = stress subtract = var:asp_test_forgiveness_before } }
+    # Compare the actual owner-adjusted stress against ordinary early abandonment.
+    asp_test_create_story_effect = { CLASS = ambition }
+    set_variable = { name = asp_test_abandonment_before value = stress }
+    scope:asp_new_story = { asp_resolve_story_effect = { OUTCOME = abandoned REWARDS = normal } }
+    set_variable = { name = asp_test_expected_release value = { value = stress subtract = var:asp_test_abandonment_before } }
+    set_variable = { name = asp_test_c09_delta value = var:asp_test_forgiveness_delta }
+    set_variable = { name = asp_test_c09_expected value = var:asp_test_expected_release }
+    set_variable = { name = asp_test_c09 value = 0 }
+    if = {
+        limit = { var:asp_test_c09_delta > 0 var:asp_test_c09_delta = var:asp_test_c09_expected }
+        set_variable = { name = asp_test_c09 value = 1 }
+        debug_log = "ASP_TEST C09 PASS: early forgiveness uses private release cost"
+    }
+    else = { debug_log = "ASP_TEST C09 FAIL: early forgiveness cost bypassed" }
+    debug_log = "ASP_TEST C10 BEGIN"
+    asp_test_create_story_effect = { CLASS = ambition }
+    set_variable = { name = asp_test_suspended_before value = stress }
+    scope:asp_new_story = {
+        set_variable = { name = asp_suspended value = yes }
+        asp_resolve_story_effect = { OUTCOME = fulfilled REWARDS = normal }
+    }
+    set_variable = { name = asp_test_c10_delta value = { value = stress subtract = var:asp_test_suspended_before } }
+    set_variable = { name = asp_test_c10_policy_none value = 0 }
+    if = { limit = { var:asp_test_ending_reward_policy = flag:none } set_variable = { name = asp_test_c10_policy_none value = 1 } }
+    set_variable = { name = asp_test_c10 value = 0 }
+    if = {
+        limit = { var:asp_test_c10_delta = 0 var:asp_test_c10_policy_none = 1 }
+        set_variable = { name = asp_test_c10 value = 1 }
+        debug_log = "ASP_TEST C10 PASS: suspended terminal policy downgraded to none"
+    }
+    else = { debug_log = "ASP_TEST C10 FAIL: suspended dispatch retains normal reward policy" }
+}
+
+# Negative coverage: an adult AI character with no land is denied a reservation.
+# This tests the combined exclusion; it does not isolate the landless predicate.
+asp_test_c11_effect = {
+    debug_log = "ASP_TEST C11 BEGIN"
+    create_character = {
+        name = asp_test_target_name
+        age = 30
+        gender = male
+        random_traits = no
+        culture = root.culture
+        faith = root.faith
+        employer = root
+        save_scope_as = asp_test_ineligible_owner
+    }
+    set_variable = { name = asp_test_c11_landless value = 0 }
+    set_variable = { name = asp_test_c11_ai value = 0 }
+    if = { limit = { scope:asp_test_ineligible_owner = { is_landed = no } } set_variable = { name = asp_test_c11_landless value = 1 } }
+    if = { limit = { scope:asp_test_ineligible_owner = { is_ai = yes } } set_variable = { name = asp_test_c11_ai value = 1 } }
+    scope:asp_test_ineligible_owner = {
+        create_story = { type = asp_core_debug save_scope_as = asp_test_ineligible_story }
+        scope:asp_test_ineligible_story = { asp_initialize_story_effect = { FAMILY = vengeance CLASS = ambition TARGET = root } }
+    }
+    set_variable = { name = asp_test_c11_active value = 0 }
+    if = { limit = { scope:asp_test_ineligible_owner = { asp_active_ambitions > 0 } } set_variable = { name = asp_test_c11_active value = 1 } }
+    set_variable = { name = asp_test_c11 value = 0 }
+    if = {
+        limit = { var:asp_test_c11_landless = 1 var:asp_test_c11_ai = 1 var:asp_test_c11_active = 0 }
+        set_variable = { name = asp_test_c11 value = 1 }
+        debug_log = "ASP_TEST C11 PASS: adult AI landless owner rejected"
+    }
+    else = { debug_log = "ASP_TEST C11 FAIL: ineligible owner reserved a story or setup invalid" }
+}
+
+asp_test_core_regression_effect = {
+    asp_test_c01_effect = yes
+    asp_test_c02_effect = yes
+    asp_test_c09_c10_effect = yes
+    asp_test_c11_effect = yes
+}

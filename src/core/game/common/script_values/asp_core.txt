@@ -1,0 +1,62 @@
+﻿asp_ambition_cap = 3
+asp_desire_cap = 5
+asp_desire_review_months = 24
+asp_ambition_review_years = 8
+asp_desire_repeat_months = 12
+asp_ambition_repeat_years = 3
+asp_declare_min_months = 12
+asp_pledge_years = 5
+asp_native_month_days = 30
+asp_native_year_days = 365
+asp_desire_fulfillment_stress = -10
+asp_ambition_fulfillment_stress = -20
+asp_desire_abandonment_stress = 5
+asp_ambition_abandonment_stress = 10
+asp_vengeful_abandonment_stress = 15
+asp_compassionate_abandonment_stress = 5
+
+# Evaluated each time from surviving active owned stories, including suspended ones.
+asp_active_ambitions = {
+    value = 0
+    every_owned_story = {
+        limit = { asp_is_active_story_trigger = yes var:asp_class = flag:ambition }
+        add = 1
+    }
+}
+asp_active_desires = {
+    value = 0
+    every_owned_story = {
+        limit = { asp_is_active_story_trigger = yes var:asp_class = flag:desire }
+        add = 1
+    }
+}
+asp_active_stories = { value = asp_active_ambitions add = asp_active_desires }
+asp_initial_review_days = {
+    value = asp_desire_review_months
+    multiply = asp_native_month_days
+    if = {
+        limit = { var:asp_class = flag:ambition }
+        value = asp_ambition_review_years
+        multiply = asp_native_year_days
+    }
+}
+asp_time_until_review_days = { value = var:asp_next_review_date subtract = current_date }
+asp_story_age_days = { value = current_date subtract = var:asp_origin_date }
+asp_fulfillment_stress = {
+    value = asp_desire_fulfillment_stress
+    if = { limit = { var:asp_class = flag:ambition } value = asp_ambition_fulfillment_stress }
+}
+asp_abandonment_stress = {
+    value = 0
+    if = {
+        limit = { NOT = { asp_story_review_due_trigger = yes } }
+        value = asp_desire_abandonment_stress
+        if = { limit = { var:asp_class = flag:ambition } value = asp_ambition_abandonment_stress }
+        if = {
+            limit = { var:asp_family = flag:vengeance }
+            value = asp_ambition_abandonment_stress
+            if = { limit = { story_owner = { has_trait = vengeful } } value = asp_vengeful_abandonment_stress }
+            else_if = { limit = { story_owner = { has_trait = compassionate } } value = asp_compassionate_abandonment_stress }
+        }
+    }
+}

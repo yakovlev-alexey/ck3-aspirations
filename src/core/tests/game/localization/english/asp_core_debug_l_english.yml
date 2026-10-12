@@ -1,0 +1,8 @@
+﻿l_english:
+ asp_core_debug:0 "Aspirations capability probe"
+ asp_core_debug_desc:0 "A private intention under test."
+ asp_debug_story_information:0 "A disposable probe of story identity and calendar persistence."
+ asp_test_probe_title:0 "Story context probe"
+ asp_test_probe_desc:0 "This event retains the exact newly created story. Save and load after choosing the option, advance one day, then invoke the calendar check."
+ asp_test_probe_check:0 "Check the retained story reference"
+ asp_test_target_name:0 "Test Aspirant"

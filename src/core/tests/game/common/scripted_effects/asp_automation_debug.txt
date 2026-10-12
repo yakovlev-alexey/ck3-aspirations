@@ -1,10 +1,34 @@
-﻿# Independent fixture; never calls unfinished gameplay core.
+﻿# Automation smoke uses private state; core-regression invokes shared dev-only core assertions.
 asp_test_automation_complete_effect = {
     set_variable = { name = asp_test_automation_result_counter value = var:asp_test_automation_counter }
     set_variable = { name = asp_test_automation_result_date value = current_date }
     if = {
         limit = { has_variable = asp_test_automation_result_counter has_variable = asp_test_automation_result_date }
-        debug_log = asp_test_automation_done
+        if = {
+            limit = { var:asp_test_automation_operation = flag:core_regression }
+            set_variable = { name = asp_test_automation_result_c01 value = var:asp_test_c01 }
+            set_variable = { name = asp_test_automation_result_c01_ambitions value = var:asp_test_c01_ambitions }
+            set_variable = { name = asp_test_automation_result_c01_desires value = var:asp_test_c01_desires }
+            set_variable = { name = asp_test_automation_result_c01_rejected value = var:asp_test_c01_rejected }
+            set_variable = { name = asp_test_automation_result_c02 value = var:asp_test_c02 }
+            set_variable = { name = asp_test_automation_result_c02_before value = var:asp_test_c02_before }
+            set_variable = { name = asp_test_automation_result_c02_delta value = var:asp_test_c02_delta }
+            set_variable = { name = asp_test_automation_result_c02_callbacks value = var:asp_test_c02_callbacks }
+            set_variable = { name = asp_test_automation_result_c02_slots_before value = var:asp_test_c02_slots_before }
+            set_variable = { name = asp_test_automation_result_c02_slots_after value = var:asp_test_c02_slots_after }
+            set_variable = { name = asp_test_automation_result_c09 value = var:asp_test_c09 }
+            set_variable = { name = asp_test_automation_result_c09_delta value = var:asp_test_c09_delta }
+            set_variable = { name = asp_test_automation_result_c09_expected value = var:asp_test_c09_expected }
+            set_variable = { name = asp_test_automation_result_c10 value = var:asp_test_c10 }
+            set_variable = { name = asp_test_automation_result_c10_delta value = var:asp_test_c10_delta }
+            set_variable = { name = asp_test_automation_result_c10_policy_none value = var:asp_test_c10_policy_none }
+            set_variable = { name = asp_test_automation_result_c11 value = var:asp_test_c11 }
+            set_variable = { name = asp_test_automation_result_c11_landless value = var:asp_test_c11_landless }
+            set_variable = { name = asp_test_automation_result_c11_ai value = var:asp_test_c11_ai }
+            set_variable = { name = asp_test_automation_result_c11_active value = var:asp_test_c11_active }
+            debug_log = asp_test_automation_core_done
+        }
+        else = { debug_log = asp_test_automation_done }
     }
 }
 
@@ -40,7 +64,10 @@ asp_test_automation_request_effect = {
                 limit = { has_variable = asp_test_automation_pending }
                 debug_log = asp_test_automation_ack
             }
-            else = { debug_log = asp_test_automation_done }
+            else = {
+                if = { limit = { var:asp_test_automation_operation = flag:core_regression } debug_log = asp_test_automation_core_done }
+                else = { debug_log = asp_test_automation_done }
+            }
         }
         else = {
             if = {
@@ -53,6 +80,7 @@ asp_test_automation_request_effect = {
                     limit = { var:asp_test_automation_operation = flag:mutate }
                     change_variable = { name = asp_test_automation_counter add = 7 }
                 }
+                if = { limit = { var:asp_test_automation_operation = flag:core_regression } asp_test_core_regression_effect = yes }
                 if = {
                     limit = { var:asp_test_automation_operation = flag:advance }
                     set_variable = asp_test_automation_pending

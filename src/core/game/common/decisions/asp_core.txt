@@ -1,0 +1,10 @@
+﻿asp_review_aspirations_decision = {
+    picture = { reference = "gfx/interface/illustrations/decisions/decision_dynasty_house.dds" }
+    desc = asp_review_aspirations_decision_desc
+    selection_tooltip = asp_review_aspirations_decision_tooltip
+    confirm_text = asp_review_aspirations_decision_confirm
+    is_shown = { is_ai = no asp_active_stories > 0 }
+    is_valid = { is_alive = yes is_adult = yes }
+    effect = { hidden_effect = { asp_open_management_effect = yes } }
+    ai_check_interval = 0
+}

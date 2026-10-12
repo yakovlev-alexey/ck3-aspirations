@@ -1,0 +1,18 @@
+﻿# Recognized families are intentionally inert until their owning module is implemented.
+# Later tasks add only the corresponding family handler; no registry or speculative calls.
+asp_family_check_progress_effect = {
+    if = {
+        limit = { NOT = { asp_has_known_family_trigger = yes } }
+        debug_log = "ASP_DIAGNOSTIC unknown family progress rejected"
+    }
+}
+asp_family_resolve_effect = {
+    if = {
+        limit = {
+            var:asp_outcome = flag:$OUTCOME$
+            var:asp_reward_policy = flag:$REWARDS$
+            NOT = { asp_has_known_family_trigger = yes }
+        }
+        debug_log = "ASP_DIAGNOSTIC unknown family resolution rejected"
+    }
+}

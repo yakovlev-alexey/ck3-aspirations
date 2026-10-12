@@ -1,0 +1,175 @@
+﻿namespace = asp_test_core
+
+# Capability probe, independent of the core implementation.
+asp_test_core.10 = {
+    type = character_event
+    title = asp_test_probe_title
+    desc = asp_test_probe_desc
+    theme = stewardship
+    immediate = {
+        debug_log = "ASP_PROBE CORE BEGIN"
+        create_story = { type = asp_core_debug save_scope_as = asp_probe_story }
+        scope:asp_probe_story = {
+            set_variable = { name = asp_target value = root }
+            set_variable = { name = asp_origin_date value = current_date }
+            set_variable = { name = asp_probe_timer value = yes months = 24 }
+            set_variable = { name = asp_probe_ambition_timer value = yes years = 8 }
+            set_variable = { name = asp_next_review_date value = { value = current_date add = 730 } }
+        }
+        set_variable = { name = asp_test_probe_reference value = scope:asp_probe_story }
+        set_variable = { name = asp_test_probe_origin value = current_date }
+        set_variable = { name = asp_test_probe_review value = { value = current_date add = 730 } }
+    }
+    option = {
+        name = asp_test_probe_check
+        if = {
+            limit = {
+                scope:asp_probe_story = {
+                    var:asp_target = root
+                    var:asp_origin_date = root.var:asp_test_probe_origin
+                    has_variable = asp_probe_timer
+                    var:asp_next_review_date = root.var:asp_test_probe_review
+                }
+            }
+            debug_log = "ASP_PROBE CORE EVENT_SCOPE PASS"
+        }
+        else = { debug_log = "ASP_PROBE CORE EVENT_SCOPE FAIL" }
+    }
+}
+
+asp_test_core.11 = {
+    type = character_event
+    hidden = yes
+    immediate = {
+        set_variable = { name = asp_test_probe_delta value = { value = current_date subtract = var:asp_test_probe_origin } }
+        if = {
+            limit = { var:asp_test_probe_delta = 1 }
+            debug_log = "ASP_PROBE CORE CALENDAR_DAY PASS"
+        }
+        else = { debug_log = "ASP_PROBE CORE CALENDAR_DAY FAIL" }
+        var:asp_test_probe_reference ?= {
+            if = {
+                limit = {
+                    var:asp_target = root
+                    var:asp_origin_date = root.var:asp_test_probe_origin
+                    has_variable = asp_probe_timer
+                    var:asp_next_review_date = root.var:asp_test_probe_review
+                }
+                debug_log = "ASP_PROBE CORE SAVE_LOAD_STATE PASS"
+            }
+            else = { debug_log = "ASP_PROBE CORE SAVE_LOAD_STATE FAIL" }
+        }
+    }
+}
+
+# Suite entry. Inspect eight choices, then invoke .20 for C02/C03 preparation.
+asp_test_core.1 = {
+    type = character_event
+    hidden = yes
+    immediate = {
+        asp_test_c01_effect = yes
+        asp_open_management_effect = yes
+    }
+}
+
+# Resolution measurement and two distinct same-family management instances.
+asp_test_core.20 = {
+    type = character_event
+    hidden = yes
+    immediate = {
+        asp_test_c02_effect = yes
+        debug_log = "ASP_TEST C03 BEGIN"
+        set_variable = { name = asp_test_terminal_callbacks value = 0 }
+        asp_test_create_story_effect = { CLASS = ambition }
+        set_variable = { name = asp_test_first_story value = scope:asp_new_story }
+        scope:asp_new_story = {
+            set_variable = { name = asp_test_first_unchanged value = yes }
+            story_owner = {
+                set_variable = { name = asp_test_first_target value = prev.var:asp_target }
+                set_variable = { name = asp_test_first_id value = prev.var:asp_instance_id }
+                set_variable = { name = asp_test_first_origin value = prev.var:asp_origin_date }
+                set_variable = { name = asp_test_first_review value = prev.var:asp_next_review_date }
+            }
+        }
+        asp_test_create_story_effect = { CLASS = ambition }
+        set_variable = { name = asp_test_second_story value = scope:asp_new_story }
+        set_variable = { name = asp_test_stale_stress value = stress }
+        asp_open_management_effect = yes
+    }
+}
+
+# Invoke from console only after selecting the second instance in the real selector.
+asp_test_core.4 = {
+    type = character_event
+    hidden = yes
+    immediate = {
+        debug_log = "ASP_TEST C03 SECOND CALLBACK"
+        var:asp_test_second_story ?= {
+            asp_resolve_story_effect = { OUTCOME = impossible REWARDS = none }
+        }
+    }
+}
+
+# Click the old Abandon action, then invoke this exact-state assertion.
+asp_test_core.3 = {
+    type = character_event
+    hidden = yes
+    immediate = {
+        if = {
+            limit = {
+                asp_active_ambitions = 1
+                asp_active_desires = 0
+                var:asp_test_terminal_callbacks = 1
+                stress = var:asp_test_stale_stress
+                NOT = { exists = var:asp_test_second_story }
+                var:asp_test_first_story = {
+                    asp_is_active_story_trigger = yes
+                    var:asp_target = root.var:asp_test_first_target
+                    var:asp_instance_id = root.var:asp_test_first_id
+                    var:asp_origin_date = root.var:asp_test_first_origin
+                    var:asp_next_review_date = root.var:asp_test_first_review
+                    has_variable = asp_test_first_unchanged
+                }
+            }
+            debug_log = "ASP_TEST C03 PASS: first exact state retained stale second action has no cost"
+        }
+        else = { debug_log = "ASP_TEST C03 FAIL: stale action changed a live story or reward" }
+    }
+}
+
+# Run only after saving and loading the post-C03 campaign through native UI.
+asp_test_core.2 = {
+    type = character_event
+    hidden = yes
+    immediate = {
+        debug_log = "ASP_TEST C04 BEGIN"
+        if = {
+            limit = {
+                asp_active_ambitions = 1
+                var:asp_test_first_story = {
+                    asp_is_active_story_trigger = yes
+                    var:asp_target = root.var:asp_test_first_target
+                    var:asp_instance_id = root.var:asp_test_first_id
+                    var:asp_origin_date = root.var:asp_test_first_origin
+                    var:asp_next_review_date = root.var:asp_test_first_review
+                }
+            }
+            debug_log = "ASP_TEST C04 PASS: target instance_id origin next_review retained"
+        }
+        else = { debug_log = "ASP_TEST C04 FAIL: saved identity or dates changed" }
+    }
+}
+
+# Additional contract regressions; run .21 before and after the review fixes.
+asp_test_core.21 = {
+    type = character_event
+    hidden = yes
+    immediate = { asp_test_c09_c10_effect = yes }
+}
+
+# Ineligible-owner negative uses the same native assertion as the registered runner.
+asp_test_core.22 = {
+    type = character_event
+    hidden = yes
+    immediate = { asp_test_c11_effect = yes }
+}

@@ -1,0 +1,29 @@
+﻿asp_has_known_family_trigger = {
+    OR = {
+        var:asp_family = flag:vengeance
+        var:asp_family = flag:holding_recovery
+        var:asp_family = flag:personal_bond
+    }
+}
+
+asp_is_active_story_trigger = {
+    has_variable = asp_schema
+    var:asp_schema = 1
+    has_variable = asp_instance_id
+    exists = var:asp_owner
+    var:asp_owner = story_owner
+    exists = var:asp_target
+    asp_has_known_family_trigger = yes
+    OR = { var:asp_class = flag:ambition var:asp_class = flag:desire }
+    NOT = { has_variable = asp_resolved }
+}
+
+asp_can_manage_story_trigger = {
+    asp_is_active_story_trigger = yes
+    NOT = { has_variable = asp_suspended }
+    story_owner = { is_alive = yes is_ai = no }
+}
+
+asp_story_review_due_trigger = {
+    asp_time_until_review_days <= 0
+}

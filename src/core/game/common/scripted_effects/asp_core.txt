@@ -1,0 +1,205 @@
+﻿# Called on the direct create_story reference, before any interpretation event.
+asp_initialize_story_effect = {
+    if = {
+        limit = { NOT = { has_variable = asp_schema } }
+        set_variable = { name = asp_family value = flag:$FAMILY$ }
+        set_variable = { name = asp_class value = flag:$CLASS$ }
+        save_scope_as = asp_initializing_story
+        if = {
+            limit = {
+                asp_has_known_family_trigger = yes
+                exists = $TARGET$
+                story_owner = {
+                    is_alive = yes
+                    is_ai = no
+                    is_adult = yes
+                    is_ruler = yes
+                    is_landed = yes
+                    OR = {
+                        AND = {
+                            scope:asp_initializing_story = { var:asp_class = flag:ambition }
+                            asp_active_ambitions < asp_ambition_cap
+                        }
+                        AND = {
+                            scope:asp_initializing_story = { var:asp_class = flag:desire }
+                            asp_active_desires < asp_desire_cap
+                        }
+                    }
+                    NOT = {
+                        any_owned_story = {
+                            asp_is_active_story_trigger = yes
+                            var:asp_family = scope:asp_initializing_story.var:asp_family
+                            var:asp_target = $TARGET$
+                        }
+                    }
+                }
+            }
+            set_variable = { name = asp_schema value = 1 }
+            set_variable = { name = asp_owner value = story_owner }
+            set_variable = { name = asp_target value = $TARGET$ }
+            story_owner = {
+                if = {
+                    limit = { NOT = { has_variable = asp_next_instance_id } }
+                    set_variable = { name = asp_next_instance_id value = 0 }
+                }
+                change_variable = { name = asp_next_instance_id add = 1 }
+            }
+            set_variable = { name = asp_instance_id value = story_owner.var:asp_next_instance_id }
+            set_variable = { name = asp_origin_date value = current_date }
+            set_variable = { name = asp_next_review_date value = { value = current_date add = asp_initial_review_days } }
+        }
+        else = {
+            debug_log = "ASP_DIAGNOSTIC aspiration initialization rejected: owner family class target duplicate or capacity"
+            end_story = yes
+        }
+    }
+}
+
+# Sole terminal payout entry. Reentrant callbacks see the latch before any consequences.
+asp_resolve_story_effect = {
+    if = {
+        limit = { asp_is_active_story_trigger = yes }
+        set_variable = { name = asp_outcome value = flag:$OUTCOME$ }
+        set_variable = { name = asp_reward_policy value = flag:$REWARDS$ }
+        # Option descriptions evaluate limits before the setters above run.
+        if = {
+            limit = { has_variable = asp_outcome has_variable = asp_reward_policy }
+            if = {
+                limit = {
+                    OR = {
+                        var:asp_outcome = flag:fulfilled
+                        var:asp_outcome = flag:abandoned
+                        var:asp_outcome = flag:forgiven
+                        var:asp_outcome = flag:impossible
+                        var:asp_outcome = flag:owner_dead
+                    }
+                    OR = { var:asp_reward_policy = flag:normal var:asp_reward_policy = flag:none }
+                }
+                set_variable = { name = asp_resolved value = yes }
+                if = {
+                    limit = {
+                        OR = {
+                            has_variable = asp_suspended
+                            story_owner = { is_alive = no }
+                            story_owner = { is_ai = yes }
+                        }
+                    }
+                    set_variable = { name = asp_reward_policy value = flag:none }
+                }
+                if = {
+                    limit = { var:asp_reward_policy = flag:normal }
+                    if = {
+                        limit = { var:asp_outcome = flag:fulfilled }
+                        save_scope_value_as = { name = asp_terminal_stress value = asp_fulfillment_stress }
+                        story_owner = { add_stress = scope:asp_terminal_stress }
+                    }
+                    else_if = {
+                        limit = { OR = { var:asp_outcome = flag:abandoned var:asp_outcome = flag:forgiven } }
+                        save_scope_value_as = { name = asp_terminal_stress value = asp_abandonment_stress }
+                        story_owner = { add_stress = scope:asp_terminal_stress }
+                    }
+                }
+                if = {
+                    limit = { var:asp_reward_policy = flag:normal }
+                    asp_family_resolve_effect = { OUTCOME = $OUTCOME$ REWARDS = normal }
+                }
+                else = { asp_family_resolve_effect = { OUTCOME = $OUTCOME$ REWARDS = none } }
+                end_story = yes
+            }
+            else = {
+                remove_variable = asp_outcome
+                remove_variable = asp_reward_policy
+                debug_log = "ASP_DIAGNOSTIC unknown resolution policy rejected"
+            }
+        }
+    }
+    else_if = {
+        limit = { NOT = { has_variable = asp_resolved } }
+        debug_log = "ASP_DIAGNOSTIC unknown schema or family resolution rejected without payout"
+    }
+}
+
+asp_refresh_story_effect = {
+    if = {
+        limit = { asp_is_active_story_trigger = yes }
+        if = {
+            limit = { story_owner = { is_alive = no } }
+            asp_resolve_story_effect = { OUTCOME = owner_dead REWARDS = none }
+        }
+        else_if = {
+            limit = { story_owner = { is_ai = yes } }
+            set_variable = { name = asp_suspended value = yes }
+        }
+        else = {
+            # Return/pledge/progress precedence is completed and tested by Task 4.
+            remove_variable = asp_suspended
+            asp_family_check_progress_effect = yes
+        }
+    }
+    else_if = {
+        limit = { NOT = { has_variable = asp_resolved } }
+        debug_log = "ASP_DIAGNOSTIC invalid aspiration retired without payout"
+        end_story = yes
+    }
+}
+
+asp_abandon_selected_story_effect = {
+    scope:asp_selected_story ?= {
+        if = {
+            limit = { asp_can_manage_story_trigger = yes story_owner = root }
+            asp_resolve_story_effect = { OUTCOME = abandoned REWARDS = normal }
+        }
+    }
+}
+
+# All displayed references belong to the current event chain, never the character.
+asp_open_management_effect = {
+    if = {
+        limit = { is_alive = yes is_ai = no }
+        clear_saved_scope = asp_selected_story
+        clear_saved_scope = asp_choice_1
+        clear_saved_scope = asp_choice_2
+        clear_saved_scope = asp_choice_3
+        clear_saved_scope = asp_choice_4
+        clear_saved_scope = asp_choice_5
+        clear_saved_scope = asp_choice_6
+        clear_saved_scope = asp_choice_7
+        clear_saved_scope = asp_choice_8
+        every_owned_story = {
+            limit = { asp_can_manage_story_trigger = yes }
+            if = {
+                limit = { NOT = { exists = scope:asp_choice_1 } }
+                save_scope_as = asp_choice_1
+            }
+            else_if = {
+                limit = { NOT = { exists = scope:asp_choice_2 } }
+                save_scope_as = asp_choice_2
+            }
+            else_if = {
+                limit = { NOT = { exists = scope:asp_choice_3 } }
+                save_scope_as = asp_choice_3
+            }
+            else_if = {
+                limit = { NOT = { exists = scope:asp_choice_4 } }
+                save_scope_as = asp_choice_4
+            }
+            else_if = {
+                limit = { NOT = { exists = scope:asp_choice_5 } }
+                save_scope_as = asp_choice_5
+            }
+            else_if = {
+                limit = { NOT = { exists = scope:asp_choice_6 } }
+                save_scope_as = asp_choice_6
+            }
+            else_if = {
+                limit = { NOT = { exists = scope:asp_choice_7 } }
+                save_scope_as = asp_choice_7
+            }
+            else_if = {
+                limit = { NOT = { exists = scope:asp_choice_8 } }
+                save_scope_as = asp_choice_8
+            }
+        }
+        trigger_event = asp_management.1
+    }
+}

@@ -5,6 +5,13 @@ import tempfile
 from pathlib import Path
 
 MARKER = "ASP_AUTOMATION|"
+CORE_FIELDS = (
+    "c01", "c01_ambitions", "c01_desires", "c01_rejected",
+    "c02", "c02_before", "c02_delta", "c02_callbacks", "c02_slots_before", "c02_slots_after",
+    "c09", "c09_delta", "c09_expected",
+    "c10", "c10_delta", "c10_policy_none",
+    "c11", "c11_landless", "c11_ai", "c11_active",
+)
 
 
 class ProtocolError(RuntimeError):
@@ -41,8 +48,9 @@ def atomic_request(root, target, text):
 
 
 class Telemetry:
-    def __init__(self, session, request):
+    def __init__(self, session, request, operation=None):
         self.session, self.request = session, request
+        self.operation = operation
         self.buffer = b""
         self.terminal = None
 
@@ -67,7 +75,10 @@ class Telemetry:
                 result = {"version": version, "session": session, "request": request, "kind": fields[3]}
                 for field in fields[4:]:
                     key, value = field.split("=", 1)
-                    if key in result or key not in ("counter", "date", "reason"):
+                    allowed = {"counter", "date", "reason"}
+                    if self.operation == "core_regression":
+                        allowed.update(CORE_FIELDS)
+                    if key in result or key not in allowed:
                         raise ValueError("Invalid or duplicate field")
                     if key != "reason" and not re.fullmatch(r"-?\d+(?:\.0+)?", value):
                         raise ValueError("Non-integral measurement")
@@ -75,7 +86,10 @@ class Telemetry:
                 if result["kind"] == "ERROR":
                     raise ProtocolError("Native request rejected: " + result.get("reason", "unknown"))
                 if result["kind"] == "DONE":
-                    if set(result) != {"version", "session", "request", "kind", "counter", "date"}:
+                    required = {"version", "session", "request", "kind", "counter", "date"}
+                    if self.operation == "core_regression":
+                        required.update(CORE_FIELDS)
+                    if set(result) != required:
                         raise ValueError("Incomplete measured terminal")
                     if self.terminal is not None:
                         if self.terminal != result:

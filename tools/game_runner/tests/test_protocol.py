@@ -44,6 +44,30 @@ class ProtocolTests(unittest.TestCase):
         data += b"ASP_AUTOMATION|1|123|2|DONE|counter=7|date=43001\n"
         self.assertEqual(self.parser.feed(data)[-1]["date"], 43001)
 
+    def test_core_terminal_requires_complete_identity_bound_measurements(self):
+        fields = {
+            "counter": 0, "date": 43000,
+            "c01": 1, "c01_ambitions": 3, "c01_desires": 5, "c01_rejected": 1,
+            "c02": 1, "c02_before": 50, "c02_delta": -20, "c02_callbacks": 1,
+            "c02_slots_before": 1, "c02_slots_after": 0,
+            "c09": 1, "c09_delta": 10, "c09_expected": 10,
+            "c10": 1, "c10_delta": 0, "c10_policy_none": 1,
+            "c11": 1, "c11_landless": 1, "c11_ai": 1, "c11_active": 0,
+        }
+        line = "ASP_AUTOMATION|1|123|2|DONE|" + "|".join(f"{key}={value}" for key, value in fields.items()) + "\n"
+        parser = Telemetry(123, 2, operation="core_regression")
+        self.assertEqual(parser.feed(line.replace("|123|2|", "|122|2|").encode()), [])
+        self.assertEqual(parser.feed(line.encode())[0]["c02_delta"], -20)
+        self.assertEqual(parser.feed(line.encode()), [])
+        with self.assertRaises(ProtocolError):
+            parser.feed(line.replace("c01_ambitions=3", "c01_ambitions=4").encode())
+        missing = Telemetry(123, 2, operation="core_regression")
+        with self.assertRaises(ProtocolError):
+            missing.feed(line.replace("|c11_active=0", "").encode())
+        wrong = Telemetry(123, 2)
+        with self.assertRaises(ProtocolError):
+            wrong.feed(line.encode())
+
     def test_log_freshness_truncation_and_rotation(self):
         with tempfile.TemporaryDirectory() as directory:
             path = Path(directory) / "debug.log"

@@ -173,6 +173,7 @@ class NativeIOBoundary:
         self.starts = 0
         self.running = False
         self.cached = None
+        self.core_fields = None
         self.pending = None
         self.fail_once = False
 
@@ -220,12 +221,27 @@ class NativeIOBoundary:
             return
         if "OP = mutate" in text:
             self.counter += 7
+        if "OP = core_regression" in text:
+            self.core_fields = {
+                "c01": 1, "c01_ambitions": 3, "c01_desires": 5, "c01_rejected": 1,
+                "c02": 1, "c02_before": 50, "c02_delta": -20, "c02_callbacks": 1,
+                "c02_slots_before": 1, "c02_slots_after": 0,
+                "c09": 1, "c09_delta": 13, "c09_expected": 13,
+                "c10": 1, "c10_delta": 0, "c10_policy_none": 1,
+                "c11": 1, "c11_landless": 1, "c11_ai": 1, "c11_active": 0,
+            }
+        if self.core_fields:
+            self.core_fields.update(getattr(self, "core_fields_override", {}))
+            self.core_fields.pop(getattr(self, "drop_core_field", ""), None)
         self.emit(log, session, request, "DONE")
 
     def emit(self, log, session, request, kind):
         line = f"ASP_AUTOMATION|1|{session}|{request}|{kind}"
         if kind == "DONE":
             line += f"|counter={self.counter}|date={self.date}"
+            if self.core_fields:
+                line += "|" + "|".join(f"{key}={value}" for key, value in self.core_fields.items())
+                self.core_fields = None
         data = (line + "\n").encode()
         with log.open("ab") as stream:
             stream.write(data)
@@ -269,6 +285,29 @@ class RunnerIOTests(unittest.TestCase):
         self.assertEqual(request.read_bytes(), b"original dedicated request content")
         self.assertEqual(list((self.root / "save games").iterdir()), [])
         self.assertFalse((self.root / ".asp-automation.lock").exists())
+
+    def test_core_regression_reports_native_cases_and_duplicate(self):
+        report = self.runner.run_scenario("core-regression")
+        self.assertEqual(report["status"], "passed")
+        run = report["runs"][0]
+        self.assertEqual(run["core"]["c01_ambitions"], 3)
+        self.assertEqual(run["core"]["c02_delta"], -20)
+        self.assertEqual(run["duplicate"], run["core"])
+        self.assertEqual({item["name"] for item in run["assertions"] if not item["passed"]}, set())
+
+    def test_core_native_failure_is_assertion_failed(self):
+        self.backend.core_fields_override = {"c01_ambitions": 4, "c01": 0}
+        report = self.runner.run_scenario("core-regression")
+        self.assertEqual(report["status"], "assertion_failed")
+        self.assertIn("C01_exact_caps_and_rejection",
+                      {item["name"] for item in report["runs"][0]["assertions"] if not item["passed"]})
+
+    def test_incomplete_core_terminal_is_transport_failure(self):
+        self.backend.drop_core_field = "c11_active"
+        report = self.runner.run_scenario("core-regression")
+        self.assertEqual(report["status"], "transport_error")
+        self.assertIn("Malformed tagged telemetry", report["error"])
+        self.assertFalse(self.backend.running)
 
     def test_staged_save_name_collision_never_deletes_existing_save(self):
         from unittest.mock import patch

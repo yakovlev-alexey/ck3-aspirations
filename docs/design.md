@@ -11,7 +11,7 @@ Approved on 2026-10-12. This living document owns product intent, language, pres
 - [Repository and distribution](repository.md)
 - [Versioned modding findings](modding-notes.md)
 
-Task 1 supplies contracts and packaging tools only. There are no implemented runtime modules and the descriptor-only bundle is not playable.
+Task 1 supplies contracts and packaging tools. Task 2 implements and verifies the core lifecycle and instance-specific management in CK3 1.20.0.4. The three gameplay families, scheduled reviews, pledges and integrated reward paths remain assigned to later stages; the current core-only bundle is a development prototype.
 
 ## Purpose and scope
 

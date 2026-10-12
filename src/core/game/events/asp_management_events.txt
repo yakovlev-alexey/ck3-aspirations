@@ -1,0 +1,246 @@
+﻿namespace = asp_management
+
+asp_management.1 = {
+    type = character_event
+    window = big_event_window
+    title = asp_management_title
+    desc = asp_management_desc
+    theme = stewardship
+    option = {
+        name = {
+            trigger = { scope:asp_choice_1 = { var:asp_family = flag:holding_recovery } }
+            text = asp_choice_1_county
+        }
+        name = {
+            trigger = { scope:asp_choice_1 = { var:asp_class = flag:ambition NOT = { var:asp_family = flag:holding_recovery } } }
+            text = asp_choice_1_ambition
+        }
+        name = {
+            trigger = { scope:asp_choice_1 = { var:asp_class = flag:desire NOT = { var:asp_family = flag:holding_recovery } } }
+            text = asp_choice_1_desire
+        }
+        trigger = { exists = scope:asp_choice_1 }
+        hidden_effect = {
+            scope:asp_choice_1 ?= {
+                if = {
+                    limit = { asp_can_manage_story_trigger = yes story_owner = root }
+                    save_scope_as = asp_selected_story
+                    story_owner = { trigger_event = asp_management.2 }
+                }
+            }
+        }
+    }
+
+    option = {
+        name = {
+            trigger = { scope:asp_choice_2 = { var:asp_family = flag:holding_recovery } }
+            text = asp_choice_2_county
+        }
+        name = {
+            trigger = { scope:asp_choice_2 = { var:asp_class = flag:ambition NOT = { var:asp_family = flag:holding_recovery } } }
+            text = asp_choice_2_ambition
+        }
+        name = {
+            trigger = { scope:asp_choice_2 = { var:asp_class = flag:desire NOT = { var:asp_family = flag:holding_recovery } } }
+            text = asp_choice_2_desire
+        }
+        trigger = { exists = scope:asp_choice_2 }
+        hidden_effect = {
+            scope:asp_choice_2 ?= {
+                if = {
+                    limit = { asp_can_manage_story_trigger = yes story_owner = root }
+                    save_scope_as = asp_selected_story
+                    story_owner = { trigger_event = asp_management.2 }
+                }
+            }
+        }
+    }
+
+    option = {
+        name = {
+            trigger = { scope:asp_choice_3 = { var:asp_family = flag:holding_recovery } }
+            text = asp_choice_3_county
+        }
+        name = {
+            trigger = { scope:asp_choice_3 = { var:asp_class = flag:ambition NOT = { var:asp_family = flag:holding_recovery } } }
+            text = asp_choice_3_ambition
+        }
+        name = {
+            trigger = { scope:asp_choice_3 = { var:asp_class = flag:desire NOT = { var:asp_family = flag:holding_recovery } } }
+            text = asp_choice_3_desire
+        }
+        trigger = { exists = scope:asp_choice_3 }
+        hidden_effect = {
+            scope:asp_choice_3 ?= {
+                if = {
+                    limit = { asp_can_manage_story_trigger = yes story_owner = root }
+                    save_scope_as = asp_selected_story
+                    story_owner = { trigger_event = asp_management.2 }
+                }
+            }
+        }
+    }
+
+    option = {
+        name = {
+            trigger = { scope:asp_choice_4 = { var:asp_family = flag:holding_recovery } }
+            text = asp_choice_4_county
+        }
+        name = {
+            trigger = { scope:asp_choice_4 = { var:asp_class = flag:ambition NOT = { var:asp_family = flag:holding_recovery } } }
+            text = asp_choice_4_ambition
+        }
+        name = {
+            trigger = { scope:asp_choice_4 = { var:asp_class = flag:desire NOT = { var:asp_family = flag:holding_recovery } } }
+            text = asp_choice_4_desire
+        }
+        trigger = { exists = scope:asp_choice_4 }
+        hidden_effect = {
+            scope:asp_choice_4 ?= {
+                if = {
+                    limit = { asp_can_manage_story_trigger = yes story_owner = root }
+                    save_scope_as = asp_selected_story
+                    story_owner = { trigger_event = asp_management.2 }
+                }
+            }
+        }
+    }
+
+    option = {
+        name = {
+            trigger = { scope:asp_choice_5 = { var:asp_family = flag:holding_recovery } }
+            text = asp_choice_5_county
+        }
+        name = {
+            trigger = { scope:asp_choice_5 = { var:asp_class = flag:ambition NOT = { var:asp_family = flag:holding_recovery } } }
+            text = asp_choice_5_ambition
+        }
+        name = {
+            trigger = { scope:asp_choice_5 = { var:asp_class = flag:desire NOT = { var:asp_family = flag:holding_recovery } } }
+            text = asp_choice_5_desire
+        }
+        trigger = { exists = scope:asp_choice_5 }
+        hidden_effect = {
+            scope:asp_choice_5 ?= {
+                if = {
+                    limit = { asp_can_manage_story_trigger = yes story_owner = root }
+                    save_scope_as = asp_selected_story
+                    story_owner = { trigger_event = asp_management.2 }
+                }
+            }
+        }
+    }
+
+    option = {
+        name = {
+            trigger = { scope:asp_choice_6 = { var:asp_family = flag:holding_recovery } }
+            text = asp_choice_6_county
+        }
+        name = {
+            trigger = { scope:asp_choice_6 = { var:asp_class = flag:ambition NOT = { var:asp_family = flag:holding_recovery } } }
+            text = asp_choice_6_ambition
+        }
+        name = {
+            trigger = { scope:asp_choice_6 = { var:asp_class = flag:desire NOT = { var:asp_family = flag:holding_recovery } } }
+            text = asp_choice_6_desire
+        }
+        trigger = { exists = scope:asp_choice_6 }
+        hidden_effect = {
+            scope:asp_choice_6 ?= {
+                if = {
+                    limit = { asp_can_manage_story_trigger = yes story_owner = root }
+                    save_scope_as = asp_selected_story
+                    story_owner = { trigger_event = asp_management.2 }
+                }
+            }
+        }
+    }
+
+    option = {
+        name = {
+            trigger = { scope:asp_choice_7 = { var:asp_family = flag:holding_recovery } }
+            text = asp_choice_7_county
+        }
+        name = {
+            trigger = { scope:asp_choice_7 = { var:asp_class = flag:ambition NOT = { var:asp_family = flag:holding_recovery } } }
+            text = asp_choice_7_ambition
+        }
+        name = {
+            trigger = { scope:asp_choice_7 = { var:asp_class = flag:desire NOT = { var:asp_family = flag:holding_recovery } } }
+            text = asp_choice_7_desire
+        }
+        trigger = { exists = scope:asp_choice_7 }
+        hidden_effect = {
+            scope:asp_choice_7 ?= {
+                if = {
+                    limit = { asp_can_manage_story_trigger = yes story_owner = root }
+                    save_scope_as = asp_selected_story
+                    story_owner = { trigger_event = asp_management.2 }
+                }
+            }
+        }
+    }
+
+    option = {
+        name = {
+            trigger = { scope:asp_choice_8 = { var:asp_family = flag:holding_recovery } }
+            text = asp_choice_8_county
+        }
+        name = {
+            trigger = { scope:asp_choice_8 = { var:asp_class = flag:ambition NOT = { var:asp_family = flag:holding_recovery } } }
+            text = asp_choice_8_ambition
+        }
+        name = {
+            trigger = { scope:asp_choice_8 = { var:asp_class = flag:desire NOT = { var:asp_family = flag:holding_recovery } } }
+            text = asp_choice_8_desire
+        }
+        trigger = { exists = scope:asp_choice_8 }
+        hidden_effect = {
+            scope:asp_choice_8 ?= {
+                if = {
+                    limit = { asp_can_manage_story_trigger = yes story_owner = root }
+                    save_scope_as = asp_selected_story
+                    story_owner = { trigger_event = asp_management.2 }
+                }
+            }
+        }
+    }
+    option = { name = asp_close }
+}
+
+asp_management.2 = {
+    type = character_event
+    window = big_event_window
+    title = asp_management_selected_title
+    desc = {
+        first_valid = {
+            triggered_desc = {
+                trigger = {
+                    scope:asp_selected_story ?= { asp_can_manage_story_trigger = yes var:asp_family = flag:holding_recovery }
+                }
+                desc = asp_management_selected_county_desc
+            }
+            triggered_desc = {
+                trigger = { scope:asp_selected_story ?= { asp_can_manage_story_trigger = yes } }
+                desc = asp_management_selected_character_desc
+            }
+            desc = asp_management_closed_desc
+        }
+    }
+    theme = stewardship
+    option = {
+        name = asp_abandon
+        if = {
+            limit = { scope:asp_selected_story ?= { asp_can_manage_story_trigger = yes story_owner = root } }
+            custom_tooltip = asp_abandon_cost
+            show_as_tooltip = {
+                scope:asp_selected_story = {
+                    save_scope_value_as = { name = asp_preview_release_stress value = asp_abandonment_stress }
+                    story_owner = { add_stress = scope:asp_preview_release_stress }
+                }
+            }
+        }
+        hidden_effect = { asp_abandon_selected_story_effect = yes }
+    }
+    option = { name = asp_back hidden_effect = { asp_open_management_effect = yes } }
+}

@@ -156,7 +156,7 @@ class GameRunner:
         else:
             effect = f"asp_test_automation_request_effect = {{ VERSION = 1 SESSION = {session} REQUEST = {request} OP = {operation} DAYS = {days} }}"
         cursor = LogCursor(self.config.user_data / "logs" / "debug.log")
-        parser = Telemetry(session, request)
+        parser = Telemetry(session, request, operation=operation)
         atomic_request(self.request_root, self.request_path, "hidden_effect = { " + effect + " }\n")
         self.backend.command("run asp_automation_request.txt")
         if operation == "advance" and not replay:
@@ -204,8 +204,8 @@ class GameRunner:
         return self._report_operation("advance", days)
 
     def run_scenario(self, name, repeat=1):
-        if name != "automation-smoke" or type(repeat) is not int or not 1 <= repeat <= 10:
-            raise ValueError("Only automation-smoke with repeat 1 through 10 is implemented")
+        if name not in ("automation-smoke", "core-regression") or type(repeat) is not int or not 1 <= repeat <= 10:
+            raise ValueError("Only registered scenarios with repeat 1 through 10 are implemented")
         if not self.flight.acquire(blocking=False):
             return {"status": "transport_error", "error": "Concurrent operation rejected"}
         self.run_directory = None
@@ -216,6 +216,26 @@ class GameRunner:
                 self.session = None
                 self._start()
                 initial = self._send("observe")
+                if name == "core-regression":
+                    core = self._send("core_regression")
+                    duplicate = self._send("core_regression", replay=True)
+                    assertions = [
+                        {"name": "C01_exact_caps_and_rejection", "passed": core["c01"] == 1 and core["c01_ambitions"] == 3 and core["c01_desires"] == 5 and core["c01_rejected"] == 1},
+                        {"name": "C02_exactly_once_stress_and_slot", "passed": core["c02"] == 1 and core["c02_before"] > 20 and core["c02_delta"] == -20 and core["c02_callbacks"] == 1 and core["c02_slots_before"] == 1 and core["c02_slots_after"] == 0},
+                        {"name": "C09_forgiveness_cost", "passed": core["c09"] == 1 and core["c09_delta"] == core["c09_expected"]},
+                        {"name": "C10_suspended_policy", "passed": core["c10"] == 1 and core["c10_delta"] == 0 and core["c10_policy_none"] == 1},
+                        {"name": "C11_ineligible_AI_landless", "passed": core["c11"] == 1 and core["c11_landless"] == 1 and core["c11_ai"] == 1 and core["c11_active"] == 0},
+                        {"name": "duplicate_identity_and_measurements", "passed": duplicate == core},
+                        {"name": "same_baseline_date", "passed": not report["runs"] or initial["date"] == report["runs"][0]["initial"]["date"]},
+                        {"name": "fresh_session", "passed": all(initial["session"] != run["initial"]["session"] for run in report["runs"])},
+                        {"name": "baseline_unchanged", "passed": hashlib.sha256(self.config.baseline_save.read_bytes()).hexdigest() == self.baseline_hash},
+                    ]
+                    run = {"index": index, "initial": initial, "core": core, "duplicate": duplicate, "assertions": assertions, "logs": self._snapshot_logs(index)}
+                    report["runs"].append(run)
+                    if not all(item["passed"] for item in assertions):
+                        report["status"] = "assertion_failed"
+                        break
+                    continue
                 mutation = self._send("mutate")
                 duplicate = self._send("mutate", replay=True)
                 observed = self._send("observe")

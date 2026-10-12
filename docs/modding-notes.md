@@ -23,15 +23,15 @@ These are implementation obligations, not verified runtime findings:
 
 - Read-side knowledge of a killer must be verified independently of a hidden engine killer reference. No omniscient fallback.
 - Construction start/completion must prove player payment and continuous county ownership; holder substitution is insufficient.
-- Saved calendar dates, exact deadline comparisons and elapsed age through save/load/suspension require a minimal dev probe.
-- Event-held story references must keep the chosen instance through subsequent options and stale-event attempts.
-- Additive native on-actions and visible story entries must be observed in-game before accepting their use.
+- Exact deadline comparisons and elapsed age through suspension still require Task 4 native boundary fixtures; Task 2 proved numeric initial dates and core save/load.
+- Later family events must keep the chosen story reference through their own options; Task 2 proved core event-held selection and stale-action rejection.
+- Additive native on-actions for natural causes remain to be observed in-game; Task 2 observed core story entries in the Situations panel.
 
 The initial repository-bootstrap task did not launch CK3 or pass a native gameplay fixture. Later automation findings are documented below; they do not certify unrelated gameplay. Durable findings include game version, game-relative source reference, probe and observed result. Machine paths, saves, backups, logs, screenshots and transient attempts belong in ignored `.local/MODLOG.md`.
 
 ## Verified console-file automation — CK3 1.20.0.4 Crozier
 
-A real one-command smoke ran three fresh owned processes from the same disposable baseline, measured its private counter 0→7 once despite replaying request 3, and observed native `current_date` 430243→430244 after `tick_day 1`. These are automation fixture findings, not evidence for unfinished core gameplay.
+A real one-command smoke ran three fresh owned processes from the same disposable baseline, measured its private counter 0→7 once despite replaying request 3, and observed native `current_date` 430243→430244 after `tick_day 1`. These are automation fixture findings; Task 2 core gameplay was accepted separately through the later core-regression and UI/save-load evidence.
 
 Installed `game/_commandline_options.info` documents `-loadsave=<name>`. On this host an absolute baseline path was rejected with `Could not load save game`; placing a uniquely named disposable `.ck3` copy under selected user-data `save games/` and supplying its filename loaded directly into the intended paused campaign. `-suppress_error_log` prevents auto-opening the log and still writes error.log. No menu navigation is needed between repeated launches.
 
@@ -48,8 +48,12 @@ Generated script docs in the disposable test record show `is_landed` requires a 
 
 A direct `create_story` saved reference survived an event option and actual native save/load. In the loaded campaign, a one-day tick changed the numeric `current_date` delta by exactly one while retaining the captured target, origin, next review and timed-variable state. Native serialized durations for `months = 24` and `years = 8` were 720 and 2920 days. The core stores origin and next review as numeric date values using these measured initial durations. Full scheduled-review and pledge boundary behavior remains assigned to Task 4.
 
-The scope/calendar probe emitted `ASP_PROBE CORE EVENT_SCOPE PASS`, `CALENDAR_DAY PASS`, and `SAVE_LOAD_STATE PASS` in the recorded fresh intervals. These markers prove the primitive capabilities, not C01–C04 core gameplay. UI presentation, terminal callbacks, count caps and core-instance reload remain pending their own live fixtures.
+The scope/calendar probe emitted `ASP_PROBE CORE EVENT_SCOPE PASS`, `CALENDAR_DAY PASS`, and `SAVE_LOAD_STATE PASS` in the recorded fresh intervals. These markers prove the primitive capabilities, not C01–C04 core gameplay. Task 2 later verified UI presentation, terminal callbacks, class caps, stale-action protection and real core-instance reload through the fixtures and evidence listed in the Task 2 report. Full P01 review and pledge boundaries remain Task 4.
 
 Automation safety review found real-profile `game.autosave=YEARLY`; October1→2 smoke does not certify autosave behavior across arbitrary boundaries. The runner now uses a read-only structural preflight requiring `NO_AUTOSAVE` and actual redirected Windows Documents user data before launch. It has no verified alternate-profile flag and does not automatically edit settings. Keep any short-test preference backup/restoration targeted to this field; never probe preservation by overwriting real autosaves.
 
 CK3 1.20.0.4 native Settings → Game → Autosave Interval → No Autosave persists `game.autosave.value="NO_AUTOSAVE"`. `NEVER` is not a valid enum: debug.log reports a fallback to YEARLY. Automation checks the accepted enum before launch, after startup and before input, including retained-session day advancement. Keep the preference disabled until the owned game closes, then restore only the captured original field.
+
+## Task 2 native story-card localization — CK3 1.20.0.4 Crozier
+
+The visible `asp_core_debug` story cycle rendered its name from `asp_core_debug` and also requested the implicit `asp_core_debug_desc` key in the Situations story card. A separate `visualization.custom_string_key` supplied card body text but did not replace this implicit description; without the key, the card displayed the raw identifier even though `error.log` had no missing-localization line. Dev fixture localization now defines both keys. `tools/game_runner/tests/test_core_fixture_localization.py` checks the static contract; a native card screenshot remains necessary to verify rendering. New family story cycles must define their matching `<type>_desc` key.

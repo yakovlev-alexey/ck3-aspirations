@@ -1,0 +1,20 @@
+﻿namespace = asp_core
+
+# The scheduled-review presentation is allocated here; Task 4 supplies due dispatch and choices.
+asp_core.1 = {
+    type = character_event
+    title = asp_core_review_title
+    desc = asp_core_review_desc
+    theme = stewardship
+    option = {
+        name = asp_core_review_return
+        hidden_effect = {
+            scope:asp_selected_story ?= {
+                if = {
+                    limit = { asp_can_manage_story_trigger = yes story_owner = root }
+                    story_owner = { trigger_event = asp_management.2 }
+                }
+            }
+        }
+    }
+}

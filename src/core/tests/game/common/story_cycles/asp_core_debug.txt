@@ -1,0 +1,30 @@
+﻿asp_core_debug = {
+    visible = yes
+    icon = { reference = "gfx/interface/icons/pets/artifact_cat_black.dds" }
+    visualization = {
+        character = { variable_name = "asp_target" label = "asp_target_label" }
+        custom_string_key = "asp_debug_story_information"
+    }
+    on_setup = {
+        story_owner = {
+            if = {
+                limit = { NOT = { has_variable = asp_test_terminal_callbacks } }
+                set_variable = { name = asp_test_terminal_callbacks value = 0 }
+            }
+        }
+    }
+    on_end = {
+        if = {
+            limit = { has_variable = asp_resolved }
+            story_owner = {
+                change_variable = { name = asp_test_terminal_callbacks add = 1 }
+                set_variable = { name = asp_test_ending_stress value = stress }
+                set_variable = { name = asp_test_ending_reward_policy value = prev.var:asp_reward_policy }
+            }
+            # Reentrant terminal callback while the ending instance is still in scope.
+            # The latch must reject this before any second payout or end_story.
+            asp_resolve_story_effect = { OUTCOME = fulfilled REWARDS = normal }
+        }
+    }
+    on_owner_death = { asp_resolve_story_effect = { OUTCOME = owner_dead REWARDS = none } }
+}

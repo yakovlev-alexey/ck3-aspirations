@@ -10,7 +10,7 @@ def main():
     parser.add_argument("--config", required=True)
     commands = parser.add_subparsers(dest="command", required=True)
     scenario = commands.add_parser("run")
-    scenario.add_argument("scenario", choices=["automation-smoke"])
+    scenario.add_argument("scenario", choices=["automation-smoke", "core-regression"])
     scenario.add_argument("--repeat", type=int, default=1, choices=range(1, 11))
     commands.add_parser("observe")
     commands.add_parser("mcp", help="Serve MCP 2025-11-25 over local stdio")

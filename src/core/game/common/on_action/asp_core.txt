@@ -1,0 +1,34 @@
+﻿on_player_character_change = { on_actions = { asp_player_character_change } }
+asp_player_character_change = {
+    effect = {
+        scope:previous_player_character ?= {
+            every_owned_story = {
+                limit = { asp_is_active_story_trigger = yes }
+                set_variable = { name = asp_suspended value = yes }
+            }
+        }
+        every_owned_story = {
+            limit = { has_variable = asp_schema }
+            asp_refresh_story_effect = yes
+        }
+    }
+}
+on_death = { on_actions = { asp_owner_death } }
+asp_owner_death = {
+    effect = {
+        every_owned_story = {
+            limit = { asp_is_active_story_trigger = yes }
+            asp_resolve_story_effect = { OUTCOME = owner_dead REWARDS = none }
+        }
+    }
+}
+quarterly_playable_pulse = { on_actions = { asp_quarterly_maintenance } }
+asp_quarterly_maintenance = {
+    trigger = { is_ai = no }
+    effect = {
+        every_owned_story = {
+            limit = { has_variable = asp_schema }
+            asp_refresh_story_effect = yes
+        }
+    }
+}
