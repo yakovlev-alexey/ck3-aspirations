@@ -1,0 +1,69 @@
+﻿# Independent fixture; never calls unfinished gameplay core.
+asp_test_automation_complete_effect = {
+    set_variable = { name = asp_test_automation_result_counter value = var:asp_test_automation_counter }
+    set_variable = { name = asp_test_automation_result_date value = current_date }
+    if = {
+        limit = { has_variable = asp_test_automation_result_counter has_variable = asp_test_automation_result_date }
+        debug_log = asp_test_automation_done
+    }
+}
+
+asp_test_automation_bootstrap_effect = {
+    set_variable = { name = asp_test_automation_input_version value = $VERSION$ }
+    # Console description evaluation precedes the setter; guard its absent variable.
+    if = {
+        limit = { has_variable = asp_test_automation_input_version }
+        if = {
+            limit = { var:asp_test_automation_input_version = 1 }
+            set_variable = { name = asp_test_automation_session value = $SESSION$ }
+            set_variable = { name = asp_test_automation_request value = $REQUEST$ }
+            set_variable = { name = asp_test_automation_expected_request value = { value = $REQUEST$ add = 1 } }
+            set_variable = { name = asp_test_automation_operation value = flag:observe }
+            if = {
+                limit = { NOT = { has_variable = asp_test_automation_counter } }
+                set_variable = { name = asp_test_automation_counter value = 0 }
+            }
+            remove_variable = asp_test_automation_pending
+            asp_test_automation_complete_effect = yes
+        }
+        else = { debug_log = "ASP_AUTOMATION|1|$SESSION$|$REQUEST$|ERROR|reason=protocol_version" }
+    }
+}
+
+asp_test_automation_request_effect = {
+    set_variable = { name = asp_test_automation_input_version value = $VERSION$ }
+    if = {
+        limit = { var:asp_test_automation_input_version = 1 var:asp_test_automation_session = $SESSION$ }
+        if = {
+            limit = { var:asp_test_automation_request = $REQUEST$ }
+            if = {
+                limit = { has_variable = asp_test_automation_pending }
+                debug_log = asp_test_automation_ack
+            }
+            else = { debug_log = asp_test_automation_done }
+        }
+        else = {
+            if = {
+                limit = { var:asp_test_automation_expected_request = $REQUEST$ }
+                set_variable = { name = asp_test_automation_request value = $REQUEST$ }
+                set_variable = { name = asp_test_automation_expected_request value = { value = $REQUEST$ add = 1 } }
+                debug_log = asp_test_automation_ack
+                set_variable = { name = asp_test_automation_operation value = flag:$OP$ }
+                if = {
+                    limit = { var:asp_test_automation_operation = flag:mutate }
+                    change_variable = { name = asp_test_automation_counter add = 7 }
+                }
+                if = {
+                    limit = { var:asp_test_automation_operation = flag:advance }
+                    set_variable = asp_test_automation_pending
+                    set_variable = { name = asp_test_automation_pending_session value = var:asp_test_automation_session }
+                    set_variable = { name = asp_test_automation_pending_request value = var:asp_test_automation_request }
+                    trigger_event = { id = asp_test_automation.2 days = $DAYS$ }
+                }
+                else = { asp_test_automation_complete_effect = yes }
+            }
+            else = { debug_log = "ASP_AUTOMATION|1|$SESSION$|$REQUEST$|ERROR|reason=request_order" }
+        }
+    }
+    else = { debug_log = "ASP_AUTOMATION|1|$SESSION$|$REQUEST$|ERROR|reason=version_or_session_identity" }
+}

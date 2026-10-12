@@ -169,6 +169,12 @@ Checks verify current source versus ordered manifest/output hashes, required doc
 
 `install-dev.ps1 -UserDataPath <existing CK3 user-data directory>` rebuilds/checks dev and writes only `mod/aspirations_dev.mod` there, adding the absolute output path and distinct title without `remote_file_id`. It preserves other descriptors and does not change launcher databases or playsets. Tests register only in ignored disposable directories.
 
-## Current bootstrap state
+## Bootstrap milestone
 
-Task 1 contains contracts and tested packaging commands. It intentionally contains no empty runtime directories or runtime script placeholders. Current root builds contain only `descriptor.mod`; this proves packaging, not playability. Scenario records describe future in-game acceptance and must remain marked pending until real observations are recorded.
+The initial repository-bootstrap task supplied contracts and tested packaging commands with descriptor-only output. That milestone established packaging, not gameplay. Subsequent native implementation requires its own observed scenarios; runnable automation fixtures and their ownership are documented below.
+
+## Local game automation
+
+`tools/game_runner/` owns the Python standard-library CLI, wire/parser, Windows input adapter and its living specification. `tools/game_runner/tests/` owns automation acceptance and deterministic failure-boundary tests. Native bridge files remain in `src/core/tests/game/` and are assembled only for dev. This tool adds no player-facing runtime framework or release dependency. Its package-local `.gitignore` excludes Python caches.
+
+Keep configuration, disposable baseline copies, reports, fresh logs, screenshots and MODLOG updates under ignored `.local/automation/` or `.local/MODLOG.md`. A uniquely named save staged under selected user data is temporary runner-owned state; it is removed on close. The original baseline and all other saves remain untouched. CLI and MCP share the same exclusive ownership lock and runner. See the [runner contract](../tools/game_runner/SPEC.md) for exact commands and the host-independent configuration schema.

@@ -1,0 +1,29 @@
+﻿namespace = asp_test_automation
+
+# Stable .1 manual fixture bootstrap; the runner uses the parameterized equivalent.
+asp_test_automation.1 = {
+    type = character_event
+    hidden = yes
+    orphan = yes # Explicit console-only fixture, as in installed vanilla debug events.
+    immediate = {
+        asp_test_automation_bootstrap_effect = { VERSION = 1 SESSION = 1 REQUEST = 1 }
+        asp_test_automation_request_effect = { VERSION = 1 SESSION = 1 REQUEST = 2 OP = observe DAYS = 1 }
+    }
+}
+
+# Delayed callback. Identity and date are measured again before completion.
+asp_test_automation.2 = {
+    type = character_event
+    hidden = yes
+    immediate = {
+        if = {
+            limit = {
+                has_variable = asp_test_automation_pending
+                var:asp_test_automation_session = var:asp_test_automation_pending_session
+                var:asp_test_automation_request = var:asp_test_automation_pending_request
+            }
+            remove_variable = asp_test_automation_pending
+            asp_test_automation_complete_effect = yes
+        }
+    }
+}

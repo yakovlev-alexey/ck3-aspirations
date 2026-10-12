@@ -1,0 +1,86 @@
+# CK3 scenario automation
+
+Approved direction: the user requested implementation and verification on 2026-10-12 after reviewing console/file transport, native test helpers, measured log results and an optional thin MCP interface. This is a development tool for Aspirations, not player-facing gameplay.
+
+## Contract
+
+A Python standard-library runner controls one explicitly configured, disposable CK3 single-player session. It writes native CK3 requests atomically, asks the debug console to run the request file, reads fresh tagged telemetry and returns structured JSON. No LLM or screenshot interpretation is required between scripted scenario steps. MCP is a thin local stdio adapter over the same runner. No package installation or global agent configuration changes are included.
+
+Keep Python code and this living specification together under tools/game_runner/. Keep automation acceptance scenarios under tools/game_runner/tests/scenarios.md. Native bridge fixtures belong in src/core/tests/game/ and must be excluded from release. Story-specific tests remain beside their stories; this bridge must not certify incomplete gameplay. Existing unfinished core files are preserved, not included in automation commits.
+
+Use English throughout. Machine paths, configuration, logs, screenshots, saves and reports belong under ignored .local/. Use the existing Python runtime; standard library only. Optional screenshots may use already-installed Pillow but the command protocol and tests cannot depend on it. Do not copy AGI-CK3 code or vanilla game files. No installation-directory edits, custom GUI overrides, new loader or release dependency. Console keyboard input is authorized for short test sessions; validate the intended game process/window before each input batch, fail on focus loss, and do not drive unrelated applications.
+
+## Execution and protocol
+
+Public operations are a bounded scenario registry, observation and bounded day advancement. An initial automation-smoke scenario provides a measured state mutation, duplicate delivery, observation and date advancement. Scenario IDs and argument schemas are validated before any side effect. No arbitrary shell/effect execution API is exposed by MCP.
+
+Each request carries protocol version, unique session identity and monotonic request ID. Native handlers consume each request once and re-acknowledge duplicates without applying the effect twice. A completed result is distinct from accepted/ACK. Reject conflicting duplicate results, malformed messages and mismatched identities; ignore historical/unrelated logs. Atomic request replacement, fresh byte cursors, partial-line buffering, log rotation/truncation detection, bounded waits and single-flight execution prevent false success. A save/load rollback cannot silently turn an old request into a new mutation: establish a fresh session after reload and validate it before work.
+
+Report status as passed, assertion_failed, transport_error or timeout. Include scenario/version, request identity, initial/final measured state, elapsed game date where relevant, assertions, evidence paths and repeat count. Never claim a value observed solely because it was requested. Day advancement completes only after observing the requested date delta. Use a controlled disposable baseline. Focus loss, an unresponsive console or absent ACK/DONE stops boundedly. Generic event-window inspection and automatic event choices are not implemented; debug `tick_day` is not proof that normal simulation can proceed through every popup.
+
+Configuration explicitly identifies game executable, existing user-data directory, disposable baseline save and local output root. Resolve and validate paths; do not follow reparse points into unexpected roots or overwrite arbitrary files. Request files use a dedicated owned name and are cleaned or restored. Only exact processes launched by this runner may be stopped. Do not adopt an unrelated running CK3 session automatically. Avoid logging full launcher command lines or credentials.
+
+The runner can restart its owned game with the same baseline save to reset scenarios if an in-session load route is not verified. The three-run acceptance command must need no manual navigation after initial configuration. Save/checkpoint commands beyond that verified path are not promised. Track affected profile settings and restore only owned changes; preserve all user saves. Restore the original launcher selection (No mods) at final cleanup if the prior task's test playset remains selected, using supported UI.
+
+## Acceptance
+
+A01: one command runs automation-smoke three times from the same baseline save; measured starting state and final assertions agree across repetitions. It runs the actual game, without manual menu navigation between repetitions.
+A02: deliver one mutation request twice; both responses refer to the same identity and only one measured state change occurs.
+A03: stale/unrelated/partial/malformed telemetry, a truncated/rotated log and a conflicting result cannot create a passing report; unit tests cover these without launching CK3.
+A04: missing game, lost foreground, timeout, invalid scenario/arguments and concurrent requests produce bounded, explicit errors. The runner never types into the wrong window.
+A05: an actual day-advance request is acknowledged and completes only after the game date advances; save reload establishes a fresh session. Native observations verify real state.
+A06: the MCP server completes initialization, tools/list and tools/call over real subprocess stdin/stdout. It advertises only implemented operations; stdout contains protocol messages only. Invalid requests yield protocol/tool errors and no game input.
+A07: existing build tests and dev/release checks pass; release contains no bridge scripts, markers or automation files. Real evidence remains ignored. The final task-owned game process is stopped and affected settings/playset restored.
+
+## Current status
+
+CLI/native implementation is present. Standard-library tests and real CK3 1.20.0.4 smoke acceptance have passed; detailed final evidence is recorded in the ignored task report. MCP acceptance A06 is a separate adapter task. This fixture does not certify unfinished gameplay core.
+
+## Stable native IDs
+
+Reserve `asp_test_automation.1` for bootstrap and `asp_test_automation.2` for delayed day completion. All bridge variables/effects use `asp_test_automation_`. These IDs must never be repurposed.
+
+## Implemented Python interface
+
+`GameRunner(config)` accepts a validated `Config` or JSON configuration path. `run_scenario("automation-smoke", repeat=1)` accepts integer repeat counts 1–10. `observe()` and `advance_days(days)` lazily open an owned baseline session; days is an integer 1–30. `close()` is idempotent and returns a JSON object. Each operation returns a JSON-serializable report. Invalid scenario/argument/configuration raises `ValueError` before game input; concurrent calls return `transport_error`. Native/Windows/log failures return `transport_error`, and absent completion returns `timeout`. The CLI prints only its final JSON report and exits 0 for `passed`, 1 for operational failure, or argparse's 2 for invalid CLI arguments.
+
+A runner holds an exclusive directory lock in the selected user-data directory until `close()`. CLI and MCP must reuse this implementation, including its lock; the MCP adapter must close the runner on stdio shutdown. A stale lock is not adopted or automatically removed. Transport failure stops the exact owned process and clears its session; a later operation starts again with a new identity. Runner instances may not adopt an existing CK3 process.
+
+```json
+{
+  "game_executable": "<absolute path to ck3.exe>",
+  "user_data": "<explicit existing CK3 user-data directory>",
+  "baseline_save": "<absolute disposable baseline .ck3 path>",
+  "output_root": "<repository>/.local/automation",
+  "startup_timeout": 90,
+  "request_timeout": 15,
+  "startup_settle_seconds": 25
+}
+```
+
+All paths are explicit absolute paths; unknown configuration fields and reparse ancestors are rejected. Output stays under this checkout's ignored `.local/`. User-data must already exist and contain `save games/`. The baseline is read-only; the runner makes an exclusive uniquely named `asp_automation_<random>.ck3` copy in that save directory, supplies its filename to `-loadsave`, and removes only that copy on close. It starts CK3 with `-debug_mode`, `-suppress_error_log`, `-skip_checksum`, and `-disable_ai`. The suppress flag prevents automatically opening error.log; it does not disable the log. The existing selected dev playset must contain Aspirations; the runner does not edit launcher selection.
+
+A startup settling bound gives CK3 time to load; the first matching native bootstrap result proves readiness. If this host loads more slowly, adjust the explicit bound (positive, maximum 180 seconds). Missing dev content or an unresponsive console produces bounded failure; arbitrary visible event windows are not inspected or handled. HWND/PID/foreground are checked before every key event. A failed chord releases only its own held modifier. An optional screenshot uses already-installed Pillow; it is not a transport dependency.
+
+## Native wire and scenario
+
+The runner atomically replaces `run/asp_automation_request.txt` under selected user data. Existing bytes of that dedicated file are restored on close; a newly created file is removed. Request content is UTF-8 BOM native script calling a bounded bridge effect with `VERSION = 1`, numeric random `SESSION`, monotonic `REQUEST`, literal operation and bounded days. It is wrapped in `hidden_effect` to hide internal effect descriptions. Bootstrap also guards variable existence before comparing freshly set state: hidden effects still evaluate conditions during console description generation. There is no user-facing arbitrary effect input.
+
+Localized native telemetry is `ASP_AUTOMATION|1|<session>|<request>|ACK` or `...|DONE|counter=<measured integer>|date=<current_date integer>`. Rejection is `...|ERROR|reason=<bounded reason>`. `GetPlayer.MakeScope.Var(...).GetValue|0` reads actual player-owned bridge state; the console-run ROOT localization getter did not work on this engine. The report keeps raw native numeric dates and checks their measured difference. Fresh cursors ignore pre-existing log bytes; partial byte lines and split UTF-8 remain buffered, and complete unrelated daily output is drained in bounded chunks. Rotation, truncation, in-place replacement, malformed tagged records and conflicting terminals fail.
+
+The native bootstrap preserves a pre-existing fixture counter, initializes absent counter to zero, and establishes session/request identity plus the expected next request. Only the most recently accepted request's result is cached. Delivering it again re-acknowledges pending work or re-emits the same completed result; it never repeats the mutation or schedules another callback. Older/out-of-order requests are rejected. A new process always loads the pristine copy before fresh bootstrap; in-session reload is not offered.
+
+`automation-smoke` observes initial zero, adds 7 to its private fixture counter, replays the same mutation identity, independently observes unchanged counter 7, then requests one day. Advance waits for its matching ACK before `tick_day 1`; `.2` completes only when its delayed native event executes. Each repetition restarts the owned game from the same staged baseline, receives a fresh session and verifies the same initial date. Reports contain measured initial/mutation/replay/observation/final states, assertions, baseline SHA-256, owned PIDs, per-repetition fresh logs and an optional actual final screenshot. Engine/static errors are retained as evidence; a passing fixture does not establish unrelated mod gameplay correctness.
+
+`.1` is a manual debug bootstrap/observe entry with fixed session 1; production automation uses the parameterized equivalent effect. `.2` is the pending advance callback. The manual `.1` is explicitly orphan; `.2` has a native delayed-event caller. All bridge variables use `asp_test_automation_`; they do not call or mutate the unfinished core.
+
+## Verified commands
+
+```powershell
+python -m unittest discover -s tools/game_runner/tests -v
+python -m tools.game_runner --config .local/automation/config.json run automation-smoke --repeat 3
+python -m tools.game_runner --config .local/automation/config.json observe
+python -m tools.game_runner --config .local/automation/config.json advance-days 1
+```
+
+Resolve `python` to the existing host runtime. No SDK, package install, global MCP setup or game-install edit is required. The CLI always closes its owned session; MCP can keep one runner alive between supported operations and must explicitly close it on shutdown. Profile/playset cleanup shared across CLI and MCP acceptance belongs to the overall test owner. Existing unfinished core hashes are historical attribution evidence: concurrent core edits by the original implementation thread must never be reverted or committed with this tool.

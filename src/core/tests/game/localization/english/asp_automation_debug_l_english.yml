@@ -1,0 +1,3 @@
+﻿l_english:
+ asp_test_automation_ack:0 "ASP_AUTOMATION|1|[GetPlayer.MakeScope.Var('asp_test_automation_session').GetValue|0]|[GetPlayer.MakeScope.Var('asp_test_automation_request').GetValue|0]|ACK"
+ asp_test_automation_done:0 "ASP_AUTOMATION|1|[GetPlayer.MakeScope.Var('asp_test_automation_session').GetValue|0]|[GetPlayer.MakeScope.Var('asp_test_automation_request').GetValue|0]|DONE|counter=[GetPlayer.MakeScope.Var('asp_test_automation_result_counter').GetValue|0]|date=[GetPlayer.MakeScope.Var('asp_test_automation_result_date').GetValue|0]"
