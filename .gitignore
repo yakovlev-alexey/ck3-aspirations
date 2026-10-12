@@ -1,0 +1,6 @@
+.build/
+.local/
+dist/
+.superpowers/
+*.log
+*.ck3

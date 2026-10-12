@@ -1,0 +1,16 @@
+# Vengeance acceptance scenarios
+
+[Contract](../SPEC.md) · [Shared lifecycle and pledge scenarios](../../../core/tests/scenarios.md). Status: **pending implementation and in-game observation**. Task 1 creates no native fixture. Allocate future `asp_test_vengeance` event IDs in SPEC; record actual event/manual procedure and result here before claiming a pass.
+
+Procedure: disposable adult landed player save; record victim, culprit, character knowledge, responsibility evidence, interpretation, story ID, stress/prestige and origin dates before and after each callback. Force only selection randomness. Repeat natural death/prison callbacks, inspect fresh logs and rendered English text. Extra deltas below do not erase vanilla effects.
+
+| ID | Given | When / manual procedure | Then / exact extra result |
+| --- | --- | --- | --- |
+| V01 | Known killer of parent/child/sibling, spouse, friend or best friend; owner not culprit, victim not rival/nemesis | Trigger observed new death, choose personal vengeance or eligible accountability | One ambition with truthful victim/culprit and target; no origin reward. Content remains eligible. Vengeful applies selection 1.5 multiplier; final chance at most 90%. Owner-caused or hated-victim death adds zero story. |
+| V02 | Hidden killer reference but no verified character knowledge | Trigger death and inspect all proposed text; separately deliver verified later disclosure | Initial callback produces zero named revenge target and no secret leak. Verified later connection may produce one eligible fresh proposal; knowledge is never inferred from killer reference alone. |
+| V03 | Personal vengeance, live culprit, stored owner reference | Cause culprit death by owner; separately cause unrelated culprit death | Owner-responsible case resolves fulfillment before generic invalidation: -20 stress once, no accountability prestige. Unrelated case grants zero fulfillment reward, unresolved memory/closure and no heir replacement; impossible pledge excused without penalty. |
+| V04 | Declared personal vengeance with known public-attribution rule | Fulfill secretly; separately fulfill by public execution/battlefield responsibility | Secret: private -20 stress closure plus pledge withdrawal +15 stress/-100 prestige once, no public success prestige. Public: -20 stress plus +100 pledge prestige once. Vanilla conflicting-trait stress remains. |
+| V05 | Accountability interpretation; culprit not already owned prisoner at origin | Newly acquire custody by valid game action, repeat callback; compare mere unrelated death or preexisting custody | New custody fulfills once: -20 stress/+100 prestige plus eligible pledge reward if declared. No free imprisonment reason/CB. Preexisting custody ineligible; death alone not accountability fulfillment. |
+| V06 | Vengeful, Compassionate without Vengeful, or neutral owner before review; shared target guards | Forgive/abandon, replay incident, then test review release and owner switch | Early release +15/+5/+10 stress respectively once; forgiveness is not execution reward. Review release free privately; pledge precedence retained. Consumed incident never regenerates. Core save/load, absence and owner-death policies apply. |
+
+Evidence record pending: fixture IDs, actual scope/knowledge predicate, attribution probe, game version, screenshots and observed deltas.

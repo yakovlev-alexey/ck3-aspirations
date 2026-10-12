@@ -1,0 +1,7 @@
+* text=auto eol=lf
+*.yml -text
+*.png binary
+*.dds binary
+*.tga binary
+*.mesh binary
+*.anim binary
