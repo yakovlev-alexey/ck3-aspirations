@@ -22,3 +22,5 @@ A04 also requires actual-profile/autosave launch preflight: missing, unsafe YEAR
 
 
 C03 selector clicks, C04 actual save/load and visible UI remain separate native acceptance in [core scenarios](../../../src/core/tests/scenarios.md); they are not inferred from A08.
+
+Vengeance registration: `vengeance-regression` invokes shared V01-V06 fixtures. Added standard-library tests cover measured results/replay, incorrect custody prestige despite a PASS flag, hidden origin despite a PASS flag, and incomplete telemetry. Native game evidence and mandatory actual GUI execution are recorded separately in the owning family scenarios/report.

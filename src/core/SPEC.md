@@ -82,7 +82,7 @@ No gold reward reimburses construction. No aspiration removes vanilla tyranny, s
 
 One visible story instance represents one aspiration. Current-player eligibility is revalidated before reservation; origin consumption, capacity and one-per-family-and-target guards precede creation. Debug forcing bypasses randomness only. Suspended instances remain owned by their original character; elapsed dates and owner-death cleanup continue.
 
-Core dispatch recognizes only `vengeance`, `holding_recovery` and `personal_bond`. Before a family exists, its dispatch performs no family effects; unknown flags are rejected. Core never rewards unimplemented family progress.
+Core dispatch recognizes only `vengeance`, `holding_recovery` and `personal_bond`. Task 3 dispatches vengeance progress and terminal effects to its family module; holding_recovery and personal_bond remain inert until their owning stages. Unknown flags are rejected. Core never rewards unimplemented family progress.
 
 Native scripted effects take parameters in braces and return no value. Task 2 probes confirmed direct story references through event options and actual save/load, numeric date values advancing by one per day, and native timer durations of 720 days for 24 months and 2920 days for eight years. Task 4 still owns full review and pledge boundary behavior.
 

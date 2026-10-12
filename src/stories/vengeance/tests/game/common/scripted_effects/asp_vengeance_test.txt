@@ -1,0 +1,215 @@
+﻿# Shared native cases: manual .1 and registered vengeance-regression execute the same effects.
+asp_test_vengeance_clear_effect = {
+    asp_test_clear_stories_effect = yes
+    every_owned_story = { limit = { asp_is_active_story_trigger = yes } asp_resolve_story_effect = { OUTCOME = impossible REWARDS = none } }
+    clear_variable_list = asp_vengeance_pending
+    clear_saved_scope = asp_test_vengeance_story
+    save_scope_value_as = { name = asp_vengeance_force value = yes }
+    add_stress = { value = 70 subtract = stress }
+}
+asp_test_vengeance_pair_effect = {
+    clear_saved_scope = asp_test_vengeance_story
+    create_character = { name = "Test Culprit" age = 30 gender = male random_traits = no culture = root.culture faith = root.faith employer = root save_scope_as = asp_test_vengeance_killer }
+    create_character = { name = "Test Loved One" age = 30 gender = male random_traits = no culture = root.culture faith = root.faith employer = root save_scope_as = asp_test_vengeance_victim }
+    set_relation_friend = scope:asp_test_vengeance_victim
+}
+asp_test_vengeance_find_effect = {
+    clear_saved_scope = asp_test_vengeance_story
+    every_owned_story = { limit = { asp_is_active_story_trigger = yes has_variable = asp_vengeance_victim var:asp_target = scope:asp_test_vengeance_killer } save_scope_as = asp_test_vengeance_story }
+}
+asp_test_vengeance_origin_effect = {
+    scope:asp_test_vengeance_victim = { death = { killer = scope:asp_test_vengeance_killer death_reason = death_duel } }
+    asp_start_vengeance_effect = { VICTIM = scope:asp_test_vengeance_victim KILLER = scope:asp_test_vengeance_killer }
+    asp_test_vengeance_find_effect = yes
+}
+asp_test_v01_effect = {
+    asp_test_vengeance_clear_effect = yes
+    debug_log = "ASP_TEST V01 BEGIN"
+    asp_test_vengeance_pair_effect = yes
+    asp_test_vengeance_origin_effect = yes
+    set_variable = { name = asp_test_v01_created value = asp_active_ambitions }
+    set_variable = { name = asp_test_v01 value = 0 }
+    if = { limit = { exists = scope:asp_test_vengeance_story scope:asp_test_vengeance_story = { var:asp_vengeance_victim = scope:asp_test_vengeance_victim var:asp_target = scope:asp_test_vengeance_killer } } set_variable = { name = asp_test_v01 value = 1 } }
+    # A second new victim with the same culprit cannot reserve a duplicate story.
+    scope:asp_test_vengeance_victim = { save_scope_as = asp_test_v01_original_victim }
+    set_variable = { name = asp_test_v01_id_before value = var:asp_next_instance_id }
+    create_character = { name = "Second Loved One" age = 30 gender = male random_traits = no culture = root.culture faith = root.faith employer = root save_scope_as = asp_test_v01_second_victim }
+    set_relation_friend = scope:asp_test_v01_second_victim
+    scope:asp_test_v01_second_victim = { death = { killer = scope:asp_test_vengeance_killer death_reason = death_duel } }
+    asp_start_vengeance_effect = { VICTIM = scope:asp_test_v01_second_victim KILLER = scope:asp_test_vengeance_killer }
+    if = { limit = { NOT = { var:asp_next_instance_id = var:asp_test_v01_id_before } } set_variable = { name = asp_test_v01 value = 0 } }
+    scope:asp_test_vengeance_story ?= { asp_resolve_story_effect = { OUTCOME = abandoned REWARDS = normal } }
+    asp_start_vengeance_effect = { VICTIM = scope:asp_test_v01_second_victim KILLER = scope:asp_test_vengeance_killer }
+    scope:asp_test_v01_original_victim = { save_scope_as = asp_test_vengeance_victim }
+    asp_start_vengeance_effect = { VICTIM = scope:asp_test_vengeance_victim KILLER = scope:asp_test_vengeance_killer }
+    asp_start_vengeance_effect = { VICTIM = scope:asp_test_vengeance_victim KILLER = scope:asp_test_vengeance_killer }
+    set_variable = { name = asp_test_v01_replayed value = asp_active_ambitions }
+    if = { limit = { var:asp_test_v01 = 1 var:asp_test_v01_created = 1 var:asp_test_v01_replayed = 0 scope:asp_vengeance_event_outcome = 4 scope:asp_vengeance_event_victim = scope:asp_test_v01_original_victim scope:asp_vengeance_event_culprit = scope:asp_test_vengeance_killer any_in_list = { variable = asp_vengeance_consumed this = scope:asp_test_v01_original_victim } any_in_list = { variable = asp_vengeance_consumed this = scope:asp_test_v01_second_victim } } debug_log = "ASP_TEST V01 PASS" }
+    else = { set_variable = { name = asp_test_v01 value = 0 } debug_log = "ASP_TEST V01 FAIL" }
+}
+asp_test_v02_effect = {
+    asp_test_vengeance_clear_effect = yes
+    debug_log = "ASP_TEST V02 BEGIN"
+    asp_test_vengeance_pair_effect = yes
+    scope:asp_test_vengeance_victim = { death = { killer = scope:asp_test_vengeance_killer death_reason = death_murder } }
+    scope:asp_test_vengeance_killer = { add_secret = { type = secret_murder target = scope:asp_test_vengeance_victim } random_secret = { type = secret_murder limit = { secret_target = scope:asp_test_vengeance_victim } save_scope_as = asp_test_vengeance_secret } }
+    asp_start_vengeance_effect = { VICTIM = scope:asp_test_vengeance_victim KILLER = scope:asp_test_vengeance_killer }
+    set_variable = { name = asp_test_v02_hidden value = asp_active_ambitions }
+    scope:asp_test_vengeance_secret = { reveal_to = root }
+    asp_vengeance_process_pending_effect = yes
+    asp_test_vengeance_find_effect = yes
+    set_variable = { name = asp_test_v02_known value = asp_active_ambitions }
+    scope:asp_test_vengeance_story ?= { asp_resolve_story_effect = { OUTCOME = forgiven REWARDS = normal } }
+    asp_vengeance_process_pending_effect = yes
+    # A different observed death exposed before our read has no queryable evidence.
+    asp_test_vengeance_pair_effect = yes
+    scope:asp_test_vengeance_victim = { death = { killer = scope:asp_test_vengeance_killer death_reason = death_murder } }
+    scope:asp_test_vengeance_killer = { add_secret = { type = secret_murder target = scope:asp_test_vengeance_victim } random_secret = { type = secret_murder limit = { secret_target = scope:asp_test_vengeance_victim } expose_secret = root } }
+    asp_vengeance_process_pending_effect = yes
+    set_variable = { name = asp_test_v02_exposed value = asp_active_ambitions }
+    set_variable = { name = asp_test_v02 value = 0 }
+    if = { limit = { var:asp_test_v02_hidden = 0 var:asp_test_v02_known = 1 var:asp_test_v02_exposed = 0 scope:asp_vengeance_event_outcome = 2 } set_variable = { name = asp_test_v02 value = 1 } debug_log = "ASP_TEST V02 PASS" }
+    else = { debug_log = "ASP_TEST V02 FAIL" }
+}
+asp_test_v03_effect = {
+    asp_test_vengeance_clear_effect = yes
+    debug_log = "ASP_TEST V03 BEGIN"
+    set_variable = { name = asp_test_v03_memory_before value = asp_test_vengeance_memory_count }
+    set_variable = { name = asp_test_v03_terminal_codes value = 0 }
+    asp_test_vengeance_pair_effect = yes
+    asp_test_vengeance_origin_effect = yes
+    scope:asp_test_vengeance_story ?= { set_variable = { name = asp_interpretation value = flag:personal_vengeance } }
+    scope:asp_test_vengeance_victim = { save_scope_as = asp_test_v03_personal_victim }
+    set_variable = { name = asp_test_v03_before value = stress }
+    scope:asp_test_vengeance_killer = { death = { killer = root death_reason = death_murder } }
+    scope:asp_test_vengeance_story ?= { asp_refresh_story_effect = yes }
+    scope:asp_test_vengeance_story ?= { asp_refresh_story_effect = yes }
+    if = { limit = { scope:asp_vengeance_event_outcome = 1 scope:asp_vengeance_event_accountability = no } change_variable = { name = asp_test_v03_terminal_codes add = 1 } }
+    set_variable = { name = asp_test_v03_personal_delta value = { value = stress subtract = var:asp_test_v03_before } }
+    asp_test_vengeance_pair_effect = yes
+    asp_test_vengeance_origin_effect = yes
+    scope:asp_test_vengeance_story ?= { set_variable = { name = asp_interpretation value = flag:personal_vengeance } }
+    set_variable = { name = asp_test_v03_before value = stress }
+    scope:asp_test_vengeance_killer = { death = { death_reason = death_natural_causes } }
+    scope:asp_test_vengeance_story ?= { asp_refresh_story_effect = yes }
+    scope:asp_test_vengeance_story ?= { asp_refresh_story_effect = yes }
+    if = { limit = { scope:asp_vengeance_event_outcome = 3 } change_variable = { name = asp_test_v03_terminal_codes add = 1 } }
+    set_variable = { name = asp_test_v03_impossible_delta value = { value = stress subtract = var:asp_test_v03_before } }
+    set_variable = { name = asp_test_v03_memories value = { value = asp_test_vengeance_memory_count subtract = var:asp_test_v03_memory_before } }
+    set_variable = { name = asp_test_v03 value = 0 }
+    if = { limit = { var:asp_test_v03_personal_delta = -20 var:asp_test_v03_impossible_delta = 0 var:asp_test_v03_memories = 2 var:asp_test_v03_terminal_codes = 2 asp_active_ambitions = 0 any_memory = { has_memory_type = asp_vengeance_personal_memory has_memory_participant = scope:asp_test_v03_personal_victim } any_memory = { has_memory_type = asp_vengeance_impossible_memory has_memory_participant = scope:asp_test_vengeance_victim } } set_variable = { name = asp_test_v03 value = 1 } debug_log = "ASP_TEST V03 PASS" }
+    else = { debug_log = "ASP_TEST V03 FAIL" }
+}
+asp_test_v04_effect = {
+    asp_test_vengeance_clear_effect = yes
+    debug_log = "ASP_TEST V04 BEGIN"
+    asp_test_vengeance_pair_effect = yes
+    asp_test_vengeance_origin_effect = yes
+    scope:asp_test_vengeance_story ?= { set_variable = { name = asp_interpretation value = flag:accountability } }
+    scope:asp_test_vengeance_victim = { save_scope_as = asp_test_v04_original_victim }
+    set_variable = { name = asp_test_v04_before value = stress }
+    set_variable = { name = asp_test_v04_prestige_before value = prestige }
+    imprison = { target = scope:asp_test_vengeance_killer type = dungeon }
+    scope:asp_test_vengeance_story ?= { asp_refresh_story_effect = yes }
+    scope:asp_test_vengeance_story ?= { asp_refresh_story_effect = yes }
+    set_variable = { name = asp_test_v04_stress_delta value = { value = stress subtract = var:asp_test_v04_before } }
+    set_variable = { name = asp_test_v04_prestige_delta value = { value = prestige subtract = var:asp_test_v04_prestige_before } }
+    asp_test_vengeance_pair_effect = yes
+    imprison = { target = scope:asp_test_vengeance_killer type = dungeon }
+    asp_test_vengeance_origin_effect = yes
+    set_variable = { name = asp_test_v04_preexisting value = 0 }
+    if = { limit = { scope:asp_test_vengeance_story ?= { asp_vengeance_can_choose_accountability_trigger = yes } } set_variable = { name = asp_test_v04_preexisting value = 1 } }
+    set_variable = { name = asp_test_v04 value = 0 }
+    if = { limit = { var:asp_test_v04_stress_delta = -20 var:asp_test_v04_prestige_delta = 100 var:asp_test_v04_preexisting = 0 any_memory = { has_memory_type = asp_vengeance_accountability_memory has_memory_participant = scope:asp_test_v04_original_victim } } set_variable = { name = asp_test_v04 value = 1 } debug_log = "ASP_TEST V04 PASS" }
+    else = { debug_log = "ASP_TEST V04 FAIL" }
+}
+asp_test_v05_effect = {
+    asp_test_vengeance_clear_effect = yes
+    debug_log = "ASP_TEST V05 BEGIN"
+    remove_trait = vengeful
+    remove_trait = compassionate
+    add_trait = content
+    set_variable = { name = asp_test_v05_weights value = 0 }
+    if = { limit = { asp_vengeance_selection_chance = 50 } change_variable = { name = asp_test_v05_weights add = 1 } }
+    add_trait = vengeful
+    if = { limit = { asp_vengeance_selection_chance = 75 } change_variable = { name = asp_test_v05_weights add = 1 } }
+    remove_trait = vengeful
+    asp_test_vengeance_pair_effect = yes
+    asp_test_vengeance_origin_effect = yes
+    if = { limit = { asp_vengeance_selection_chance = 35 } change_variable = { name = asp_test_v05_weights add = 1 } }
+    add_trait = vengeful
+    if = { limit = { asp_vengeance_selection_chance = 52.5 } change_variable = { name = asp_test_v05_weights add = 1 } }
+    remove_trait = vengeful
+    asp_test_create_story_effect = { CLASS = ambition }
+    if = { limit = { asp_vengeance_selection_chance = 20 } change_variable = { name = asp_test_v05_weights add = 1 } }
+    add_trait = vengeful
+    if = { limit = { asp_vengeance_selection_chance = 30 } change_variable = { name = asp_test_v05_weights add = 1 } }
+    remove_trait = vengeful
+    scope:asp_new_story = { asp_resolve_story_effect = { OUTCOME = impossible REWARDS = none } }
+    set_variable = { name = asp_test_v05_content value = asp_active_ambitions }
+    set_variable = { name = asp_test_v05_costs value = 0 }
+    if = { limit = { exists = scope:asp_test_vengeance_story } scope:asp_test_vengeance_story = {
+        if = { limit = { asp_abandonment_stress = 10 } story_owner = { change_variable = { name = asp_test_v05_costs add = 1 } } }
+        story_owner = { add_trait = compassionate }
+        if = { limit = { asp_abandonment_stress = 5 } story_owner = { change_variable = { name = asp_test_v05_costs add = 1 } } }
+        story_owner = { add_trait = vengeful }
+        if = { limit = { asp_abandonment_stress = 15 story_owner = { has_trait = vengeful has_trait = compassionate } } story_owner = { change_variable = { name = asp_test_v05_costs add = 1 } } }
+        story_owner = { remove_trait = compassionate }
+        if = { limit = { asp_abandonment_stress = 15 } story_owner = { change_variable = { name = asp_test_v05_costs add = 1 } } }
+        asp_resolve_story_effect = { OUTCOME = forgiven REWARDS = normal }
+    } }
+    if = { limit = { var:asp_test_v05_costs = 4 } set_variable = { name = asp_test_v05_costs value = 1 } }
+    else = { set_variable = { name = asp_test_v05_costs value = 0 } }
+    set_variable = { name = asp_test_v05_exclusions value = 0 }
+    asp_test_vengeance_pair_effect = yes
+    scope:asp_test_vengeance_victim = { death = { killer = root death_reason = death_duel } }
+    asp_start_vengeance_effect = { VICTIM = scope:asp_test_vengeance_victim KILLER = root }
+    if = { limit = { asp_active_ambitions = 0 } change_variable = { name = asp_test_v05_exclusions add = 1 } }
+    asp_test_vengeance_pair_effect = yes
+    create_character = { name = "Test Hated Child" age = 10 gender = male random_traits = no culture = root.culture faith = root.faith employer = root save_scope_as = asp_test_vengeance_victim }
+    scope:asp_test_vengeance_victim = { set_father = root }
+    set_relation_rival = scope:asp_test_vengeance_victim
+    asp_test_vengeance_origin_effect = yes
+    if = { limit = { asp_active_ambitions = 0 scope:asp_test_vengeance_victim = { is_child_of = root } } change_variable = { name = asp_test_v05_exclusions add = 1 } }
+    asp_test_vengeance_pair_effect = yes
+    create_character = { name = "Test Hated Child" age = 10 gender = male random_traits = no culture = root.culture faith = root.faith employer = root save_scope_as = asp_test_vengeance_victim }
+    scope:asp_test_vengeance_victim = { set_father = root }
+    set_relation_nemesis = scope:asp_test_vengeance_victim
+    asp_test_vengeance_origin_effect = yes
+    if = { limit = { asp_active_ambitions = 0 scope:asp_test_vengeance_victim = { is_child_of = root } } change_variable = { name = asp_test_v05_exclusions add = 1 } }
+    set_variable = { name = asp_test_v05 value = 0 }
+    if = { limit = { var:asp_test_v05_content = 1 var:asp_test_v05_exclusions = 3 var:asp_test_v05_costs = 1 var:asp_test_v05_weights = 6 } set_variable = { name = asp_test_v05 value = 1 } debug_log = "ASP_TEST V05 PASS" }
+    else = { debug_log = "ASP_TEST V05 FAIL" }
+}
+asp_test_v06_effect = {
+    asp_test_vengeance_clear_effect = yes
+    debug_log = "ASP_TEST V06 BEGIN"
+    remove_trait = vengeful
+    remove_trait = sadistic
+    add_trait = compassionate
+    asp_test_vengeance_pair_effect = yes
+    asp_test_vengeance_origin_effect = yes
+    scope:asp_test_vengeance_story ?= { set_variable = { name = asp_interpretation value = flag:personal_vengeance } }
+    imprison = { target = scope:asp_test_vengeance_killer type = dungeon }
+    set_variable = { name = asp_test_v06_before value = stress }
+    save_scope_as = actor
+    save_scope_as = puppet_or_actor
+    scope:asp_test_vengeance_killer = { save_scope_as = recipient }
+    execute_prisoner_effect = { VICTIM = scope:asp_test_vengeance_killer EXECUTIONER = root }
+    set_variable = { name = asp_test_v06_action_delta value = { value = stress subtract = var:asp_test_v06_before } }
+    set_variable = { name = asp_test_v06_after_action value = stress }
+    scope:asp_test_vengeance_story ?= { asp_refresh_story_effect = yes }
+    set_variable = { name = asp_test_v06_closure_delta value = { value = stress subtract = var:asp_test_v06_after_action } }
+    set_variable = { name = asp_test_v06_total_delta value = { value = stress subtract = var:asp_test_v06_before } }
+    set_variable = { name = asp_test_v06 value = 0 }
+    if = { limit = { var:asp_test_v06_action_delta > 0 var:asp_test_v06_closure_delta = -20 } set_variable = { name = asp_test_v06 value = 1 } debug_log = "ASP_TEST V06 PASS" }
+    else = { debug_log = "ASP_TEST V06 FAIL" }
+}
+asp_test_vengeance_regression_effect = {
+    asp_test_v01_effect = yes
+    asp_test_v02_effect = yes
+    asp_test_v03_effect = yes
+    asp_test_v04_effect = yes
+    asp_test_v05_effect = yes
+    asp_test_v06_effect = yes
+}

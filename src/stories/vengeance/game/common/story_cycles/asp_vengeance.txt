@@ -1,0 +1,10 @@
+﻿asp_vengeance_story = {
+    visible = yes
+    icon = { reference = "gfx/interface/icons/traits/vengeful.dds" }
+    visualization = {
+        character = { variable_name = "asp_vengeance_victim" label = "asp_vengeance_victim_label" }
+        character = { variable_name = "asp_target" label = "asp_vengeance_culprit_label" }
+        custom_string_key = "asp_vengeance_story_information"
+    }
+    on_owner_death = { asp_resolve_story_effect = { OUTCOME = owner_dead REWARDS = none } }
+}

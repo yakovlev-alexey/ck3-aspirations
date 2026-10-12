@@ -1,6 +1,6 @@
 # Vengeance specification
 
-Status: authoritative living contract migrated from the approved 2026-10-12 design. Runtime implementation is pending.
+Status: authoritative living contract migrated from the approved 2026-10-12 design. Task 3 implements the native family; acceptance evidence is recorded below.
 
 [Core lifecycle and balancing](../../core/SPEC.md) · [Product intent](../../../docs/design.md) · [Acceptance scenarios](tests/scenarios.md)
 
@@ -47,3 +47,23 @@ Vengeance permits declaration only under core's minimum age and milestone rules;
 Origin text names the victim and only a verified known culprit; no hidden-killer disclosure or investigation system. Explain personal vengeance, accountability, forgiveness, all costs and public attribution before commitment. Show unresolved closure distinctly from fulfillment. Use English localization and vanilla art references; no extracted assets.
 
 Required surfaces: death and prisoner on-actions, knowledge predicate/disclosure event, owner-attribution evidence, stories and memories. Knowledge and responsibility probes are prerequisites, not facts inferred from an engine killer reference. CK3 1.20.0.4 source inspected; runtime acceptance pending, no DLC-dependent branch promised. Saved identifiers follow schema 1 and core migration policy.
+
+## Task 3 stable event allocations
+
+Reserve `asp_vengeance.1` for origin interpretation, `.2` for terminal narrative, and `.10` for post-death candidate processing. Dev IDs: `asp_test_vengeance.1` is the shared V01-V06 regression entry, `.10` is the four-case knowledge probe, `.20` prepares an actual player execution, and `.21` asserts its observed action result. Never repurpose these IDs.
+
+Task 3 also reserves runtime `asp_vengeance.11` for deferred fixed-target validation. Pending records `asp_vengeance_pending` and consumed records `asp_vengeance_consumed` are owner-local victim reference lists captured by the death child hook; pending records never contain a hidden culprit. Only the current eligible player receives them. `asp_vengeance_custody_available` preserves initial lack of custody; `asp_vengeance_owner_responsible` records an exact target death callback with that owner as killer; `asp_vengeance_public_fulfillment` marks verified public death reasons.
+
+Validated knowledge route: explicit public death reasons with `public_knowledge=yes`, or a matched `any_known_secret` murder secret identifying the same owner and victim. Quarterly delayed checks examine retained post-activation candidates only. Direct public exposure before a known-secret observation is unsupported: CK3 1.20.0.4 removes the secret from the known-secret iterator and exposes no generic read-side killer-knowledge predicate or additive disclosure hook. No vanilla secret type is overridden. This conservative gap can miss a public revelation; it never authorizes exposing hidden responsibility.
+
+Dev `asp_test_vengeance.30` and `.31` reserve visual unresolved-closure setup and observation after the separate actual execution acceptance.
+
+Terminal event context copies known victim/culprit references and uses numeric outcome values (fulfilled 1, forgiven 2, impossible 3, abandoned 4) plus a boolean accountability indicator, because native event-value transport cannot copy flag variables. Persisted aspiration interpretation/outcome flags and schema 1 remain unchanged. Natural deaths without a supplied killer do not create pending killing candidates.
+
+Dev `.32` is reserved for scripted visual custody after `.30` setup and actual accountability choice; the real GUI execution remains the separate mandatory action check. The custody on-action runs in its own effect chain, so caller assertions use exact victim-bound memories/rewards rather than assuming child event values return to the caller.
+
+Own-act death evidence is recorded on matching stories owned by the supplied killer, including a former player. This preserves attribution for Task 4 return handling without resuming absent-owner events or rewards. Full switch/return policy remains Task 4 acceptance. Story-card localization uses the validated case-sensitive native `Story` getter.
+
+## Task 3 observed acceptance
+
+V01-V06 passed the registered native regression in CK3 1.20.0.4; the documented manual `.1` entry uses identical fixtures. The actual vanilla Execute UI action on a Compassionate player produced +100 Stress, with a separate aspiration -20 and exactly one memory. Native cards show the fixed cause/target, exact chosen condition, age and reflection interval; personal, accountability, forgiveness and impossible terminal descriptions were visually verified. Direct public exposure before observation remains unsupported. Full scheduled reflection, pledge, replacement, switch/return and cross-family acceptance remain their owning later stages. See the family scenarios for reproducible commands and required manual steps.

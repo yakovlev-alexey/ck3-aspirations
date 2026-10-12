@@ -1,0 +1,41 @@
+﻿on_death = { on_actions = { asp_vengeance_observe_death } }
+asp_vengeance_observe_death = {
+    effect = {
+        save_scope_as = asp_vengeance_dying_character
+        # Retain own-act evidence even for a former player. Do not process or reward absent owners.
+        scope:killer ?= {
+            every_owned_story = {
+                limit = { asp_is_active_story_trigger = yes has_variable = asp_vengeance_victim var:asp_target = scope:asp_vengeance_dying_character }
+                set_variable = { name = asp_vengeance_owner_responsible value = yes }
+            }
+        }
+        every_player = {
+            limit = { is_alive = yes is_adult = yes is_ruler = yes is_landed = yes }
+            # Record the player's own act only for a fixed existing target.
+            every_owned_story = {
+                limit = { asp_is_active_story_trigger = yes has_variable = asp_vengeance_victim var:asp_target = scope:asp_vengeance_dying_character }
+                story_owner = { trigger_event = { id = asp_vengeance.11 days = 1 } }
+            }
+            if = {
+                limit = {
+                    exists = scope:killer
+                    asp_vengeance_loved_one_trigger = { VICTIM = scope:asp_vengeance_dying_character }
+                    NOT = { any_in_list = { variable = asp_vengeance_consumed this = scope:asp_vengeance_dying_character } }
+                    NOT = { any_in_list = { variable = asp_vengeance_pending this = scope:asp_vengeance_dying_character } }
+                    NOT = { AND = { exists = scope:killer scope:killer = this } }
+                }
+                add_to_variable_list = { name = asp_vengeance_pending target = scope:asp_vengeance_dying_character }
+                trigger_event = { id = asp_vengeance.10 days = 1 }
+            }
+        }
+    }
+}
+on_imprison = { on_actions = { asp_vengeance_observe_custody } }
+asp_vengeance_observe_custody = {
+    effect = {
+        save_scope_as = asp_vengeance_new_prisoner
+        scope:imprisoner ?= { every_owned_story = { limit = { asp_can_manage_story_trigger = yes has_variable = asp_vengeance_victim var:asp_target = scope:asp_vengeance_new_prisoner } asp_vengeance_check_progress_effect = yes } }
+    }
+}
+quarterly_playable_pulse = { on_actions = { asp_vengeance_delayed_knowledge } }
+asp_vengeance_delayed_knowledge = { trigger = { is_ai = no } effect = { asp_vengeance_process_pending_effect = yes } }

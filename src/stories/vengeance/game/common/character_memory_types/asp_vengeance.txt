@@ -1,0 +1,40 @@
+﻿asp_vengeance_personal_memory = {
+    categories = { asp_vengeance }
+    description = { desc = asp_vengeance_personal_memory_desc }
+    second_perspective_description = { desc = asp_vengeance_personal_memory_desc_second_perspective }
+    third_perspective_description = { desc = asp_vengeance_personal_memory_desc_third_perspective }
+    participants = { victim culprit }
+    duration = { years = 100 }
+}
+asp_vengeance_accountability_memory = {
+    categories = { asp_vengeance }
+    description = { desc = asp_vengeance_accountability_memory_desc }
+    second_perspective_description = { desc = asp_vengeance_accountability_memory_desc_second_perspective }
+    third_perspective_description = { desc = asp_vengeance_accountability_memory_desc_third_perspective }
+    participants = { victim culprit }
+    duration = { years = 100 }
+}
+asp_vengeance_forgiven_memory = {
+    categories = { asp_vengeance }
+    description = { desc = asp_vengeance_forgiven_memory_desc }
+    second_perspective_description = { desc = asp_vengeance_forgiven_memory_desc_second_perspective }
+    third_perspective_description = { desc = asp_vengeance_forgiven_memory_desc_third_perspective }
+    participants = { victim culprit }
+    duration = { years = 100 }
+}
+asp_vengeance_impossible_memory = {
+    categories = { asp_vengeance }
+    description = { desc = asp_vengeance_impossible_memory_desc }
+    second_perspective_description = { desc = asp_vengeance_impossible_memory_desc_second_perspective }
+    third_perspective_description = { desc = asp_vengeance_impossible_memory_desc_third_perspective }
+    participants = { victim culprit }
+    duration = { years = 100 }
+}
+asp_vengeance_abandoned_memory = {
+    categories = { asp_vengeance }
+    description = { desc = asp_vengeance_abandoned_memory_desc }
+    second_perspective_description = { desc = asp_vengeance_abandoned_memory_desc_second_perspective }
+    third_perspective_description = { desc = asp_vengeance_abandoned_memory_desc_third_perspective }
+    participants = { victim culprit }
+    duration = { years = 100 }
+}

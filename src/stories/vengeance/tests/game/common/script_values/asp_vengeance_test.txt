@@ -1,0 +1,1 @@
+﻿asp_test_vengeance_memory_count = { value = 0 every_memory = { limit = { has_memory_category = asp_vengeance } add = 1 } }

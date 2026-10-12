@@ -1,0 +1,45 @@
+﻿namespace = asp_vengeance
+asp_vengeance.1 = {
+    type = character_event
+    title = asp_vengeance_origin_title
+    desc = { first_valid = { triggered_desc = { trigger = { NOT = { exists = scope:asp_vengeance_event_story } } desc = asp_management_closed_desc } desc = asp_vengeance_origin_desc } }
+    theme = intrigue
+    option = {
+        name = asp_vengeance_personal
+        trigger = { exists = scope:asp_vengeance_event_story }
+        custom_tooltip = asp_vengeance_personal_condition
+        hidden_effect = { scope:asp_vengeance_event_story ?= { if = { limit = { asp_can_manage_story_trigger = yes story_owner = root } set_variable = { name = asp_interpretation value = flag:personal_vengeance } } } }
+    }
+    option = {
+        name = asp_vengeance_accountability
+        trigger = { exists = scope:asp_vengeance_event_story scope:asp_vengeance_event_story = { asp_vengeance_can_choose_accountability_trigger = yes } }
+        custom_tooltip = asp_vengeance_accountability_condition
+        hidden_effect = { scope:asp_vengeance_event_story ?= { if = { limit = { asp_vengeance_can_choose_accountability_trigger = yes story_owner = root } set_variable = { name = asp_interpretation value = flag:accountability } } } }
+    }
+    option = {
+        name = asp_vengeance_forgive
+        trigger = { exists = scope:asp_vengeance_event_story }
+        custom_tooltip = asp_vengeance_release_cost
+        show_as_tooltip = { scope:asp_vengeance_event_story ?= { if = { limit = { asp_can_manage_story_trigger = yes } save_scope_value_as = { name = asp_vengeance_tooltip_cost value = asp_abandonment_stress } story_owner = { add_stress = scope:asp_vengeance_tooltip_cost } } } }
+        hidden_effect = { scope:asp_vengeance_event_story ?= { if = { limit = { asp_can_manage_story_trigger = yes story_owner = root } asp_resolve_story_effect = { OUTCOME = forgiven REWARDS = normal } } } }
+    }
+    option = { name = asp_close trigger = { NOT = { exists = scope:asp_vengeance_event_story } } }
+}
+asp_vengeance.2 = {
+    type = character_event
+    title = asp_vengeance_terminal_title
+    desc = {
+        first_valid = {
+            triggered_desc = { trigger = { scope:asp_vengeance_event_outcome = 2 } desc = asp_vengeance_forgiven_desc }
+            triggered_desc = { trigger = { scope:asp_vengeance_event_outcome = 3 } desc = asp_vengeance_impossible_desc }
+            triggered_desc = { trigger = { scope:asp_vengeance_event_outcome = 4 } desc = asp_vengeance_abandoned_desc }
+            triggered_desc = { trigger = { scope:asp_vengeance_event_accountability = yes } desc = asp_vengeance_accountability_desc }
+            desc = asp_vengeance_personal_desc
+        }
+    }
+    theme = intrigue
+    option = { name = asp_vengeance_terminal_close }
+}
+# Processing is deferred until the engine's death transition has completed.
+asp_vengeance.10 = { type = character_event hidden = yes immediate = { asp_vengeance_process_pending_effect = yes } }
+asp_vengeance.11 = { type = character_event hidden = yes immediate = { every_owned_story = { limit = { asp_is_active_story_trigger = yes has_variable = asp_vengeance_victim } asp_refresh_story_effect = yes } } }

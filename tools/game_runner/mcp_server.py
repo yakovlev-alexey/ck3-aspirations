@@ -9,7 +9,7 @@ MAX_REQUESTS = 10000
 TOOLS = [
     {"name": "aspirations_run_scenario", "description": "Run a registered disposable measured CK3 scenario; resets the owned session.",
      "inputSchema": {"type": "object", "properties": {
-         "scenario": {"type": "string", "enum": ["automation-smoke", "core-regression"]},
+         "scenario": {"type": "string", "enum": ["automation-smoke", "core-regression", "vengeance-regression"]},
          "repeat": {"type": "integer", "minimum": 1, "maximum": 10, "default": 1}},
          "required": ["scenario"], "additionalProperties": False}},
     {"name": "aspirations_observe", "description": "Observe native fixture state, lazily starting the configured disposable session.",
@@ -44,7 +44,7 @@ def call_tool(runner, params):
             raise ValueError("Unexpected or missing tool arguments")
         if name == "aspirations_run_scenario":
             repeat = arguments.get("repeat", 1)
-            if arguments["scenario"] not in ("automation-smoke", "core-regression") or type(repeat) is not int or not 1 <= repeat <= 10:
+            if arguments["scenario"] not in ("automation-smoke", "core-regression", "vengeance-regression") or type(repeat) is not int or not 1 <= repeat <= 10:
                 raise ValueError("Only registered scenarios with repeat 1 through 10 are implemented")
             operation = lambda: runner.run_scenario(arguments["scenario"], repeat)
         elif name == "aspirations_advance_days":

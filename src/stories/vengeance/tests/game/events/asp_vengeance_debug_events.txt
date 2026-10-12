@@ -1,0 +1,77 @@
+﻿namespace = asp_test_vengeance
+
+asp_test_vengeance.10 = {
+    type = character_event
+    hidden = yes
+    orphan = yes
+    immediate = {
+        debug_log = "ASP_PROBE VENGEANCE BEGIN"
+        create_character = { name = "Probe Culprit" age = 30 gender = male random_traits = no culture = root.culture faith = root.faith employer = root save_scope_as = asp_probe_killer }
+        create_character = { name = "Public Victim" age = 30 gender = male random_traits = no culture = root.culture faith = root.faith employer = root save_scope_as = asp_probe_public }
+        create_character = { name = "Hidden Victim" age = 30 gender = male random_traits = no culture = root.culture faith = root.faith employer = root save_scope_as = asp_probe_hidden }
+        scope:asp_probe_public = { death = { killer = scope:asp_probe_killer death_reason = death_duel } }
+        scope:asp_probe_hidden = { death = { killer = scope:asp_probe_killer death_reason = death_murder } }
+        if = { limit = { scope:asp_probe_public = { death_reason = death_duel killer = scope:asp_probe_killer } } debug_log = "ASP_PROBE PUBLIC PASS death_duel and exact killer" }
+        else = { debug_log = "ASP_PROBE PUBLIC FAIL" }
+        if = { limit = { NOT = { any_known_secret = { secret_type = secret_murder secret_owner = scope:asp_probe_killer secret_target = scope:asp_probe_hidden } } } debug_log = "ASP_PROBE HIDDEN PASS raw killer has no matching known secret" }
+        else = { debug_log = "ASP_PROBE HIDDEN FAIL" }
+        scope:asp_probe_killer = { add_secret = { type = secret_murder target = scope:asp_probe_hidden } random_secret = { type = secret_murder limit = { secret_target = scope:asp_probe_hidden } save_scope_as = asp_probe_secret } }
+        scope:asp_probe_secret = { reveal_to = root }
+        if = { limit = { any_known_secret = { secret_type = secret_murder secret_owner = scope:asp_probe_killer secret_target = scope:asp_probe_hidden is_known_by = root } } debug_log = "ASP_PROBE DISCOVERY PASS matched known secret" }
+        else = { debug_log = "ASP_PROBE DISCOVERY FAIL" }
+        scope:asp_probe_secret = { expose_secret = root }
+        if = { limit = { any_known_secret = { secret_type = secret_murder secret_owner = scope:asp_probe_killer secret_target = scope:asp_probe_hidden is_known_by = root } } debug_log = "ASP_PROBE EXPOSURE KNOWN_SECRET_RETAINED" }
+        else = { debug_log = "ASP_PROBE EXPOSURE KNOWN_SECRET_ABSENT" }
+        if = { limit = { exists = scope:asp_probe_secret } debug_log = "ASP_PROBE EXPOSURE SECRET_SCOPE_RETAINED" }
+        else = { debug_log = "ASP_PROBE EXPOSURE SECRET_SCOPE_ABSENT" }
+        debug_log = "ASP_PROBE VENGEANCE END"
+    }
+}
+
+asp_test_vengeance.1 = { type = character_event hidden = yes orphan = yes immediate = { asp_test_vengeance_regression_effect = yes } }
+
+# Actual GUI action setup; no scripted execution is performed here.
+asp_test_vengeance.20 = {
+    type = character_event hidden = yes orphan = yes
+    immediate = {
+        asp_test_vengeance_clear_effect = yes
+        remove_trait = vengeful
+        remove_trait = sadistic
+        add_trait = compassionate
+        asp_test_vengeance_pair_effect = yes
+        asp_test_vengeance_origin_effect = yes
+        scope:asp_test_vengeance_story ?= { set_variable = { name = asp_interpretation value = flag:personal_vengeance } }
+        imprison = { target = scope:asp_test_vengeance_killer type = dungeon }
+        set_variable = { name = asp_test_action_target value = scope:asp_test_vengeance_killer }
+        set_variable = { name = asp_test_action_story value = scope:asp_test_vengeance_story }
+        set_variable = { name = asp_test_action_memory_before value = asp_test_vengeance_memory_count }
+        set_variable = { name = asp_test_action_before value = stress }
+        if = { limit = { exists = scope:asp_test_vengeance_story scope:asp_test_vengeance_killer = { is_alive = yes is_imprisoned_by = root } } debug_log = "ASP_TEST V06 GUI READY" }
+        else = { debug_log = "ASP_TEST V06 GUI SETUP FAIL" }
+    }
+}
+asp_test_vengeance.21 = {
+    type = character_event hidden = yes orphan = yes
+    immediate = {
+        set_variable = { name = asp_test_action_delta value = { value = stress subtract = var:asp_test_action_before } }
+        set_variable = { name = asp_test_action_after value = stress }
+        var:asp_test_action_story ?= { asp_refresh_story_effect = yes }
+        set_variable = { name = asp_test_action_closure value = { value = stress subtract = var:asp_test_action_after } }
+        var:asp_test_action_story ?= { asp_refresh_story_effect = yes }
+        set_variable = { name = asp_test_action_memories value = { value = asp_test_vengeance_memory_count subtract = var:asp_test_action_memory_before } }
+        if = { limit = { var:asp_test_action_target = { is_alive = no killer = root } var:asp_test_action_delta > 0 var:asp_test_action_closure = -20 var:asp_test_action_memories = 1 asp_active_ambitions = 0 } debug_log = "ASP_TEST V06 GUI PASS" }
+        else = { debug_log = "ASP_TEST V06 GUI FAIL" }
+        debug_log = asp_test_vengeance_action_measurements
+    }
+}
+# Visual unresolved-closure setup, after the actual action session.
+asp_test_vengeance.30 = {
+    type = character_event hidden = yes orphan = yes
+    immediate = { asp_test_vengeance_clear_effect = yes asp_test_vengeance_pair_effect = yes asp_test_vengeance_origin_effect = yes set_variable = { name = asp_test_visual_target value = scope:asp_test_vengeance_killer } debug_log = "ASP_TEST V03 VISUAL READY" }
+}
+asp_test_vengeance.31 = {
+    type = character_event hidden = yes orphan = yes
+    immediate = { var:asp_test_visual_target ?= { death = { death_reason = death_natural_causes } } every_owned_story = { limit = { asp_is_active_story_trigger = yes has_variable = asp_vengeance_victim } asp_refresh_story_effect = yes } debug_log = "ASP_TEST V03 VISUAL CLOSED" }
+}
+
+asp_test_vengeance.32 = { type = character_event hidden = yes orphan = yes immediate = { imprison = { target = var:asp_test_visual_target type = dungeon } debug_log = "ASP_TEST V04 VISUAL CUSTODY" } }

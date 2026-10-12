@@ -1,0 +1,119 @@
+﻿# Character scope. Entry requires an observed eligible bereavement and independently verified knowledge.
+asp_start_vengeance_effect = {
+    if = {
+        limit = {
+            is_alive = yes is_ai = no is_adult = yes is_ruler = yes is_landed = yes
+            exists = $VICTIM$ exists = $KILLER$ this != $KILLER$
+            $VICTIM$ = { is_alive = no }
+            $KILLER$ = { is_alive = yes }
+            in_diplomatic_range = $KILLER$
+            any_in_list = { variable = asp_vengeance_pending this = $VICTIM$ }
+            NOT = { any_in_list = { variable = asp_vengeance_consumed this = $VICTIM$ } }
+            asp_vengeance_knows_incident_trigger = { VICTIM = $VICTIM$ KILLER = $KILLER$ }
+        }
+        # Consume before probability/capacity/duplicate decisions. A rejection is not a reroll.
+        add_to_variable_list = { name = asp_vengeance_consumed target = $VICTIM$ }
+        remove_list_variable = { name = asp_vengeance_pending target = $VICTIM$ }
+        if = {
+            limit = {
+                asp_active_ambitions < asp_ambition_cap
+                NOT = { any_owned_story = { asp_is_active_story_trigger = yes var:asp_family = flag:vengeance var:asp_target = $KILLER$ } }
+            }
+            save_scope_as = asp_vengeance_origin_owner
+            $VICTIM$ = { save_scope_as = asp_vengeance_origin_victim }
+            $KILLER$ = { save_scope_as = asp_vengeance_origin_killer }
+            # Only a dev event chain can supply this randomness-only override.
+            if = { limit = { exists = scope:asp_vengeance_force scope:asp_vengeance_force = yes } asp_vengeance_create_effect = yes }
+            else = { random = { chance = asp_vengeance_selection_chance asp_vengeance_create_effect = yes } }
+        }
+    }
+}
+asp_vengeance_create_effect = {
+    clear_saved_scope = asp_vengeance_new_story
+    create_story = { type = asp_vengeance_story save_scope_as = asp_vengeance_new_story }
+    scope:asp_vengeance_new_story = {
+        asp_initialize_story_effect = { FAMILY = vengeance CLASS = ambition TARGET = scope:asp_vengeance_origin_killer }
+        if = {
+            limit = { asp_is_active_story_trigger = yes }
+            set_variable = { name = asp_vengeance_victim value = scope:asp_vengeance_origin_victim }
+            set_variable = { name = asp_interpretation value = flag:personal_vengeance }
+            if = { limit = { var:asp_target = { NOT = { is_imprisoned_by = prev.story_owner } } } set_variable = { name = asp_vengeance_custody_available value = yes } }
+            var:asp_vengeance_victim = { save_scope_as = asp_vengeance_event_victim }
+            var:asp_target = { save_scope_as = asp_vengeance_event_culprit }
+            save_scope_as = asp_vengeance_event_story
+            story_owner = { trigger_event = asp_vengeance.1 }
+        }
+    }
+}
+# Pending records contain only victims; no concealed culprit is retained or rendered.
+asp_vengeance_process_pending_effect = {
+    if = { limit = { is_alive = yes is_ai = no is_adult = yes is_landed = yes }
+        save_scope_as = asp_vengeance_pending_owner
+        every_in_list = {
+            variable = asp_vengeance_pending
+            limit = { is_alive = no }
+            save_scope_as = asp_vengeance_pending_victim
+            clear_saved_scope = asp_vengeance_known_killer
+            if = { limit = { asp_vengeance_public_death_trigger = yes exists = killer } killer = { save_scope_as = asp_vengeance_known_killer } }
+            else = {
+                scope:asp_vengeance_pending_owner = {
+                    random_known_secret = {
+                        limit = { secret_type = secret_murder secret_target = scope:asp_vengeance_pending_victim is_known_by = scope:asp_vengeance_pending_owner }
+                        secret_owner = { save_scope_as = asp_vengeance_known_killer }
+                    }
+                }
+            }
+            if = { limit = { exists = scope:asp_vengeance_known_killer }
+                scope:asp_vengeance_pending_owner = { asp_start_vengeance_effect = { VICTIM = scope:asp_vengeance_pending_victim KILLER = scope:asp_vengeance_known_killer } }
+            }
+        }
+    }
+}
+asp_vengeance_check_progress_effect = {
+    if = { limit = { asp_is_active_story_trigger = yes has_variable = asp_vengeance_victim }
+        if = { limit = { var:asp_target = { is_alive = no } }
+            # Recorded own responsibility precedes generic dead-target invalidation.
+            if = { limit = { var:asp_interpretation = flag:personal_vengeance has_variable = asp_vengeance_owner_responsible }
+                if = { limit = { var:asp_target = { asp_vengeance_public_death_trigger = yes } } set_variable = { name = asp_vengeance_public_fulfillment value = yes } }
+                asp_resolve_story_effect = { OUTCOME = fulfilled REWARDS = normal }
+            }
+            else = { asp_resolve_story_effect = { OUTCOME = impossible REWARDS = normal } }
+        }
+        else_if = { limit = { var:asp_interpretation = flag:accountability has_variable = asp_vengeance_custody_available var:asp_target = { is_imprisoned_by = prev.story_owner } }
+            asp_resolve_story_effect = { OUTCOME = fulfilled REWARDS = normal }
+        }
+    }
+}
+# Called only after core's terminal latch. Memory is independent of reward policy.
+asp_vengeance_resolve_effect = {
+    if = { limit = { has_variable = asp_vengeance_victim var:asp_outcome = flag:$OUTCOME$ var:asp_reward_policy = flag:$REWARDS$ }
+        var:asp_vengeance_victim = { save_scope_as = asp_vengeance_memory_victim }
+        var:asp_target = { save_scope_as = asp_vengeance_memory_culprit }
+        save_scope_as = asp_vengeance_ending_story
+        if = { limit = { story_owner = { is_alive = yes } }
+            story_owner = {
+                if = { limit = { scope:asp_vengeance_ending_story = { var:asp_outcome = flag:fulfilled } }
+                    if = { limit = { scope:asp_vengeance_ending_story = { var:asp_interpretation = flag:accountability } }
+                        create_character_memory = { type = asp_vengeance_accountability_memory participants = { victim = scope:asp_vengeance_memory_victim culprit = scope:asp_vengeance_memory_culprit } }
+                        if = { limit = { scope:asp_vengeance_ending_story = { var:asp_reward_policy = flag:normal } } add_prestige = asp_vengeance_accountability_prestige }
+                    }
+                    else = { create_character_memory = { type = asp_vengeance_personal_memory participants = { victim = scope:asp_vengeance_memory_victim culprit = scope:asp_vengeance_memory_culprit } } }
+                }
+                else_if = { limit = { scope:asp_vengeance_ending_story = { var:asp_outcome = flag:forgiven } } create_character_memory = { type = asp_vengeance_forgiven_memory participants = { victim = scope:asp_vengeance_memory_victim culprit = scope:asp_vengeance_memory_culprit } } }
+                else_if = { limit = { scope:asp_vengeance_ending_story = { var:asp_outcome = flag:impossible } } create_character_memory = { type = asp_vengeance_impossible_memory participants = { victim = scope:asp_vengeance_memory_victim culprit = scope:asp_vengeance_memory_culprit } } }
+                else = { create_character_memory = { type = asp_vengeance_abandoned_memory participants = { victim = scope:asp_vengeance_memory_victim culprit = scope:asp_vengeance_memory_culprit } } }
+                # Copy cause/outcome into event context before core destroys this instance.
+                if = { limit = { is_ai = no scope:asp_vengeance_ending_story = { var:asp_reward_policy = flag:normal } }
+                    # Event-value transport supports only numbers/bools, not persisted flag variables.
+                    save_scope_value_as = { name = asp_vengeance_event_outcome value = 1 }
+                    if = { limit = { scope:asp_vengeance_ending_story = { var:asp_outcome = flag:forgiven } } save_scope_value_as = { name = asp_vengeance_event_outcome value = 2 } }
+                    else_if = { limit = { scope:asp_vengeance_ending_story = { var:asp_outcome = flag:impossible } } save_scope_value_as = { name = asp_vengeance_event_outcome value = 3 } }
+                    else_if = { limit = { scope:asp_vengeance_ending_story = { var:asp_outcome = flag:abandoned } } save_scope_value_as = { name = asp_vengeance_event_outcome value = 4 } }
+                    save_scope_value_as = { name = asp_vengeance_event_accountability value = no }
+                    if = { limit = { scope:asp_vengeance_ending_story = { var:asp_interpretation = flag:accountability } } save_scope_value_as = { name = asp_vengeance_event_accountability value = yes } }
+                    trigger_event = asp_vengeance.2
+                }
+            }
+        }
+    }
+}

@@ -1,0 +1,2 @@
+﻿l_english:
+ asp_test_vengeance_action_measurements:0 "ASP_TEST V06 GUI MEASURE action=[THIS.Char.MakeScope.Var('asp_test_action_delta').GetValue|0] closure=[THIS.Char.MakeScope.Var('asp_test_action_closure').GetValue|0] memories=[THIS.Char.MakeScope.Var('asp_test_action_memories').GetValue|0]"

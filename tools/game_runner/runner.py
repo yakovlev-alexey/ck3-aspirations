@@ -204,7 +204,7 @@ class GameRunner:
         return self._report_operation("advance", days)
 
     def run_scenario(self, name, repeat=1):
-        if name not in ("automation-smoke", "core-regression") or type(repeat) is not int or not 1 <= repeat <= 10:
+        if name not in ("automation-smoke", "core-regression", "vengeance-regression") or type(repeat) is not int or not 1 <= repeat <= 10:
             raise ValueError("Only registered scenarios with repeat 1 through 10 are implemented")
         if not self.flight.acquire(blocking=False):
             return {"status": "transport_error", "error": "Concurrent operation rejected"}
@@ -231,6 +231,27 @@ class GameRunner:
                         {"name": "baseline_unchanged", "passed": hashlib.sha256(self.config.baseline_save.read_bytes()).hexdigest() == self.baseline_hash},
                     ]
                     run = {"index": index, "initial": initial, "core": core, "duplicate": duplicate, "assertions": assertions, "logs": self._snapshot_logs(index)}
+                    report["runs"].append(run)
+                    if not all(item["passed"] for item in assertions):
+                        report["status"] = "assertion_failed"
+                        break
+                    continue
+                if name == "vengeance-regression":
+                    vengeance = self._send("vengeance_regression")
+                    duplicate = self._send("vengeance_regression", replay=True)
+                    assertions = [
+                        {"name": "V01_consumed_known_origin", "passed": vengeance["v01"] == 1 and vengeance["v01_created"] == 1 and vengeance["v01_replayed"] == 0},
+                        {"name": "V02_knowledge_gated_discovery", "passed": vengeance["v02"] == 1 and vengeance["v02_hidden"] == 0 and vengeance["v02_known"] == 1 and vengeance["v02_exposed"] == 0},
+                        {"name": "V03_death_precedence_and_memories", "passed": vengeance["v03"] == 1 and vengeance["v03_personal_delta"] == -20 and vengeance["v03_impossible_delta"] == 0 and vengeance["v03_memories"] == 2},
+                        {"name": "V04_new_custody_only", "passed": vengeance["v04"] == 1 and vengeance["v04_stress_delta"] == -20 and vengeance["v04_prestige_delta"] == 100 and vengeance["v04_preexisting"] == 0},
+                        {"name": "V05_eligibility_and_trait_costs", "passed": vengeance["v05"] == 1 and vengeance["v05_content"] == 1 and vengeance["v05_exclusions"] == 3 and vengeance["v05_costs"] == 1},
+                        {"name": "V06_vanilla_stress_separate_from_closure", "passed": vengeance["v06"] == 1 and vengeance["v06_action_delta"] > 0 and vengeance["v06_closure_delta"] == -20 and vengeance["v06_total_delta"] == vengeance["v06_action_delta"] - 20},
+                        {"name": "duplicate_identity_and_measurements", "passed": duplicate == vengeance},
+                        {"name": "same_baseline_date", "passed": not report["runs"] or initial["date"] == report["runs"][0]["initial"]["date"]},
+                        {"name": "fresh_session", "passed": all(initial["session"] != run["initial"]["session"] for run in report["runs"])},
+                        {"name": "baseline_unchanged", "passed": hashlib.sha256(self.config.baseline_save.read_bytes()).hexdigest() == self.baseline_hash},
+                    ]
+                    run = {"index": index, "initial": initial, "vengeance": vengeance, "duplicate": duplicate, "assertions": assertions, "logs": self._snapshot_logs(index)}
                     report["runs"].append(run)
                     if not all(item["passed"] for item in assertions):
                         report["status"] = "assertion_failed"

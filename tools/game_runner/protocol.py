@@ -12,6 +12,7 @@ CORE_FIELDS = (
     "c10", "c10_delta", "c10_policy_none",
     "c11", "c11_landless", "c11_ai", "c11_active",
 )
+VENGEANCE_FIELDS = ('v01', 'v01_created', 'v01_replayed', 'v02', 'v02_hidden', 'v02_known', 'v02_exposed', 'v03', 'v03_personal_delta', 'v03_impossible_delta', 'v03_memories', 'v04', 'v04_stress_delta', 'v04_prestige_delta', 'v04_preexisting', 'v05', 'v05_content', 'v05_exclusions', 'v05_costs', 'v06', 'v06_action_delta', 'v06_closure_delta', 'v06_total_delta')
 
 
 class ProtocolError(RuntimeError):
@@ -78,6 +79,8 @@ class Telemetry:
                     allowed = {"counter", "date", "reason"}
                     if self.operation == "core_regression":
                         allowed.update(CORE_FIELDS)
+                    if self.operation == "vengeance_regression":
+                        allowed.update(VENGEANCE_FIELDS)
                     if key in result or key not in allowed:
                         raise ValueError("Invalid or duplicate field")
                     if key != "reason" and not re.fullmatch(r"-?\d+(?:\.0+)?", value):
@@ -89,6 +92,8 @@ class Telemetry:
                     required = {"version", "session", "request", "kind", "counter", "date"}
                     if self.operation == "core_regression":
                         required.update(CORE_FIELDS)
+                    if self.operation == "vengeance_regression":
+                        required.update(VENGEANCE_FIELDS)
                     if set(result) != required:
                         raise ValueError("Incomplete measured terminal")
                     if self.terminal is not None:

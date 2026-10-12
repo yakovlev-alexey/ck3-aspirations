@@ -1,0 +1,22 @@
+﻿# Versioned conservative public causes. Each definition has public_knowledge=yes in CK3 1.20.0.4.
+asp_vengeance_public_death_trigger = {
+    OR = { death_reason = death_duel death_reason = death_battle death_reason = death_fight death_reason = death_fight_killer death_reason = death_punishment death_reason = death_execution death_reason = death_execution_killer death_reason = death_torture death_reason = death_raid death_reason = death_revenge }
+}
+# Character scope is the bereaved owner. Never use raw killer as a knowledge predicate.
+asp_vengeance_knows_incident_trigger = {
+    OR = {
+        $VICTIM$ = { asp_vengeance_public_death_trigger = yes killer = $KILLER$ }
+        any_known_secret = { secret_type = secret_murder secret_owner = $KILLER$ secret_target = $VICTIM$ is_known_by = prev }
+    }
+}
+asp_vengeance_loved_one_trigger = {
+    OR = { is_parent_of = $VICTIM$ is_child_of = $VICTIM$ is_sibling_of = $VICTIM$ is_spouse_of_even_if_dead = $VICTIM$ has_relation_friend = $VICTIM$ has_relation_best_friend = $VICTIM$ }
+    NOT = { has_relation_rival = $VICTIM$ }
+    NOT = { has_relation_nemesis = $VICTIM$ }
+}
+asp_vengeance_can_choose_accountability_trigger = {
+    asp_can_manage_story_trigger = yes
+    has_variable = asp_vengeance_victim
+    has_variable = asp_vengeance_custody_available
+    var:asp_target = { is_alive = yes NOT = { is_imprisoned_by = prev.story_owner } }
+}

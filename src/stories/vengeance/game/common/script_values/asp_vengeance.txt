@@ -1,0 +1,8 @@
+﻿asp_vengeance_accountability_prestige = 100
+asp_vengeance_selection_chance = {
+    value = 50
+    if = { limit = { asp_active_ambitions = 1 } multiply = 0.7 }
+    else_if = { limit = { asp_active_ambitions >= 2 } multiply = 0.4 }
+    if = { limit = { has_trait = vengeful } multiply = 1.5 }
+    max = 90
+}

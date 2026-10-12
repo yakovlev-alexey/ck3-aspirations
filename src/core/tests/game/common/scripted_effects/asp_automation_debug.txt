@@ -28,6 +28,33 @@ asp_test_automation_complete_effect = {
             set_variable = { name = asp_test_automation_result_c11_active value = var:asp_test_c11_active }
             debug_log = asp_test_automation_core_done
         }
+        else_if = {
+            limit = { var:asp_test_automation_operation = flag:vengeance_regression }
+            set_variable = { name = asp_test_automation_result_v01 value = var:asp_test_v01 }
+            set_variable = { name = asp_test_automation_result_v01_created value = var:asp_test_v01_created }
+            set_variable = { name = asp_test_automation_result_v01_replayed value = var:asp_test_v01_replayed }
+            set_variable = { name = asp_test_automation_result_v02 value = var:asp_test_v02 }
+            set_variable = { name = asp_test_automation_result_v02_hidden value = var:asp_test_v02_hidden }
+            set_variable = { name = asp_test_automation_result_v02_known value = var:asp_test_v02_known }
+            set_variable = { name = asp_test_automation_result_v02_exposed value = var:asp_test_v02_exposed }
+            set_variable = { name = asp_test_automation_result_v03 value = var:asp_test_v03 }
+            set_variable = { name = asp_test_automation_result_v03_personal_delta value = var:asp_test_v03_personal_delta }
+            set_variable = { name = asp_test_automation_result_v03_impossible_delta value = var:asp_test_v03_impossible_delta }
+            set_variable = { name = asp_test_automation_result_v03_memories value = var:asp_test_v03_memories }
+            set_variable = { name = asp_test_automation_result_v04 value = var:asp_test_v04 }
+            set_variable = { name = asp_test_automation_result_v04_stress_delta value = var:asp_test_v04_stress_delta }
+            set_variable = { name = asp_test_automation_result_v04_prestige_delta value = var:asp_test_v04_prestige_delta }
+            set_variable = { name = asp_test_automation_result_v04_preexisting value = var:asp_test_v04_preexisting }
+            set_variable = { name = asp_test_automation_result_v05 value = var:asp_test_v05 }
+            set_variable = { name = asp_test_automation_result_v05_content value = var:asp_test_v05_content }
+            set_variable = { name = asp_test_automation_result_v05_exclusions value = var:asp_test_v05_exclusions }
+            set_variable = { name = asp_test_automation_result_v05_costs value = var:asp_test_v05_costs }
+            set_variable = { name = asp_test_automation_result_v06 value = var:asp_test_v06 }
+            set_variable = { name = asp_test_automation_result_v06_action_delta value = var:asp_test_v06_action_delta }
+            set_variable = { name = asp_test_automation_result_v06_closure_delta value = var:asp_test_v06_closure_delta }
+            set_variable = { name = asp_test_automation_result_v06_total_delta value = var:asp_test_v06_total_delta }
+            debug_log = asp_test_automation_vengeance_done
+        }
         else = { debug_log = asp_test_automation_done }
     }
 }
@@ -66,6 +93,7 @@ asp_test_automation_request_effect = {
             }
             else = {
                 if = { limit = { var:asp_test_automation_operation = flag:core_regression } debug_log = asp_test_automation_core_done }
+                else_if = { limit = { var:asp_test_automation_operation = flag:vengeance_regression } debug_log = asp_test_automation_vengeance_done }
                 else = { debug_log = asp_test_automation_done }
             }
         }
@@ -81,6 +109,7 @@ asp_test_automation_request_effect = {
                     change_variable = { name = asp_test_automation_counter add = 7 }
                 }
                 if = { limit = { var:asp_test_automation_operation = flag:core_regression } asp_test_core_regression_effect = yes }
+                if = { limit = { var:asp_test_automation_operation = flag:vengeance_regression } asp_test_vengeance_regression_effect = yes }
                 if = {
                     limit = { var:asp_test_automation_operation = flag:advance }
                     set_variable = asp_test_automation_pending
