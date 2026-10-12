@@ -142,6 +142,7 @@ class RunnerTests(unittest.TestCase):
         from tools.game_runner.windows import WindowsBackend
         backend = WindowsBackend.__new__(WindowsBackend)
         backend.process = None
+        backend.preflight = lambda: None
         with patch("tools.game_runner.windows.subprocess.run", side_effect=subprocess.TimeoutExpired("tasklist", 10)):
             with self.assertRaises(TimeoutError):
                 backend.start("asp_automation_0123456789abcdef.ck3")

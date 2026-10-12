@@ -84,3 +84,11 @@ python -m tools.game_runner --config .local/automation/config.json advance-days 
 ```
 
 Resolve `python` to the existing host runtime. No SDK, package install, global MCP setup or game-install edit is required. The CLI always closes its owned session; MCP can keep one runner alive between supported operations and must explicitly close it on shutdown. Profile/playset cleanup shared across CLI and MCP acceptance belongs to the overall test owner. Existing unfinished core hashes are historical attribution evidence: concurrent core edits by the original implementation thread must never be reverted or committed with this tool.
+
+## Autosave/profile preservation preflight
+
+Version1 has no verified alternate-profile launch flag. Before any CK3 process launch, the Windows backend resolves actual redirected Documents with `SHGetFolderPathW(CSIDL_PERSONAL)` and requires configured `user_data` to equal its `Paradox Interactive/Crusader Kings III` directory. Launcher-specific/alternate profile overrides are unsupported and rejected.
+
+The backend reads `pdx_settings.txt` without changing it and structurally parses the `game` → `autosave` → `value` preference. It requires exactly `NEVER`; missing, duplicate, malformed or unsafe settings are rejected before process launch. `NEVER` in comments or another section cannot satisfy this preflight. This protects real autosave files when a1–30-day operation or a retained MCP session crosses an autosave boundary.
+
+Prepare a disposable test session by selecting autosave `NEVER` in CK3 settings before launching automation. If the overall test owner changes this preference for a short test, take a current targeted backup, change only this exact owned preference and restore its original value after closing the owned game. The runner never changes it automatically. Existing October1→2 smoke evidence predates this safety preflight and does not establish arbitrary-boundary autosave behavior. The current host value is YEARLY, so Task2 must prepare/restore that preference for its live acceptance. No destructive autosave probe is authorized or needed.

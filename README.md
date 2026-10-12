@@ -27,7 +27,7 @@ Registration writes `mod/aspirations_dev.mod` with the title Aspirations (Develo
 
 Native fixture files under module `tests/game/` are dev-only. Release excludes them. Static validation checks assembly, encoding, links, metadata and identifiable duplicate IDs; CK3 runtime scenarios remain the authority for behavior. Source scripts/localization never come from generated output, and extracted game assets are never committed.
 
-For bounded real-game smoke tests, use the existing Python runtime with standard-library modules only. Put explicit machine configuration and a disposable baseline under `.local/automation/`, select the dev playset, and close other CK3 sessions:
+For bounded real-game smoke tests, use the existing Python runtime with standard-library modules only. Put explicit machine configuration and a disposable baseline under `.local/automation/`, select the dev playset, set CK3 autosave to `NEVER` for the disposable session, and close other CK3 sessions:
 
 ```powershell
 python -m unittest discover -s tools/game_runner/tests -v
@@ -35,3 +35,5 @@ python -m tools.game_runner --config .local/automation/config.json run automatio
 ```
 
 The command restarts only its own game from the same baseline, checks native measured state and duplicate delivery, advances one actual day, records JSON/log/screenshot evidence, and cleans up its owned session. `observe` and `advance-days 1` are also supported. Configuration, bounds and failure behavior are documented in the [automation contract](tools/game_runner/SPEC.md). No game-install edits or additional packages are needed.
+
+The launch preflight requires the actual Windows Documents CK3 profile and its exact `game.autosave` preference `NEVER`, preserving existing autosaves across date advancement. Alternate profiles and missing/ambiguous settings are rejected. The runner reads the preference and never changes it; restore any test-owned preference change after cleanup.

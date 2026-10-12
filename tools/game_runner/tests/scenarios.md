@@ -4,7 +4,7 @@ The runner fixture is independent of unfinished Aspirations gameplay. Native fix
 
 | ID | Given / When | Required measured result |
 | --- | --- | --- |
-| A01 | Explicit disposable baseline and selected dev playset; run `python -m tools.game_runner --config PATH run automation-smoke --repeat 3`. | Three owned process launches without navigation; fresh session per repetition; initial counter 0 and identical date; all assertions passed; unchanged baseline hash. |
+| A01 | Explicit disposable baseline, selected dev playset and actual-profile autosave NEVER; run `python -m tools.game_runner --config PATH run automation-smoke --repeat 3`. | Three owned process launches without navigation; fresh session per repetition; initial counter 0 and identical date; all assertions passed; unchanged baseline hash. |
 | A02 | A mutation request is completed and delivered again with the same identity. | Both terminals match exactly; counter changes by 7 once; independent observation remains 7. |
 | A03 | Unit tests inject unrelated/stale/malformed/partial UTF-8, duplicate terminals and rotated/truncated logs. | Wrong identities never complete; identical terminal repeats are inert; conflicts and log replacement fail. A large complete daily log batch cannot hide a valid terminal. |
 | A04 | Invalid scenarios/days/repeats, missing executable, lost HWND/PID/foreground, concurrent ownership or absent DONE. | Reject before game input; timeout is bounded; ACK alone cannot pass; release only own modifier; stop exact owned process; next operation establishes a fresh session. |
@@ -14,3 +14,5 @@ The runner fixture is independent of unfinished Aspirations gameplay. Native fix
 Run unit tests with `python -m unittest discover -s tools/game_runner/tests -v`; existing assembly tests with `pwsh -NoProfile -File tools/tests/run.ps1`. Close CK3 before rebuilding dev output. Preserve `.local/automation/` reports, three fresh log snapshots and one real screenshot. Inspect namespace errors separately from pre-existing core/vanilla issues; a fixture PASS is not gameplay certification.
 
 The first version uses a controlled disposable baseline. It does not inspect or choose generic visible events. `tick_day` is a bounded debug-time operation; successful date advancement does not prove normal simulation would proceed through every popup.
+
+A04 also requires actual-profile/autosave launch preflight: missing, unsafe YEARLY/MONTHLY, duplicate settings, NEVER in another section/comment, and alternate user-data profile all fail before process launch. Unit tests exercise these without launching the game. The overall test owner restores any temporary NEVER preference after the owned session closes.

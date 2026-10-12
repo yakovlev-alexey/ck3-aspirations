@@ -1,6 +1,9 @@
 """PID/HWND-bound Windows console input and exact owned-process cleanup."""
 import ctypes
 import os
+import re
+from pathlib import Path
+from .protocol import safe_path
 import subprocess
 import time
 from ctypes import wintypes
@@ -13,6 +16,65 @@ class FocusError(RuntimeError):
 def validate_foreground(expected_hwnd, expected_pid, actual_hwnd, actual_pid):
     if not expected_hwnd or (expected_hwnd, expected_pid) != (actual_hwnd, actual_pid):
         raise FocusError("CK3 lost foreground or window ownership")
+
+
+def require_safe_profile(user_data, documents):
+    """Read-only preflight for the only verified launch profile and autosave setting."""
+    expected = safe_path(Path(documents) / "Paradox Interactive" / "Crusader Kings III")
+    if safe_path(user_data) != expected:
+        raise ValueError("Alternate CK3 profiles are unsupported; user_data must match actual Windows Documents")
+    path = safe_path(expected / "pdx_settings.txt")
+    if not path.is_file() or path.stat().st_size > 1024 * 1024:
+        raise ValueError("Missing or oversized CK3 settings; autosave safety cannot be established")
+    text = path.read_text(encoding="utf-8-sig")
+    pattern = re.compile(r'\s+|#[^\n]*|"(?:[^"\\]|\\.)*"|[{}=]|[^\s{}="#]+')
+    tokens, position = [], 0
+    while position < len(text):
+        match = pattern.match(text, position)
+        if match is None:
+            raise ValueError("Malformed CK3 settings")
+        token = match.group()
+        position = match.end()
+        if not token.isspace() and not token.startswith("#"):
+            tokens.append(token)
+    index = 0
+    def block(nested=False, depth=0):
+        nonlocal index
+        if depth > 32:
+            raise ValueError("Settings nesting exceeds safe bound")
+        values = {}
+        while index < len(tokens):
+            if tokens[index] == "}":
+                if not nested:
+                    raise ValueError("Unexpected settings closing brace")
+                index += 1
+                return values
+            key = tokens[index].strip('"')
+            index += 1
+            if not key or key in values or index >= len(tokens) or tokens[index] != "=":
+                raise ValueError("Ambiguous or malformed CK3 settings")
+            index += 1
+            if index >= len(tokens):
+                raise ValueError("Missing settings value")
+            value = tokens[index]
+            index += 1
+            if value == "{":
+                value = block(True, depth + 1)
+            elif value in ("}", "="):
+                raise ValueError("Malformed settings value")
+            else:
+                value = value.strip('"')
+            values[key] = value
+        if nested:
+            raise ValueError("Unclosed settings block")
+        return values
+    settings = block()
+    try:
+        autosave = settings["game"]["autosave"]["value"]
+    except (KeyError, TypeError) as error:
+        raise ValueError("Missing game.autosave preference; launch rejected") from error
+    if autosave != "NEVER":
+        raise ValueError("Set CK3 game.autosave to NEVER for the disposable automation session; launch rejected to preserve user saves")
 
 
 class WindowsBackend:
@@ -39,7 +101,17 @@ class WindowsBackend:
         self.user32.MapVirtualKeyW.restype = wintypes.UINT
         self.user32.SetProcessDPIAware()
 
+    def preflight(self):
+        shell32 = ctypes.WinDLL("shell32", use_last_error=True)
+        shell32.SHGetFolderPathW.argtypes = [wintypes.HWND, ctypes.c_int, wintypes.HANDLE, wintypes.DWORD, wintypes.LPWSTR]
+        shell32.SHGetFolderPathW.restype = wintypes.LONG
+        documents = ctypes.create_unicode_buffer(260)
+        if shell32.SHGetFolderPathW(None, 5, None, 0, documents) != 0:
+            raise ValueError("Actual Windows Documents path could not be resolved")
+        require_safe_profile(self.config.user_data, documents.value)
+
     def start(self, save_name):
+        self.preflight()
         if self.process:
             raise RuntimeError("Owned process already exists")
         try:
