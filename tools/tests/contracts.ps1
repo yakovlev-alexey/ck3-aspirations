@@ -146,6 +146,21 @@ Case 'K15 nested native cards retain implicit key checks' {
     Write-Text $path ([IO.File]::ReadAllText($path) -replace '(?m)^ asp_vengeance_story_desc:.*\r?\n?', '')
     Check $root 'Missing visible Story localization.*asp_vengeance_story_desc'
 }
+Case 'K16 same-line visible Story cannot bypass native key checks' {
+    $root = New-Fixture K16
+    $path = Join-Path $root 'src/stories/vengeance/game/common/story_cycles/asp_story.txt'
+    Write-Text $path 'asp_context_story = { visible = no } asp_visible_story = { visible = yes visualization = { custom_string_key = "asp_missing_body" } }'
+    Write-Text (Join-Path $root 'src/stories/vengeance/game/localization/english/asp_fixture_l_english.yml') 'l_english:'
+    Check $root 'Missing visible Story localization.*asp_visible_story'
+    Write-Text (Join-Path $root 'src/stories/vengeance/game/localization/english/asp_fixture_l_english.yml') "l_english:`n asp_visible_story:0 `"Title`"`n asp_visible_story_desc:0 `"Description`"`n asp_missing_body:0 `"Body`"`n"
+    Check $root
+}
+Case 'K17 nested assignments are not top-level Story definitions' {
+    $root = New-Fixture K17
+    $path = Join-Path $root 'src/stories/vengeance/game/common/story_cycles/asp_story.txt'
+    Add-Content -LiteralPath $path "`nother_container = { asp_nested_story = { visible = yes } }"
+    Check $root
+}
 Write-Host "Contract fixtures: $testRoot"
 if ($failures.Count) { Write-Host "$($failures.Count) contract cases failed"; exit 1 }
-Write-Host 'All 15 shared contract cases passed'; exit 0
+Write-Host 'All 17 shared contract cases passed'; exit 0

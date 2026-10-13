@@ -92,7 +92,16 @@ function Test-StoryKeys {
             $source = Read-TrackedText ([IO.Path]::GetRelativePath($script:Root, $file.FullName))
             # Mask quoted strings/comments before counting braces or matching visibility.
             $masked = [regex]::Replace($source, '"(?:\\.|[^"\\])*"|#[^\r\n]*', [Text.RegularExpressions.MatchEvaluator]{ param($match) return [regex]::Replace($match.Value, '[^\r\n]', ' ') })
-            foreach ($definition in [regex]::Matches($masked, '(?m)^\s*(asp_[a-zA-Z0-9_]+)\s*=\s*\{')) {
+            $cursor = 0; $topDepth = 0
+            foreach ($definition in [regex]::Matches($masked, '\b(asp_[a-zA-Z0-9_]+)\s*=\s*\{')) {
+                # Native assignments need no line break; only depth-zero blocks are Stories.
+                if ($definition.Index -lt $cursor) { continue }
+                while ($cursor -lt $definition.Index) {
+                    if ($masked[$cursor] -eq '{') { $topDepth++ }
+                    if ($masked[$cursor] -eq '}') { $topDepth-- }
+                    $cursor++
+                }
+                if ($topDepth -ne 0) { continue }
                 $start = $definition.Index + $definition.Length
                 $depth = 1; $end = $start
                 while ($end -lt $masked.Length -and $depth) {
@@ -101,6 +110,7 @@ function Test-StoryKeys {
                     $end++
                 }
                 if ($depth) { throw "Unclosed Story definition: $($definition.Groups[1].Value)" }
+                $cursor = $end
                 $body = $masked.Substring($start, $end - $start - 1)
                 if ($body -notmatch '\bvisible\s*=\s*yes\b') { continue }
                 $story = $definition.Groups[1].Value
