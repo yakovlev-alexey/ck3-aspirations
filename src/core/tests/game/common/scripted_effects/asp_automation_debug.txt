@@ -173,6 +173,44 @@ asp_test_automation_complete_effect = {
             set_variable = { name = asp_test_automation_result_already_mode value = var:asp_test_bond_already_mode }
             set_variable = { name = asp_test_automation_result_routine_created value = var:asp_test_bond_routine_created }
             set_variable = { name = asp_test_automation_result_context_stable value = var:asp_test_bond_context_stable }
+            set_variable = { name = asp_test_automation_result_f2r_eligible value = var:asp_test_bond_f2r_eligible }
+            set_variable = { name = asp_test_automation_result_f2r_mode value = var:asp_test_bond_f2r_mode }
+            set_variable = { name = asp_test_automation_result_f2r_same_story value = var:asp_test_bond_f2r_same_story }
+            set_variable = { name = asp_test_automation_result_f2r_same_target value = var:asp_test_bond_f2r_same_target }
+            set_variable = { name = asp_test_automation_result_f2r_instance_delta value = var:asp_test_bond_f2r_instance_delta }
+            set_variable = { name = asp_test_automation_result_f2r_allocation_delta value = var:asp_test_bond_f2r_allocation_delta }
+            set_variable = { name = asp_test_automation_result_f2r_origin_delta value = var:asp_test_bond_f2r_origin_delta }
+            set_variable = { name = asp_test_automation_result_f2r_incident_delta value = var:asp_test_bond_f2r_incident_delta }
+            set_variable = { name = asp_test_automation_result_f2r_signature_delta value = var:asp_test_bond_f2r_signature_delta }
+            set_variable = { name = asp_test_automation_result_f2r_serial_delta value = var:asp_test_bond_f2r_serial_delta }
+            set_variable = { name = asp_test_automation_result_f2r_consumed_delta value = var:asp_test_bond_f2r_consumed_delta }
+            set_variable = { name = asp_test_automation_result_f2r_cooldown_delta value = var:asp_test_bond_f2r_cooldown_delta }
+            set_variable = { name = asp_test_automation_result_f2r_desires value = var:asp_test_bond_f2r_desires }
+            set_variable = { name = asp_test_automation_result_f2r_stress value = var:asp_test_bond_f2r_stress }
+            set_variable = { name = asp_test_automation_result_f2r_xp value = var:asp_test_bond_f2r_xp }
+            set_variable = { name = asp_test_automation_result_f2r_memories value = var:asp_test_bond_f2r_memories }
+            set_variable = { name = asp_test_automation_result_f2r_review_days value = var:asp_test_bond_f2r_review_days }
+            set_variable = { name = asp_test_automation_result_f2r_review_notified value = var:asp_test_bond_f2r_review_notified }
+            set_variable = { name = asp_test_automation_result_r2f_eligible value = var:asp_test_bond_r2f_eligible }
+            set_variable = { name = asp_test_automation_result_r2f_mode value = var:asp_test_bond_r2f_mode }
+            set_variable = { name = asp_test_automation_result_r2f_same_story value = var:asp_test_bond_r2f_same_story }
+            set_variable = { name = asp_test_automation_result_r2f_same_target value = var:asp_test_bond_r2f_same_target }
+            set_variable = { name = asp_test_automation_result_r2f_instance_delta value = var:asp_test_bond_r2f_instance_delta }
+            set_variable = { name = asp_test_automation_result_r2f_allocation_delta value = var:asp_test_bond_r2f_allocation_delta }
+            set_variable = { name = asp_test_automation_result_r2f_origin_delta value = var:asp_test_bond_r2f_origin_delta }
+            set_variable = { name = asp_test_automation_result_r2f_incident_delta value = var:asp_test_bond_r2f_incident_delta }
+            set_variable = { name = asp_test_automation_result_r2f_signature_delta value = var:asp_test_bond_r2f_signature_delta }
+            set_variable = { name = asp_test_automation_result_r2f_serial_delta value = var:asp_test_bond_r2f_serial_delta }
+            set_variable = { name = asp_test_automation_result_r2f_consumed_delta value = var:asp_test_bond_r2f_consumed_delta }
+            set_variable = { name = asp_test_automation_result_r2f_cooldown_delta value = var:asp_test_bond_r2f_cooldown_delta }
+            set_variable = { name = asp_test_automation_result_r2f_desires value = var:asp_test_bond_r2f_desires }
+            set_variable = { name = asp_test_automation_result_r2f_stress value = var:asp_test_bond_r2f_stress }
+            set_variable = { name = asp_test_automation_result_r2f_xp value = var:asp_test_bond_r2f_xp }
+            set_variable = { name = asp_test_automation_result_r2f_memories value = var:asp_test_bond_r2f_memories }
+            set_variable = { name = asp_test_automation_result_r2f_review_days value = var:asp_test_bond_r2f_review_days }
+            set_variable = { name = asp_test_automation_result_r2f_review_notified value = var:asp_test_bond_r2f_review_notified }
+            set_variable = { name = asp_test_automation_result_f2r_before_mode value = var:asp_test_bond_f2r_before_mode }
+            set_variable = { name = asp_test_automation_result_r2f_before_mode value = var:asp_test_bond_r2f_before_mode }
             debug_log = asp_test_automation_bond_done
         }
         else = { debug_log = asp_test_automation_done }

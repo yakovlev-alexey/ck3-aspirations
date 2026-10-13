@@ -283,7 +283,9 @@ asp_test_bond_extended_effect = {
     scope:asp_test_bond_woman = { save_scope_as = asp_test_bond_current_contact }
     asp_bond_observe_context_effect = { TARGET = scope:asp_test_bond_current_contact }
     scope:asp_test_bond_context ?= { if = { limit = { var:asp_bond_context_serial = scope:asp_test_bond_context_serial } story_owner = { set_variable = { name = asp_test_bond_context_stable value = 1 } } } }
-    if = { limit = { var:asp_test_bond_already_mode = 1 var:asp_test_bond_routine_created = 1 var:asp_test_bond_context_stable = 1 } set_variable = { name = asp_test_bond_b07 value = 1 } debug_log = "ASP_TEST B07 PASS" }
+    asp_test_bond_positive_reinterpret_effect = { FROM = friendship TO = romance PREFIX = f2r DUE = no }
+    asp_test_bond_positive_reinterpret_effect = { FROM = romance TO = friendship PREFIX = r2f DUE = yes }
+    if = { limit = { var:asp_test_bond_already_mode = 1 var:asp_test_bond_routine_created = 1 var:asp_test_bond_context_stable = 1 var:asp_test_bond_f2r_before_mode = 1 var:asp_test_bond_r2f_before_mode = 2 var:asp_test_bond_f2r_eligible = 1 var:asp_test_bond_f2r_mode = 2 var:asp_test_bond_f2r_same_story = 1 var:asp_test_bond_f2r_same_target = 1 var:asp_test_bond_f2r_instance_delta = 0 var:asp_test_bond_f2r_allocation_delta = 0 var:asp_test_bond_f2r_origin_delta = 0 var:asp_test_bond_f2r_incident_delta = 0 var:asp_test_bond_f2r_signature_delta = 0 var:asp_test_bond_f2r_serial_delta = 0 var:asp_test_bond_f2r_consumed_delta = 0 var:asp_test_bond_f2r_cooldown_delta = 0 var:asp_test_bond_f2r_desires = 1 var:asp_test_bond_f2r_stress = 0 var:asp_test_bond_f2r_xp = 0 var:asp_test_bond_f2r_memories = 0 var:asp_test_bond_f2r_review_days = 720 var:asp_test_bond_f2r_review_notified = 0 var:asp_test_bond_r2f_eligible = 1 var:asp_test_bond_r2f_mode = 1 var:asp_test_bond_r2f_same_story = 1 var:asp_test_bond_r2f_same_target = 1 var:asp_test_bond_r2f_instance_delta = 0 var:asp_test_bond_r2f_allocation_delta = 0 var:asp_test_bond_r2f_origin_delta = 0 var:asp_test_bond_r2f_incident_delta = 0 var:asp_test_bond_r2f_signature_delta = 0 var:asp_test_bond_r2f_serial_delta = 0 var:asp_test_bond_r2f_consumed_delta = 0 var:asp_test_bond_r2f_cooldown_delta = 0 var:asp_test_bond_r2f_desires = 1 var:asp_test_bond_r2f_stress = 0 var:asp_test_bond_r2f_xp = 0 var:asp_test_bond_r2f_memories = 0 var:asp_test_bond_r2f_review_days = 360 var:asp_test_bond_r2f_review_notified = 0 } set_variable = { name = asp_test_bond_b07 value = 1 } debug_log = "ASP_TEST B07 PASS" }
     else = { debug_log = "ASP_TEST B07 FAIL" }
 }
 asp_test_bond_gui_setup_effect = {
@@ -376,4 +378,110 @@ asp_test_bond_gui_loss_effect = {
 asp_test_bond_gui_loss_assert_effect = {
     if = { limit = { asp_active_desires = 0 stress = var:asp_test_bond_loss_stress diplomacy_lifestyle_xp = var:asp_test_bond_loss_xp any_memory = { has_memory_type = asp_bond_loss_memory has_memory_participant = root.var:asp_test_bond_gui_target } } debug_log = "ASP_TEST BOND GUI_TARGET_LOSS_PASS" }
     else = { debug_log = "ASP_TEST BOND GUI_TARGET_LOSS_FAIL" }
+}
+
+# Shared registered B07 positive path. Contacts/perk and due-date stamps are controlled setup.
+asp_test_bond_positive_reinterpret_effect = {
+    asp_test_bond_setup_effect = yes
+    add_perk = befriend_perk
+    set_variable = { name = asp_test_bond_$PREFIX$_before_mode value = -999 }
+    set_variable = { name = asp_test_bond_$PREFIX$_eligible value = -999 }
+    set_variable = { name = asp_test_bond_$PREFIX$_mode value = -999 }
+    set_variable = { name = asp_test_bond_$PREFIX$_same_story value = -999 }
+    set_variable = { name = asp_test_bond_$PREFIX$_same_target value = -999 }
+    set_variable = { name = asp_test_bond_$PREFIX$_instance_delta value = -999 }
+    set_variable = { name = asp_test_bond_$PREFIX$_allocation_delta value = -999 }
+    set_variable = { name = asp_test_bond_$PREFIX$_origin_delta value = -999 }
+    set_variable = { name = asp_test_bond_$PREFIX$_incident_delta value = -999 }
+    set_variable = { name = asp_test_bond_$PREFIX$_signature_delta value = -999 }
+    set_variable = { name = asp_test_bond_$PREFIX$_serial_delta value = -999 }
+    set_variable = { name = asp_test_bond_$PREFIX$_consumed_delta value = -999 }
+    set_variable = { name = asp_test_bond_$PREFIX$_cooldown_delta value = -999 }
+    set_variable = { name = asp_test_bond_$PREFIX$_desires value = -999 }
+    set_variable = { name = asp_test_bond_$PREFIX$_stress value = -999 }
+    set_variable = { name = asp_test_bond_$PREFIX$_xp value = -999 }
+    set_variable = { name = asp_test_bond_$PREFIX$_memories value = -999 }
+    set_variable = { name = asp_test_bond_$PREFIX$_review_days value = -999 }
+    set_variable = { name = asp_test_bond_$PREFIX$_review_notified value = -999 }
+
+    set_variable = { name = asp_test_bond_$PREFIX$_eligible value = 0 }
+    if = { limit = { asp_bond_friendship_pursuit_trigger = { TARGET = scope:asp_test_bond_woman } asp_bond_romance_pursuit_trigger = { TARGET = scope:asp_test_bond_woman } }
+        set_variable = { name = asp_test_bond_$PREFIX$_eligible value = 1 }
+    }
+    asp_start_personal_bond_effect = { TARGET = scope:asp_test_bond_woman MODE = $FROM$ }
+    asp_test_bond_find_effect = yes
+    if = { limit = { always = $DUE$ }
+        scope:asp_test_bond_story ?= {
+            set_variable = { name = asp_origin_date value = { value = current_date subtract = 720 } }
+            set_variable = { name = asp_next_review_date value = current_date }
+            set_variable = { name = asp_review_notified value = yes }
+        }
+        set_variable = { name = asp_bond_next_routine_date value = { value = current_date subtract = 360 } }
+    }
+    set_variable = { name = asp_test_bond_reinterpret_before_stress value = stress }
+    set_variable = { name = asp_test_bond_reinterpret_before_xp value = diplomacy_lifestyle_xp }
+    set_variable = { name = asp_test_bond_reinterpret_before_allocation value = var:asp_next_instance_id }
+    set_variable = { name = asp_test_bond_reinterpret_before_cooldown value = var:asp_bond_next_routine_date }
+    set_variable = { name = asp_test_bond_reinterpret_before_memories value = 0 }
+    every_memory = { root = { change_variable = { name = asp_test_bond_reinterpret_before_memories add = 1 } } }
+    scope:asp_test_bond_story ?= {
+        save_scope_value_as = { name = asp_test_bond_reinterpret_before_mode value = 0 }
+        if = { limit = { var:asp_interpretation = flag:friendship } save_scope_value_as = { name = asp_test_bond_reinterpret_before_mode value = 1 } }
+        else_if = { limit = { var:asp_interpretation = flag:romance } save_scope_value_as = { name = asp_test_bond_reinterpret_before_mode value = 2 } }
+        story_owner = { set_variable = { name = asp_test_bond_$PREFIX$_before_mode value = scope:asp_test_bond_reinterpret_before_mode } }
+        save_scope_as = asp_test_bond_reinterpret_original_story
+        var:asp_target = { save_scope_as = asp_test_bond_reinterpret_original_target }
+        save_scope_value_as = { name = asp_test_bond_reinterpret_before_instance value = var:asp_instance_id }
+        save_scope_value_as = { name = asp_test_bond_reinterpret_before_origin value = var:asp_origin_date }
+        save_scope_value_as = { name = asp_test_bond_reinterpret_before_incident value = var:asp_bond_origin_incident }
+        save_scope_value_as = { name = asp_test_bond_reinterpret_before_signature value = var:asp_bond_origin_context }
+
+    }
+    every_owned_story = { type = asp_personal_bond_context_story
+        if = { limit = { var:asp_bond_context_target = scope:asp_test_bond_woman } save_scope_as = asp_test_bond_reinterpret_context }
+    }
+    scope:asp_test_bond_reinterpret_context ?= {
+        save_scope_value_as = { name = asp_test_bond_reinterpret_before_serial value = var:asp_bond_context_serial }
+        save_scope_value_as = { name = asp_test_bond_reinterpret_before_consumed value = var:asp_bond_consumed_serial }
+    }
+    scope:asp_test_bond_story ?= { asp_bond_reinterpret_effect = { MODE = $TO$ } }
+    # Reacquire to expose any replacement/no-op, rather than only inspecting the old saved object.
+    asp_test_bond_find_effect = yes
+    scope:asp_test_bond_story ?= {
+        save_scope_value_as = { name = asp_test_bond_reinterpret_after_mode value = 0 }
+        if = { limit = { var:asp_interpretation = flag:friendship } save_scope_value_as = { name = asp_test_bond_reinterpret_after_mode value = 1 } }
+        else_if = { limit = { var:asp_interpretation = flag:romance } save_scope_value_as = { name = asp_test_bond_reinterpret_after_mode value = 2 } }
+        story_owner = { set_variable = { name = asp_test_bond_$PREFIX$_mode value = scope:asp_test_bond_reinterpret_after_mode } }
+        story_owner = { set_variable = { name = asp_test_bond_$PREFIX$_same_story value = 0 } set_variable = { name = asp_test_bond_$PREFIX$_same_target value = 0 } }
+        if = { limit = { this = scope:asp_test_bond_reinterpret_original_story } story_owner = { set_variable = { name = asp_test_bond_$PREFIX$_same_story value = 1 } } }
+        if = { limit = { var:asp_target = scope:asp_test_bond_reinterpret_original_target } story_owner = { set_variable = { name = asp_test_bond_$PREFIX$_same_target value = 1 } } }
+        save_scope_value_as = { name = asp_test_bond_reinterpret_delta_instance value = { value = var:asp_instance_id subtract = scope:asp_test_bond_reinterpret_before_instance } }
+        story_owner = { set_variable = { name = asp_test_bond_$PREFIX$_instance_delta value = scope:asp_test_bond_reinterpret_delta_instance } }
+        save_scope_value_as = { name = asp_test_bond_reinterpret_delta_origin value = { value = var:asp_origin_date subtract = scope:asp_test_bond_reinterpret_before_origin } }
+        story_owner = { set_variable = { name = asp_test_bond_$PREFIX$_origin_delta value = scope:asp_test_bond_reinterpret_delta_origin } }
+        save_scope_value_as = { name = asp_test_bond_reinterpret_delta_incident value = { value = var:asp_bond_origin_incident subtract = scope:asp_test_bond_reinterpret_before_incident } }
+        story_owner = { set_variable = { name = asp_test_bond_$PREFIX$_incident_delta value = scope:asp_test_bond_reinterpret_delta_incident } }
+        save_scope_value_as = { name = asp_test_bond_reinterpret_delta_signature value = { value = var:asp_bond_origin_context subtract = scope:asp_test_bond_reinterpret_before_signature } }
+        story_owner = { set_variable = { name = asp_test_bond_$PREFIX$_signature_delta value = scope:asp_test_bond_reinterpret_delta_signature } }
+
+        save_scope_value_as = { name = asp_test_bond_reinterpret_after_review value = { value = var:asp_next_review_date subtract = current_date } }
+        story_owner = { set_variable = { name = asp_test_bond_$PREFIX$_review_days value = scope:asp_test_bond_reinterpret_after_review } set_variable = { name = asp_test_bond_$PREFIX$_review_notified value = 0 } }
+        if = { limit = { has_variable = asp_review_notified } story_owner = { set_variable = { name = asp_test_bond_$PREFIX$_review_notified value = 1 } } }
+    }
+    scope:asp_test_bond_reinterpret_context ?= {
+        save_scope_value_as = { name = asp_test_bond_reinterpret_delta_serial value = { value = var:asp_bond_context_serial subtract = scope:asp_test_bond_reinterpret_before_serial } }
+        story_owner = { set_variable = { name = asp_test_bond_$PREFIX$_serial_delta value = scope:asp_test_bond_reinterpret_delta_serial } }
+        save_scope_value_as = { name = asp_test_bond_reinterpret_delta_consumed value = { value = var:asp_bond_consumed_serial subtract = scope:asp_test_bond_reinterpret_before_consumed } }
+        story_owner = { set_variable = { name = asp_test_bond_$PREFIX$_consumed_delta value = scope:asp_test_bond_reinterpret_delta_consumed } }
+
+    }
+    set_variable = { name = asp_test_bond_$PREFIX$_allocation_delta value = { value = var:asp_next_instance_id subtract = var:asp_test_bond_reinterpret_before_allocation } }
+    set_variable = { name = asp_test_bond_$PREFIX$_cooldown_delta value = { value = var:asp_bond_next_routine_date subtract = var:asp_test_bond_reinterpret_before_cooldown } }
+    set_variable = { name = asp_test_bond_$PREFIX$_desires value = asp_active_desires }
+    set_variable = { name = asp_test_bond_$PREFIX$_stress value = { value = stress subtract = var:asp_test_bond_reinterpret_before_stress } }
+    set_variable = { name = asp_test_bond_$PREFIX$_xp value = { value = diplomacy_lifestyle_xp subtract = var:asp_test_bond_reinterpret_before_xp } }
+    set_variable = { name = asp_test_bond_reinterpret_after_memories value = 0 }
+    every_memory = { root = { change_variable = { name = asp_test_bond_reinterpret_after_memories add = 1 } } }
+    set_variable = { name = asp_test_bond_$PREFIX$_memories value = { value = var:asp_test_bond_reinterpret_after_memories subtract = var:asp_test_bond_reinterpret_before_memories } }
+    debug_log = "ASP_TEST B07 POSITIVE_REINTERPRET $FROM$->$TO$"
 }
