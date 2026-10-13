@@ -2,6 +2,7 @@
 import dataclasses
 import hashlib
 import json
+import re
 import secrets
 import shutil
 import sys
@@ -70,6 +71,22 @@ class ManagedFiles:
                         raise ValueError('Staged save changed externally; retained')
                     self.save.unlink()
             except (OSError, ValueError) as error:
+                conflicts.append(str(error))
+        ui_journal = self.directory / 'ui-save-ownership.json'
+        if ui_journal.exists():
+            try:
+                entries = json.loads(ui_journal.read_text(encoding='utf-8'))['saves']
+                if not isinstance(entries, list) or len(entries) > 10:
+                    raise ValueError('Invalid UI save ownership journal')
+                for entry in entries:
+                    path = safe_path(entry['path'])
+                    if path.parent != safe_path(self.config.user_data / 'save games') or not re.fullmatch(r'asp_ui_[0-9a-f]{16}\.ck3', path.name):
+                        raise ValueError('UI save path is not an owned disposable name')
+                    if path.exists():
+                        if not entry.get('sha256') or sha(path) != entry['sha256']:
+                            raise ValueError('UI save incomplete or changed externally; retained')
+                        path.unlink()
+            except (OSError, ValueError, KeyError, TypeError) as error:
                 conflicts.append(str(error))
         if self.created_root:
             try:

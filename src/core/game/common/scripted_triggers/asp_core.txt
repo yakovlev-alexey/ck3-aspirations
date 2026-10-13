@@ -31,7 +31,12 @@ asp_story_review_due_trigger = {
 # Initial age, independent of retained reminders.
 asp_story_free_release_trigger = { asp_story_age_days >= asp_initial_review_days }
 asp_family_can_declare_trigger = {
-    OR = { AND = { var:asp_family = flag:vengeance asp_vengeance_can_declare_trigger = yes } AND = { var:asp_family = flag:holding_recovery asp_holding_recovery_can_declare_trigger = yes } }
+    OR = {
+        trigger_if = { limit = { var:asp_family = flag:vengeance } asp_vengeance_can_declare_trigger = yes }
+        trigger_else = { always = no }
+        trigger_if = { limit = { var:asp_family = flag:holding_recovery } asp_holding_recovery_can_declare_trigger = yes }
+        trigger_else = { always = no }
+    }
 }
 asp_can_declare_story_trigger = {
     asp_can_manage_story_trigger = yes

@@ -46,9 +46,12 @@ For a complete managed regression, build/check dev output, close CK3 and its lau
 
 ```powershell
 python -m tools.game_runner --config .local/automation/config.json session core-regression --repeat 1 --deadline 240
+python -m tools.game_runner --config .local/automation/config.json session ui-regression --repeat 1 --deadline 240
 ```
 
 This additive command prepares/restores only the autosave preference and enabled-mod selection, uses a unique temporary descriptor/save, and stops its exact owned worker/game Job on failure or deadline. It retains generated `report.json` and `report.md` with build provenance, measured assertions, required fresh screenshot/log evidence and restoration results under configured `.local/` output. Changed external targets are retained as explicit failures. Repeat is 1–10 and deadline is 1–900 seconds; existing commands/MCP remain available. See the [managed lifecycle contract](tools/game_runner/SPEC.md#managed-session-lifecycle).
+
+The managed `ui-regression` additionally selects the exact second native Story, declares its eligible ambition, saves through native Save Game and reloads that actual campaign with exact persistence assertions and ordered screenshots. This UI sequence was measured on CK3 1.20.1 at a 2560x1440 client, GUI scale1.3 and local saves; other layouts fail clearly. Bare `run` and MCP calls reject this managed-only sequence. See [UI operations and evidence](tools/game_runner/SPEC.md#registered-ui-regression).
 
 For a local MCP client, start `python -m tools.game_runner --config '<absolute configuration JSON path>' mcp` from the repository directory. It supports MCP 2025-11-25 initialization, a fixed three-tool list and calls to `aspirations_run_scenario`, `aspirations_observe` and `aspirations_advance_days`. Calls share the same bounded runner and ownership lock; close client stdin to stop the owned game and restore temporary runner files. No global MCP registration or SDK is needed. See the [stdio examples and implementation limits](tools/game_runner/SPEC.md#mcp-stdio-interface), including serial dispatch without progress or interruptible cancellation.
 

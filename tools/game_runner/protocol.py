@@ -4,6 +4,7 @@ import os
 import re
 import tempfile
 from pathlib import Path
+from .ui import UI_FIELDS
 
 MARKER = "ASP_AUTOMATION|"
 CORE_FIELDS = (
@@ -102,6 +103,8 @@ class Telemetry:
                 for field in fields[4:]:
                     key, value = field.split("=", 1)
                     allowed = {"counter", "date", "reason"}
+                    if self.operation in ("ui_setup", "ui_open", "ui_assert", "ui_reload_assert"):
+                        allowed.update(UI_FIELDS)
                     if self.operation == "core_regression":
                         allowed.update(CORE_FIELDS)
                     if self.operation == "vengeance_regression":
@@ -127,6 +130,8 @@ class Telemetry:
                     raise ProtocolError("Native request rejected: " + result.get("reason", "unknown"))
                 if result["kind"] == "DONE":
                     required = {"version", "session", "request", "kind", "counter", "date"}
+                    if self.operation in ("ui_setup", "ui_open", "ui_assert", "ui_reload_assert"):
+                        required.update(UI_FIELDS)
                     if self.operation == "core_regression":
                         required.update(CORE_FIELDS)
                     if self.operation == "vengeance_regression":

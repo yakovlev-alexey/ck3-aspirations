@@ -12,6 +12,8 @@ from pathlib import Path
 
 from .protocol import LogCursor, ProtocolError, Telemetry, atomic_request, safe_path
 from .windows import WindowsBackend
+from .ui import UIError
+from .ui_scenario import run_ui_sequence
 from .registry import SCENARIOS
 
 
@@ -162,6 +164,8 @@ class GameRunner:
         deadline = self.clock() + self.config.startup_settle_seconds
         while self.clock() < deadline:
             self.sleep(min(0.2, deadline - self.clock()))
+        if hasattr(self.backend, "ready"):
+            self.backend.ready()
         self.backend.validate()
         self.backend.open_console()
         self.session = secrets.randbelow(80000000) + 10000000
@@ -254,11 +258,22 @@ class GameRunner:
         self.run_directory = None
         report = {"status": "passed", "scenario": name, "version": 1, "repeat": repeat, "runs": [], "baseline_sha256": self.baseline_hash}
         try:
+            if name == "ui-regression" and not hasattr(self, "request_journal"):
+                raise UIError("ui-regression requires the managed session ownership workflow")
             for index in range(1, repeat + 1):
                 self.backend.stop()
                 self.session = None
                 self._start()
                 initial = self._send("observe")
+                if name == "ui-regression":
+                    run = run_ui_sequence(self, initial, index)
+                    run['assertions'][-1]['passed'] = hashlib.sha256(self.config.baseline_save.read_bytes()).hexdigest() == self.baseline_hash
+                    _assert_aspiration_diagnostics_absent(run, run['ui_declaration_logs'], run['logs'])
+                    report['runs'].append(run)
+                    if not all(item['passed'] for item in run['assertions']):
+                        report['status'] = 'assertion_failed'
+                        break
+                    continue
                 if name == "core-regression":
                     core = self._send("core_regression")
                     duplicate = self._send("core_regression", replay=True)
@@ -432,7 +447,7 @@ class GameRunner:
             except (ImportError, OSError):
                 pass
         except (RuntimeError, ValueError, OSError, TimeoutError) as error:
-            report["status"] = "timeout" if isinstance(error, TimeoutError) else "transport_error"
+            report["status"] = "assertion_failed" if isinstance(error, UIError) else "timeout" if isinstance(error, TimeoutError) else "transport_error"
             report["error"] = str(error)
             self._snapshot_logs("failure")
             try:

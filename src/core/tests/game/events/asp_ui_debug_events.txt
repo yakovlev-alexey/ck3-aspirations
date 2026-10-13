@@ -1,0 +1,4 @@
+﻿namespace = asp_test_core
+asp_test_core.80 = { type = character_event hidden = yes immediate = { asp_test_ui_setup_effect = yes } }
+asp_test_core.81 = { type = character_event hidden = yes immediate = { asp_test_ui_measure_effect = yes debug_log = "ASP_TEST UI DECLARATION MEASURED" } }
+asp_test_core.82 = { type = character_event hidden = yes immediate = { asp_test_ui_measure_effect = yes debug_log = "ASP_TEST UI RELOAD MEASURED" } }

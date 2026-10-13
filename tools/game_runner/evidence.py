@@ -5,6 +5,7 @@ import subprocess
 import time
 from pathlib import Path
 from .protocol import safe_path
+from .ui import WindowGeometry, validate_frame
 
 
 def sha(path):
@@ -90,7 +91,34 @@ def validate_evidence(native, started, output_root):
         if not measurements:
             raise ValueError('Missing native request measurements')
         logic_keys = {'initial', 'lifecycle', 'duplicate'}
-        if 'logic_logs' in run:
+        if 'ui_declaration_logs' in run:
+            declaration_session = run['initial']['session']
+            reload_session = run['ui_reloaded']['session']
+            if declaration_session == reload_session:
+                raise ValueError('UI reload must use a fresh session')
+            declaration_keys = {'initial', 'ui_setup', 'ui_open', 'ui_declared', 'ui_duplicate'}
+            intervals = [(run['ui_declaration_logs'], declaration_session, {key: value for key, value in measurements.items() if key in declaration_keys}),
+                         (run['logs'], reload_session, {key: value for key, value in measurements.items() if key not in declaration_keys})]
+            required_frames = ['open-aspirations', 'select-story', 'declare-confirmation', 'declare-result', 'save-menu', 'save-dialog', 'save-name', 'save-result', 'reload-selector', 'reload-story']
+            frames = run.get('ui_frames', [])
+            if [frame.get('operation') for frame in frames] != required_frames:
+                raise ValueError('Missing complete ordered native UI frame evidence')
+            for frame in frames:
+                geometry = WindowGeometry(**frame['geometry'])
+                observed = validate_frame(frame['path'], evidence, geometry, started, frame['operation'])
+                if observed != frame:
+                    raise ValueError('UI screenshot metadata or bytes changed')
+                paths.append(safe_path(frame['path']))
+            frame_record = evidence / f"ui-frames-{run['index']}.json"
+            if not frame_record.exists() or json.loads(frame_record.read_text()) != frames:
+                raise ValueError('Missing matching UI frame record')
+            paths.append(frame_record)
+            saved = run['ui_save']
+            retained = safe_path(saved['evidence_path'])
+            if not retained.is_relative_to(evidence) or not retained.is_file() or sha(retained) != saved['sha256'] or retained.stat().st_size != saved['bytes'] or saved['sha256'] == native.get('baseline_sha256'):
+                raise ValueError('Missing actual nonbaseline UI campaign evidence')
+            paths.append(retained)
+        elif 'logic_logs' in run:
             logic_session = run['initial']['session']
             calendar_session = run['calendar_setup']['session']
             if logic_session == calendar_session:

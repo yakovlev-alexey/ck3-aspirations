@@ -237,6 +237,26 @@ asp_test_automation_complete_effect = {
             set_variable = { name = asp_test_automation_result_r2f_before_mode value = var:asp_test_bond_r2f_before_mode }
             debug_log = asp_test_automation_bond_done
         }
+        else_if = {
+            limit = { OR = { var:asp_test_automation_operation = flag:ui_setup var:asp_test_automation_operation = flag:ui_open var:asp_test_automation_operation = flag:ui_assert var:asp_test_automation_operation = flag:ui_reload_assert } }
+            set_variable = { name = asp_test_automation_result_first_id value = var:asp_test_ui_first_id }
+            set_variable = { name = asp_test_automation_result_second_id value = var:asp_test_ui_second_id }
+            set_variable = { name = asp_test_automation_result_selected_id value = var:asp_test_ui_selected_id }
+            set_variable = { name = asp_test_automation_result_ambitions value = var:asp_test_ui_ambitions }
+            set_variable = { name = asp_test_automation_result_declared_count value = var:asp_test_ui_declared_count }
+            set_variable = { name = asp_test_automation_result_first_identity value = var:asp_test_ui_first_identity }
+            set_variable = { name = asp_test_automation_result_second_identity value = var:asp_test_ui_second_identity }
+            set_variable = { name = asp_test_automation_result_first_declared value = var:asp_test_ui_first_declared }
+            set_variable = { name = asp_test_automation_result_second_declared value = var:asp_test_ui_second_declared }
+            set_variable = { name = asp_test_automation_result_deadline_days value = var:asp_test_ui_deadline_days }
+            set_variable = { name = asp_test_automation_result_origin_delta value = var:asp_test_ui_origin_delta }
+            set_variable = { name = asp_test_automation_result_review_delta value = var:asp_test_ui_review_delta }
+            set_variable = { name = asp_test_automation_result_stress_delta value = var:asp_test_ui_stress_delta }
+            set_variable = { name = asp_test_automation_result_prestige_delta value = var:asp_test_ui_prestige_delta }
+            set_variable = { name = asp_test_automation_result_choice_second value = var:asp_test_ui_choice_second }
+            set_variable = { name = asp_test_automation_result_eligible_count value = var:asp_test_ui_eligible_count }
+            debug_log = asp_test_automation_ui_done
+        }
         else = { debug_log = asp_test_automation_done }
     }
 }
@@ -282,6 +302,7 @@ asp_test_automation_request_effect = {
                 else_if = { limit = { var:asp_test_automation_operation = flag:lifecycle_reload_assert } debug_log = asp_test_automation_reload_done }
                 else_if = { limit = { var:asp_test_automation_operation = flag:integrated_regression } debug_log = asp_test_automation_integrated_done }
                 else_if = { limit = { var:asp_test_automation_operation = flag:bond_regression } debug_log = asp_test_automation_bond_done }
+                else_if = { limit = { OR = { var:asp_test_automation_operation = flag:ui_setup var:asp_test_automation_operation = flag:ui_open var:asp_test_automation_operation = flag:ui_assert var:asp_test_automation_operation = flag:ui_reload_assert } } debug_log = asp_test_automation_ui_done }
                 else = { debug_log = asp_test_automation_done }
             }
         }
@@ -308,6 +329,9 @@ asp_test_automation_request_effect = {
                 if = { limit = { var:asp_test_automation_operation = flag:lifecycle_calendar } asp_test_lifecycle_calendar_setup_effect = yes }
                 if = { limit = { var:asp_test_automation_operation = flag:lifecycle_calendar_assert } asp_test_lifecycle_calendar_assert_effect = yes }
                 if = { limit = { var:asp_test_automation_operation = flag:lifecycle_reload_assert } asp_test_lifecycle_reload_assert_effect = yes }
+                if = { limit = { var:asp_test_automation_operation = flag:ui_setup } asp_test_ui_setup_effect = yes }
+                if = { limit = { var:asp_test_automation_operation = flag:ui_open } asp_test_ui_open_effect = yes }
+                if = { limit = { OR = { var:asp_test_automation_operation = flag:ui_assert var:asp_test_automation_operation = flag:ui_reload_assert } } asp_test_ui_measure_effect = yes }
                 if = {
                     limit = { var:asp_test_automation_operation = flag:advance }
                     set_variable = asp_test_automation_pending

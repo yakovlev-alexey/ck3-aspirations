@@ -5,6 +5,7 @@ import os
 import re
 from pathlib import Path
 from .protocol import safe_path
+from .ui import WindowGeometry
 import subprocess
 import time
 from ctypes import wintypes
@@ -16,7 +17,7 @@ class FocusError(RuntimeError):
 
 def validate_foreground(expected_hwnd, expected_pid, actual_hwnd, actual_pid):
     if not expected_hwnd or (expected_hwnd, expected_pid) != (actual_hwnd, actual_pid):
-        raise FocusError("CK3 lost foreground or window ownership")
+        raise FocusError(f"CK3 lost foreground or window ownership: expected HWND/PID {expected_hwnd}/{expected_pid}, observed {actual_hwnd}/{actual_pid}")
 
 
 def require_safe_profile(user_data, documents):
@@ -76,6 +77,7 @@ def require_safe_profile(user_data, documents):
         raise ValueError("Missing game.autosave preference; launch rejected") from error
     if autosave != "NO_AUTOSAVE":
         raise ValueError("Set CK3 game.autosave to NO_AUTOSAVE for the disposable automation session; launch rejected to preserve user saves")
+    return settings
 
 
 def resolve_documents():
@@ -122,6 +124,14 @@ class WindowsBackend:
         self.user32.MapVirtualKeyW.argtypes = [wintypes.UINT, wintypes.UINT]
         self.user32.MapVirtualKeyW.restype = wintypes.UINT
         self.user32.SetProcessDPIAware()
+        # Capture, ClientToScreen and cursor movement now use one physical-unit
+        # awareness context on this input thread, including 125% host scaling.
+        self.user32.SetThreadDpiAwarenessContext.argtypes = [ctypes.c_void_p]
+        self.user32.SetThreadDpiAwarenessContext.restype = ctypes.c_void_p
+        if not self.user32.SetThreadDpiAwarenessContext(ctypes.c_void_p(-4)):
+            raise RuntimeError("Per-monitor Windows DPI awareness could not be established")
+        self.user32.GetDpiForWindow.argtypes = [wintypes.HWND]
+        self.user32.GetDpiForWindow.restype = wintypes.UINT
 
     def preflight(self):
         shell32 = ctypes.WinDLL("shell32", use_last_error=True)
@@ -130,7 +140,7 @@ class WindowsBackend:
         documents = ctypes.create_unicode_buffer(260)
         if shell32.SHGetFolderPathW(None, 5, None, 0, documents) != 0:
             raise ValueError("Actual Windows Documents path could not be resolved")
-        require_safe_profile(self.config.user_data, documents.value)
+        return require_safe_profile(self.config.user_data, documents.value)
 
     def start(self, save_name):
         self.preflight()
@@ -153,28 +163,62 @@ class WindowsBackend:
             temporary.write_text(json.dumps({'owned_pids': self.started_pids}), encoding='utf-8')
             os.replace(temporary, journal)
         deadline = time.monotonic() + self.config.startup_timeout
-        callback_type = ctypes.WINFUNCTYPE(wintypes.BOOL, wintypes.HWND, wintypes.LPARAM)
         while time.monotonic() < deadline:
             if self.process.poll() is not None:
                 raise RuntimeError("Owned CK3 exited during startup")
-            handles = []
-            def find(hwnd, _):
-                pid = wintypes.DWORD()
-                self.user32.GetWindowThreadProcessId(hwnd, ctypes.byref(pid))
-                if pid.value == self.process.pid and self.user32.IsWindowVisible(hwnd):
-                    handles.append(hwnd)
-                return True
-            callback = callback_type(find)
-            self.user32.EnumWindows.argtypes = [callback_type, wintypes.LPARAM]
-            self.user32.EnumWindows.restype = wintypes.BOOL
-            self.user32.EnumWindows(callback, 0)
-            if handles:
-                self.hwnd = handles[0]
-                self.user32.SetForegroundWindow(self.hwnd)
-                self.validate()
-                return
+            hwnd = self._owned_window()
+            if hwnd:
+                self.hwnd = hwnd
+                return  # Loading is input-free; activation happens after settle.
             time.sleep(0.2)
         raise TimeoutError("CK3 window startup timed out")
+
+    def _owned_window(self):
+        callback_type = ctypes.WINFUNCTYPE(wintypes.BOOL, wintypes.HWND, wintypes.LPARAM)
+        handles = []
+        def find(hwnd, _):
+            pid, rect = wintypes.DWORD(), wintypes.RECT()
+            self.user32.GetWindowThreadProcessId(hwnd, ctypes.byref(pid))
+            if pid.value == self.process.pid and self.user32.IsWindowVisible(hwnd) and self.user32.GetClientRect(hwnd, ctypes.byref(rect)):
+                handles.append((rect.right * rect.bottom, int(hwnd)))
+            return True
+        callback = callback_type(find)
+        self.user32.EnumWindows.argtypes = [callback_type, wintypes.LPARAM]
+        self.user32.EnumWindows.restype = wintypes.BOOL
+        if not self.user32.EnumWindows(callback, 0):
+            raise RuntimeError("Owned CK3 window inventory failed")
+        return max(handles)[1] if handles else 0
+
+    def ready(self):
+        hwnd = self._owned_window()
+        if not hwnd:
+            raise RuntimeError("Loaded owned CK3 window is absent")
+        self.hwnd = hwnd
+        self._focus_owned_window()
+
+    def _focus_owned_window(self):
+        # Foreground activation can be asynchronous or denied to the worker.
+        # Attach only for activation, never send an Alt key to an unrelated app.
+        if not self.user32.SetForegroundWindow(self.hwnd):
+            foreground = self.user32.GetForegroundWindow()
+            foreground_thread = self.user32.GetWindowThreadProcessId(foreground, None)
+            kernel32 = ctypes.WinDLL("kernel32", use_last_error=True)
+            current_thread = kernel32.GetCurrentThreadId()
+            self.user32.AttachThreadInput.argtypes = [wintypes.DWORD, wintypes.DWORD, wintypes.BOOL]
+            self.user32.AttachThreadInput.restype = wintypes.BOOL
+            attached = bool(foreground_thread and foreground_thread != current_thread and self.user32.AttachThreadInput(current_thread, foreground_thread, True))
+            try:
+                self.user32.SetForegroundWindow(self.hwnd)
+            finally:
+                if attached:
+                    self.user32.AttachThreadInput(current_thread, foreground_thread, False)
+        deadline = time.monotonic() + 2
+        while time.monotonic() < deadline:
+            if self.user32.GetForegroundWindow() == self.hwnd:
+                self.validate()
+                return
+            time.sleep(0.05)
+        self.validate()  # Precise ownership diagnostics; no input was sent.
 
     def validate(self):
         if not self.process or self.process.poll() is not None:
@@ -217,7 +261,7 @@ class WindowsBackend:
         self.key(0xC0)
         time.sleep(0.2)
 
-    def command(self, text):
+    def replace_text(self, text):
         self.validate()
         self._input(0x11)
         try:
@@ -232,17 +276,63 @@ class WindowsBackend:
                 self.validate()
             finally:
                 self._input(char=ord(char), flags=6, release=True)
+
+    def command(self, text):
+        self.replace_text(text)
         self.key(0x0D)
         time.sleep(0.1)
+
+    def geometry(self):
+        self.validate()
+        rect, point = wintypes.RECT(), wintypes.POINT()
+        if not self.user32.GetClientRect(self.hwnd, ctypes.byref(rect)) or not self.user32.ClientToScreen(self.hwnd, ctypes.byref(point)):
+            raise RuntimeError("Owned client geometry could not be measured")
+        dpi = self.user32.GetDpiForWindow(self.hwnd)
+        return WindowGeometry(int(self.hwnd), self.process.pid, dpi, rect.right, rect.bottom, rect.right, rect.bottom, point.x, point.y)
+
+    def _mouse_input(self, flags, *, release=False):
+        if not release:
+            self.validate()
+        class Mouse(ctypes.Structure):
+            _fields_ = [("dx", wintypes.LONG), ("dy", wintypes.LONG), ("data", wintypes.DWORD), ("flags", wintypes.DWORD), ("time", wintypes.DWORD), ("extra", ctypes.c_size_t)]
+        class Key(ctypes.Structure):
+            _fields_ = [("vk", wintypes.WORD), ("scan", wintypes.WORD), ("flags", wintypes.DWORD), ("time", wintypes.DWORD), ("extra", ctypes.c_size_t)]
+        class Payload(ctypes.Union):
+            _fields_ = [("mouse", Mouse), ("key", Key)]
+        class Input(ctypes.Structure):
+            _fields_ = [("type", wintypes.DWORD), ("payload", Payload)]
+        event = Input(0, Payload(mouse=Mouse(0, 0, 0, flags, 0, 0)))
+        self.user32.SendInput.argtypes = [wintypes.UINT, ctypes.POINTER(Input), ctypes.c_int]
+        self.user32.SendInput.restype = wintypes.UINT
+        if self.user32.SendInput(1, ctypes.byref(event), ctypes.sizeof(event)) != 1:
+            raise RuntimeError("Windows rejected mouse input")
+
+    def click_image(self, geometry, x, y):
+        geometry.require_unchanged(self.geometry())
+        point = geometry.image_to_screen(x, y)
+        self.validate()
+        self.user32.SetCursorPos.argtypes = [ctypes.c_int, ctypes.c_int]
+        self.user32.SetCursorPos.restype = wintypes.BOOL
+        if not self.user32.SetCursorPos(*point):
+            raise RuntimeError("Windows rejected owned-window cursor placement")
+        # Let the native frame consume pointer movement before button dispatch.
+        time.sleep(0.1)
+        self.validate()
+        self._mouse_input(2)
+        try:
+            self.validate()
+        finally:
+            self._mouse_input(4, release=True)
+        time.sleep(0.15)
 
     def screenshot(self, path):
         self.validate()
         # Optional evidence capture; transport does not depend on Pillow.
         from PIL import ImageGrab
-        rect, point = wintypes.RECT(), wintypes.POINT()
-        self.user32.GetClientRect(self.hwnd, ctypes.byref(rect))
-        self.user32.ClientToScreen(self.hwnd, ctypes.byref(point))
-        ImageGrab.grab(bbox=(point.x, point.y, point.x + rect.right, point.y + rect.bottom)).save(path)
+        geometry = self.geometry()
+        ImageGrab.grab(bbox=(geometry.screen_x, geometry.screen_y, geometry.screen_x + geometry.client_width, geometry.screen_y + geometry.client_height)).save(path)
+        geometry.require_unchanged(self.geometry())
+        return geometry
 
     def stop(self):
         process = self.process

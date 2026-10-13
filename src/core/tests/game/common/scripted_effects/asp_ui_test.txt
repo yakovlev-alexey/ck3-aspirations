@@ -1,0 +1,98 @@
+﻿# UI setup is artificial; only real management input may declare a Story.
+asp_test_ui_setup_effect = {
+    asp_test_clear_stories_effect = yes
+    set_variable = { name = asp_test_ui_choice_second value = 0 }
+    asp_test_create_story_effect = { CLASS = ambition }
+    set_variable = { name = asp_test_ui_first_story value = scope:asp_new_story }
+    scope:asp_new_story = {
+        set_variable = { name = asp_vengeance_victim value = story_owner }
+        set_variable = { name = asp_interpretation value = flag:personal_vengeance }
+        set_variable = { name = asp_origin_date value = { value = current_date subtract = 360 } }
+        story_owner = {
+            set_variable = { name = asp_test_ui_first_target value = prev.var:asp_target }
+            set_variable = { name = asp_test_ui_first_saved_id value = prev.var:asp_instance_id }
+            set_variable = { name = asp_test_ui_first_origin value = prev.var:asp_origin_date }
+            set_variable = { name = asp_test_ui_first_review value = prev.var:asp_next_review_date }
+        }
+    }
+    asp_test_create_story_effect = { CLASS = ambition }
+    set_variable = { name = asp_test_ui_second_story value = scope:asp_new_story }
+    scope:asp_new_story = {
+        set_variable = { name = asp_vengeance_victim value = story_owner }
+        set_variable = { name = asp_interpretation value = flag:personal_vengeance }
+        set_variable = { name = asp_origin_date value = { value = current_date subtract = 360 } }
+        story_owner = {
+            set_variable = { name = asp_test_ui_second_target value = prev.var:asp_target }
+            set_variable = { name = asp_test_ui_second_saved_id value = prev.var:asp_instance_id }
+            set_variable = { name = asp_test_ui_second_origin value = prev.var:asp_origin_date }
+            set_variable = { name = asp_test_ui_second_review value = prev.var:asp_next_review_date }
+        }
+    }
+    set_variable = { name = asp_test_ui_stress_before value = stress }
+    set_variable = { name = asp_test_ui_prestige_before value = prestige }
+    asp_test_ui_measure_effect = yes
+}
+
+asp_test_ui_open_effect = {
+    asp_open_management_effect = yes
+    set_variable = { name = asp_test_ui_choice_second value = 0 }
+    if = { limit = { exists = scope:asp_choice_2 scope:asp_choice_2 = var:asp_test_ui_second_story }
+        set_variable = { name = asp_test_ui_choice_second value = 1 }
+    }
+    asp_test_ui_measure_effect = yes
+}
+
+asp_test_ui_measure_effect = {
+    set_variable = { name = asp_test_ui_first_id value = 0 }
+    set_variable = { name = asp_test_ui_second_id value = 0 }
+    set_variable = { name = asp_test_ui_selected_id value = 0 }
+    set_variable = { name = asp_test_ui_ambitions value = 0 }
+    set_variable = { name = asp_test_ui_declared_count value = 0 }
+    set_variable = { name = asp_test_ui_first_identity value = 0 }
+    set_variable = { name = asp_test_ui_second_identity value = 0 }
+    set_variable = { name = asp_test_ui_first_declared value = 0 }
+    set_variable = { name = asp_test_ui_second_declared value = 0 }
+    set_variable = { name = asp_test_ui_deadline_days value = 0 }
+    set_variable = { name = asp_test_ui_origin_delta value = 0 }
+    set_variable = { name = asp_test_ui_review_delta value = 0 }
+    set_variable = { name = asp_test_ui_stress_delta value = 0 }
+    set_variable = { name = asp_test_ui_prestige_delta value = 0 }
+    set_variable = { name = asp_test_ui_eligible_count value = 0 }
+    every_owned_story = {
+        limit = { asp_can_declare_story_trigger = yes }
+        story_owner = { change_variable = { name = asp_test_ui_eligible_count add = 1 } }
+    }
+    set_variable = { name = asp_test_ui_ambitions value = asp_active_ambitions }
+    every_owned_story = {
+        limit = { asp_is_active_story_trigger = yes has_variable = asp_declared }
+        story_owner = { change_variable = { name = asp_test_ui_declared_count add = 1 } }
+    }
+    var:asp_test_ui_first_story ?= {
+        story_owner = { set_variable = { name = asp_test_ui_first_id value = prev.var:asp_instance_id } }
+        if = { limit = { asp_can_manage_story_trigger = yes var:asp_target = root.var:asp_test_ui_first_target var:asp_instance_id = root.var:asp_test_ui_first_saved_id var:asp_origin_date = root.var:asp_test_ui_first_origin var:asp_next_review_date = root.var:asp_test_ui_first_review }
+            story_owner = { set_variable = { name = asp_test_ui_first_identity value = 1 } }
+        }
+        if = { limit = { has_variable = asp_declared }
+            story_owner = { set_variable = { name = asp_test_ui_first_declared value = 1 } set_variable = { name = asp_test_ui_selected_id value = prev.var:asp_instance_id } }
+        }
+    }
+    var:asp_test_ui_second_story ?= {
+        story_owner = { set_variable = { name = asp_test_ui_second_id value = prev.var:asp_instance_id } }
+        if = { limit = { asp_can_manage_story_trigger = yes var:asp_target = root.var:asp_test_ui_second_target var:asp_instance_id = root.var:asp_test_ui_second_saved_id var:asp_origin_date = root.var:asp_test_ui_second_origin var:asp_next_review_date = root.var:asp_test_ui_second_review }
+            story_owner = { set_variable = { name = asp_test_ui_second_identity value = 1 } }
+        }
+        if = { limit = { has_variable = asp_declared }
+            story_owner = {
+                set_variable = { name = asp_test_ui_second_declared value = 1 }
+                set_variable = { name = asp_test_ui_selected_id value = prev.var:asp_instance_id }
+                set_variable = { name = asp_test_ui_deadline_days value = { value = prev.var:asp_pledge_deadline subtract = current_date } }
+            }
+        }
+        story_owner = {
+            set_variable = { name = asp_test_ui_origin_delta value = { value = prev.var:asp_origin_date subtract = var:asp_test_ui_second_origin } }
+            set_variable = { name = asp_test_ui_review_delta value = { value = prev.var:asp_next_review_date subtract = var:asp_test_ui_second_review } }
+        }
+    }
+    set_variable = { name = asp_test_ui_stress_delta value = { value = stress subtract = var:asp_test_ui_stress_before } }
+    set_variable = { name = asp_test_ui_prestige_delta value = { value = prestige subtract = var:asp_test_ui_prestige_before } }
+}
