@@ -278,7 +278,7 @@ class GameRunner:
                     if logic_errors.exists():
                         diagnostics += "\n" + logic_errors.read_text(encoding="utf-8-sig", errors="replace")
                     runtime_blocks = re.split(r"(?=\[.*?\]\[E\])", diagnostics)
-                    aspiration_errors = [block for block in runtime_blocks if "asp_" in block and any(tag in block for tag in ("Script system error!", "pdx_persistent_reader.cpp", "Unknown trigger:", "Unknown effect:", "Failed to parse", "Data error in"))]
+                    aspiration_errors = [block for block in runtime_blocks if "asp_" in block and any(tag in block for tag in ("Script system error!", "pdx_persistent_reader.cpp", "Unknown trigger:", "Unknown effect:", "Failed to parse", "Data error in", "triggered but has no valid options"))]
                     assertions.append({"name": "aspiration_runtime_diagnostics_absent", "passed": not aspiration_errors})
                     run["aspiration_runtime_error_count"] = len(aspiration_errors)
                     report["runs"].append(run)

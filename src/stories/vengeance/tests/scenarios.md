@@ -30,7 +30,7 @@ Knowledge capability probe: `event asp_test_vengeance.10` compares explicit publ
 
 Do not repurpose core `.2` (C04 reload) or `.3` (C03 stale action). Test fixture and debug localization are dev-only. Record fresh report paths and actual screenshots in the ignored task report; never commit saves or logs.
 
-Observed Task 3 results on CK3 1.20.0.4: registered V01-V06 passed, including literal deltas/counts and cached duplicate identity; actual paused vanilla Execute separately passed +100 action Stress/-20 closure/one memory. Corrected native cards and all four distinct terminal meanings render in English. The earlier uppercase getter failure is retained in the ignored report/evidence. V07-V08 remain pending Task 4.
+Observed Task 3 results on CK3 1.20.0.4: registered V01-V06 passed, including literal deltas/counts and cached duplicate identity; actual paused vanilla Execute separately passed +100 action Stress/-20 closure/one memory. Corrected native cards and all four distinct terminal meanings render in English. The earlier uppercase getter failure is retained in the ignored report/evidence. V07-V08 are covered by the Task 4 P01-P06 procedures below; independent stage review is pending.
 
 ## Task 4 pledge and lifecycle entry
 

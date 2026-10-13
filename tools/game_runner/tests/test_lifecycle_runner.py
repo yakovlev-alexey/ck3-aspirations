@@ -45,6 +45,13 @@ class LifecycleTests(unittest.TestCase):
         report=self.runner.run_scenario("lifecycle-regression")
         self.assertEqual(report["status"],"assertion_failed")
         self.assertGreaterEqual(report["runs"][0]["aspiration_runtime_error_count"],1)
+    def test_no_valid_options_rejected_despite_native_pass(self):
+        self.backend.runtime_error=True
+        self.backend.diagnostic="[05:13:22][E][event_window_data.cpp:286]: Event 'asp_vengeance.1' triggered but has no valid options for Test Aspirant\n"
+        report=self.runner.run_scenario("lifecycle-regression")
+        self.assertTrue(all(report["runs"][0]["lifecycle"]["p0"+str(n)]==1 for n in range(1,7)))
+        self.assertEqual(report["status"],"assertion_failed")
+        self.assertGreater(report["runs"][0]["aspiration_runtime_error_count"],0)
     def test_wrong_actual_calendar_boundary_rejected(self):
         self.backend.override={"calendar_reviews":1}
         self.assertEqual(self.runner.run_scenario("lifecycle-regression")["status"],"assertion_failed")
