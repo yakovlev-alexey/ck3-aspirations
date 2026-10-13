@@ -2,7 +2,7 @@
 asp_pledge.1 = {
     type = character_event
     title = asp_declare_title
-    desc = { first_valid = { triggered_desc = { trigger = { asp_event_can_declare_trigger = yes } desc = asp_declare_desc } desc = asp_management_closed_desc } }
+    desc = { first_valid = { triggered_desc = { trigger = { asp_event_can_declare_trigger = yes } desc = { first_valid = { triggered_desc = { trigger = { asp_recovery_event_can_manage_trigger = { STORY = scope:asp_selected_story } } desc = asp_recovery_declare_desc } desc = asp_declare_desc } } } desc = asp_management_closed_desc } }
     theme = intrigue
     option = {
         name = asp_declare_confirm
@@ -17,6 +17,10 @@ asp_pledge.2 = {
     type = character_event
     title = asp_pledge_settlement_title
     desc = { first_valid = {
+        triggered_desc = { trigger = { scope:asp_pledge_event_county = yes scope:asp_pledge_event_result = 2 } desc = asp_recovery_pledge_withdrawn_desc }
+        triggered_desc = { trigger = { scope:asp_pledge_event_county = yes scope:asp_pledge_event_result = 3 } desc = asp_recovery_pledge_expired_desc }
+        triggered_desc = { trigger = { scope:asp_pledge_event_county = yes scope:asp_pledge_event_result = 4 } desc = asp_recovery_pledge_excused_desc }
+        triggered_desc = { trigger = { scope:asp_pledge_event_county = yes } desc = asp_recovery_pledge_fulfilled_desc }
         triggered_desc = { trigger = { scope:asp_pledge_event_result = 2 } desc = asp_pledge_withdrawn_desc }
         triggered_desc = { trigger = { scope:asp_pledge_event_result = 3 } desc = asp_pledge_expired_desc }
         triggered_desc = { trigger = { scope:asp_pledge_event_result = 4 } desc = asp_pledge_excused_desc }

@@ -231,9 +231,29 @@ try {
             Assert ($output -match 'Invalid UTF-8 BOM prefix') 'T23: failed for a reason other than the malformed prefix'
         }
     }
+    Case 'T24 live exited and unverifiable CK3 rebuild guards' {
+        $module = Import-Module (Join-Path $repo 'tools/Aspirations.Build.psm1') -Force -PassThru
+        & $module {
+            function script:Get-Process { [CmdletBinding()] param([string]$Name) return $script:aspGuardProbe }
+            try {
+                $script:aspGuardProbe = [pscustomobject]@{ HasExited = $false }
+                $rejected = $false
+                try { Assert-DevGameStopped dev } catch { $rejected = $true }
+                if (-not $rejected) { throw 'T24: a live CK3 process did not block dev output' }
+                $script:aspGuardProbe = [pscustomobject]@{ HasExited = $true }
+                Assert-DevGameStopped dev
+                $script:aspGuardProbe = [pscustomobject]@{ Name = 'ck3' }
+                $rejected = $false
+                try { Assert-DevGameStopped dev } catch { $rejected = $true }
+                if (-not $rejected) { throw 'T24: unverifiable liveness did not fail closed' }
+                $script:aspGuardProbe = @()
+                Assert-DevGameStopped dev
+            } finally { Remove-Item Function:script:Get-Process; Remove-Variable aspGuardProbe -Scope Script }
+        }
+    }
 } finally {
     # Never recursively remove a linked fixture. Leave disposable roots ignored for inspection.
     Write-Host "Fixtures: $testRoot"
 }
 if ($failures.Count) { Write-Host "$($failures.Count) test cases failed"; exit 1 }
-Write-Host 'All 23 tooling cases passed'; exit 0
+Write-Host 'All 24 tooling cases passed'; exit 0

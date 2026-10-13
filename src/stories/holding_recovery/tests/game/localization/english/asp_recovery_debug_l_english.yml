@@ -1,0 +1,2 @@
+﻿l_english:
+ asp_test_callback_start_state:0 "ASP_CALLBACK_STATE|slots=[GetPlayer.MakeScope.Var('asp_test_callback_slots').GetValue|0]|ongoing=[GetPlayer.MakeScope.Var('asp_test_callback_ongoing').GetValue|0]|payer_owner=[GetPlayer.MakeScope.Var('asp_test_callback_payer').GetValue|0]|strict_legal=[GetPlayer.MakeScope.Var('asp_test_callback_strict_legal').GetValue|0]|baseline=[GetPlayer.MakeScope.Var('asp_test_callback_baseline').GetValue|0]"

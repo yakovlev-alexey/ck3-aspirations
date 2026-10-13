@@ -205,7 +205,7 @@ class GameRunner:
         return self._report_operation("advance", days)
 
     def run_scenario(self, name, repeat=1):
-        if name not in ("automation-smoke", "core-regression", "vengeance-regression", "lifecycle-regression") or type(repeat) is not int or not 1 <= repeat <= 10:
+        if name not in ("automation-smoke", "core-regression", "vengeance-regression", "lifecycle-regression", "recovery-regression") or type(repeat) is not int or not 1 <= repeat <= 10:
             raise ValueError("Only registered scenarios with repeat 1 through 10 are implemented")
         if not self.flight.acquire(blocking=False):
             return {"status": "transport_error", "error": "Concurrent operation rejected"}
@@ -232,6 +232,32 @@ class GameRunner:
                         {"name": "baseline_unchanged", "passed": hashlib.sha256(self.config.baseline_save.read_bytes()).hexdigest() == self.baseline_hash},
                     ]
                     run = {"index": index, "initial": initial, "core": core, "duplicate": duplicate, "assertions": assertions, "logs": self._snapshot_logs(index)}
+                    report["runs"].append(run)
+                    if not all(item["passed"] for item in assertions):
+                        report["status"] = "assertion_failed"
+                        break
+                    continue
+                if name == "recovery-regression":
+                    recovery = self._send("recovery_regression")
+                    duplicate = self._send("recovery_regression", replay=True)
+                    assertions = [
+                        {"name": "H01_incident_and_legal_origin", "passed": recovery["h01"] == 1 and recovery["origin_control"] == 69},
+                        {"name": "H02_two_milestones_once", "passed": recovery["h02"] == 1 and recovery["reward_stress"] == -20 and recovery["reward_xp"] == 100 and recovery["modifier_count"] == 1 and recovery["replayed"] == 0},
+                        {"name": "H03_original_payer_and_start_identity", "passed": recovery["h03"] == 1 and recovery["unproven"] == 0 and recovery["foreign"] == 0 and recovery["cancelled"] == 0},
+                        {"name": "H04_loss_and_independent_native_costs", "passed": recovery["h04"] == 1 and recovery["loss_stress"] == recovery["loss_control"] and recovery["loss_control"] > 0 and recovery["pledge_stress"] == recovery["pledge_control"] and recovery["pledge_control"] > 0 and recovery["pledge_prestige"] == -100},
+                        {"name": "H05_declaration_and_repeat_incident", "passed": recovery["h05"] == 1},
+                        {"name": "duplicate_identity_and_measurements", "passed": duplicate == recovery},
+                        {"name": "same_baseline_date", "passed": not report["runs"] or initial["date"] == report["runs"][0]["initial"]["date"]},
+                        {"name": "fresh_session", "passed": all(initial["session"] != run["initial"]["session"] for run in report["runs"])},
+                        {"name": "baseline_unchanged", "passed": hashlib.sha256(self.config.baseline_save.read_bytes()).hexdigest() == self.baseline_hash},
+                    ]
+                    run = {"index": index, "initial": initial, "recovery": recovery, "duplicate": duplicate, "assertions": assertions, "logs": self._snapshot_logs(index)}
+                    errors = Path(run["logs"]) / "error.log"
+                    diagnostics = errors.read_text(encoding="utf-8-sig", errors="replace") if errors.exists() else ""
+                    blocks = re.split(r"(?=\[.*?\]\[E\])", diagnostics)
+                    aspiration_errors = [block for block in blocks if "asp_" in block and any(tag in block for tag in ("Script system error!", "pdx_persistent_reader.cpp", "Unknown trigger:", "Unknown effect:", "Failed to parse", "Data error in", "triggered but has no valid options"))]
+                    assertions.append({"name": "aspiration_runtime_diagnostics_absent", "passed": not aspiration_errors})
+                    run["aspiration_runtime_error_count"] = len(aspiration_errors)
                     report["runs"].append(run)
                     if not all(item["passed"] for item in assertions):
                         report["status"] = "assertion_failed"

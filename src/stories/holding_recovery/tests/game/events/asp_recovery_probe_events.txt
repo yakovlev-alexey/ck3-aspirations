@@ -1,0 +1,59 @@
+﻿namespace = asp_test_holding_recovery
+asp_test_holding_recovery.10 = {
+ type = character_event hidden = yes
+ immediate = {
+  capital_province = { set_variable = { name = asp_probe_owner value = root } save_scope_as = asp_probe_capital }
+  set_variable = { name = asp_probe_gold value = gold }
+  debug_log = "ASP_PROBE RECOVERY READY"
+ }
+}
+asp_test_holding_recovery.11 = {
+ type = character_event hidden = yes
+ immediate = {
+  debug_log = "ASP_PROBE RECOVERY OBSERVE"
+  capital_province = {
+   if = { limit = { has_variable = asp_probe_started_payer var:asp_probe_started_payer = 1 } debug_log = "ASP_PROBE RECOVERY START_VERIFIED" }
+   if = { limit = { has_ongoing_construction = yes } debug_log = "ASP_PROBE RECOVERY ONGOING" }
+  }
+ }
+}
+
+asp_test_holding_recovery.12 = {
+ type = character_event hidden = yes
+ immediate = {
+  title:d_timbuktu.holder = {
+   save_scope_as = holder
+   capital_province = {
+    if = { limit = { has_building = pastures_02 } remove_building = pastures_02 }
+    if = { limit = { has_free_building_slot = yes has_building_or_higher = castle_01 building_pastures_requirement_terrain = yes NOT = { has_ongoing_construction = yes } }
+     debug_log = "ASP_PROBE AI_LEGAL_VACANCY"
+    }
+    else = { debug_log = "ASP_PROBE AI_NO_LEGAL_VACANCY" }
+   }
+   add_gold = 10000
+   set_variable = { name = asp_probe_ai_before_gold value = gold }
+   ai_attempt_to_build_building_effect = yes
+  }
+  debug_log = "ASP_PROBE AI_SETUP_DONE"
+ }
+}
+asp_test_holding_recovery.13 = {
+ type = character_event hidden = yes
+ immediate = {
+  title:d_timbuktu.holder = {
+   if = { limit = { is_ai = yes exists = var:asp_probe_ai_started_province var:asp_probe_ai_started_character = this gold < var:asp_probe_ai_before_gold }
+    debug_log = "ASP_PROBE AI_PAYMENT_AND_NATIVE_PAYER_PASS"
+   }
+   else = { debug_log = "ASP_PROBE AI_PAYMENT_AND_NATIVE_PAYER_FAIL" }
+  }
+ }
+}
+asp_test_holding_recovery.14 = {
+ type = character_event hidden = yes
+ immediate = {
+  create_title_and_vassal_change = { type = conquest save_scope_as = asp_probe_change }
+  title:c_tabon = { change_title_holder = { holder = title:d_timbuktu.holder change = scope:asp_probe_change } }
+  resolve_title_and_vassal_change = scope:asp_probe_change
+  debug_log = "ASP_PROBE CONQUEST_SETUP_DONE"
+ }
+}

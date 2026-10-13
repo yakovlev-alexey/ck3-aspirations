@@ -56,6 +56,28 @@ asp_test_automation_complete_effect = {
             debug_log = asp_test_automation_vengeance_done
         }
         else_if = {
+            limit = { var:asp_test_automation_operation = flag:recovery_regression }
+            set_variable = { name = asp_test_automation_result_h01 value = var:asp_test_h01 }
+            set_variable = { name = asp_test_automation_result_h02 value = var:asp_test_h02 }
+            set_variable = { name = asp_test_automation_result_h03 value = var:asp_test_h03 }
+            set_variable = { name = asp_test_automation_result_h04 value = var:asp_test_h04 }
+            set_variable = { name = asp_test_automation_result_h05 value = var:asp_test_h05 }
+            set_variable = { name = asp_test_automation_result_reward_stress value = var:asp_test_reward_stress }
+            set_variable = { name = asp_test_automation_result_reward_xp value = var:asp_test_reward_xp }
+            set_variable = { name = asp_test_automation_result_modifier_count value = var:asp_test_modifier_count }
+            set_variable = { name = asp_test_automation_result_loss_stress value = var:asp_test_loss_stress }
+            set_variable = { name = asp_test_automation_result_loss_control value = var:asp_test_loss_control }
+            set_variable = { name = asp_test_automation_result_pledge_stress value = var:asp_test_pledge_stress }
+            set_variable = { name = asp_test_automation_result_pledge_control value = var:asp_test_pledge_control }
+            set_variable = { name = asp_test_automation_result_pledge_prestige value = var:asp_test_pledge_prestige }
+            set_variable = { name = asp_test_automation_result_unproven value = var:asp_test_unproven }
+            set_variable = { name = asp_test_automation_result_foreign value = var:asp_test_foreign }
+            set_variable = { name = asp_test_automation_result_cancelled value = var:asp_test_cancelled }
+            set_variable = { name = asp_test_automation_result_replayed value = var:asp_test_replayed }
+            set_variable = { name = asp_test_automation_result_origin_control value = var:asp_test_origin_control }
+            debug_log = asp_test_automation_recovery_done
+        }
+        else_if = {
             limit = { var:asp_test_automation_operation = flag:lifecycle_regression }
             set_variable = { name = asp_test_automation_result_p01 value = var:asp_test_p01 }
             set_variable = { name = asp_test_automation_result_p02 value = var:asp_test_p02 }
@@ -131,6 +153,7 @@ asp_test_automation_request_effect = {
             else = {
                 if = { limit = { var:asp_test_automation_operation = flag:core_regression } debug_log = asp_test_automation_core_done }
                 else_if = { limit = { var:asp_test_automation_operation = flag:vengeance_regression } debug_log = asp_test_automation_vengeance_done }
+                else_if = { limit = { var:asp_test_automation_operation = flag:recovery_regression } debug_log = asp_test_automation_recovery_done }
                 else_if = { limit = { var:asp_test_automation_operation = flag:lifecycle_regression } debug_log = asp_test_automation_lifecycle_done }
                 else_if = { limit = { var:asp_test_automation_operation = flag:lifecycle_calendar_assert } debug_log = asp_test_automation_calendar_done }
                 else_if = { limit = { var:asp_test_automation_operation = flag:lifecycle_reload_assert } debug_log = asp_test_automation_reload_done }
@@ -153,6 +176,7 @@ asp_test_automation_request_effect = {
                 }
                 if = { limit = { var:asp_test_automation_operation = flag:core_regression } asp_test_core_regression_effect = yes }
                 if = { limit = { var:asp_test_automation_operation = flag:vengeance_regression } asp_test_vengeance_regression_effect = yes }
+                if = { limit = { var:asp_test_automation_operation = flag:recovery_regression } asp_test_holding_recovery_regression_effect = yes }
                 if = { limit = { var:asp_test_automation_operation = flag:lifecycle_regression } asp_test_lifecycle_regression_effect = yes }
                 if = { limit = { var:asp_test_automation_operation = flag:lifecycle_calendar } asp_test_lifecycle_calendar_setup_effect = yes }
                 if = { limit = { var:asp_test_automation_operation = flag:lifecycle_calendar_assert } asp_test_lifecycle_calendar_assert_effect = yes }

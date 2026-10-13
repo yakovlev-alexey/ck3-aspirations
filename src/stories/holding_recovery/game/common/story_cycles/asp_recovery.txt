@@ -1,0 +1,7 @@
+﻿asp_holding_recovery_story = {
+    visible = yes
+    icon = { reference = "gfx/interface/icons/traits/architect.dds" }
+    visualization = { custom_string_key = "asp_recovery_story_information" }
+    effect_group = { days = 1 triggered_effect = { trigger = { has_variable = asp_schema } effect = { asp_refresh_story_effect = yes } } }
+    on_owner_death = { asp_resolve_story_effect = { OUTCOME = owner_dead REWARDS = none } }
+}

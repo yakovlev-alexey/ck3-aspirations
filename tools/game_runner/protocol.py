@@ -21,6 +21,9 @@ LIFECYCLE_FIELDS = ('p01', 'p02', 'p03', 'p04', 'p05', 'p06', 'release_delta', '
 CALENDAR_FIELDS = ('calendar_before', 'calendar_after', 'calendar_reviews', 'calendar_declare', 'calendar_prestige', 'calendar_stress', 'calendar_control')
 
 
+RECOVERY_FIELDS = ('h01', 'h02', 'h03', 'h04', 'h05', 'reward_stress', 'reward_xp', 'modifier_count', 'loss_stress', 'loss_control', 'pledge_stress', 'pledge_control', 'pledge_prestige', 'unproven', 'foreign', 'cancelled', 'replayed', 'origin_control')
+
+
 RELOAD_FIELDS = ("reload_identity",)
 
 
@@ -90,6 +93,8 @@ class Telemetry:
                         allowed.update(CORE_FIELDS)
                     if self.operation == "vengeance_regression":
                         allowed.update(VENGEANCE_FIELDS)
+                    if self.operation == "recovery_regression":
+                        allowed.update(RECOVERY_FIELDS)
                     if self.operation == "lifecycle_regression":
                         allowed.update(LIFECYCLE_FIELDS)
                     if self.operation == "lifecycle_calendar_assert":
@@ -109,6 +114,8 @@ class Telemetry:
                         required.update(CORE_FIELDS)
                     if self.operation == "vengeance_regression":
                         required.update(VENGEANCE_FIELDS)
+                    if self.operation == "recovery_regression":
+                        required.update(RECOVERY_FIELDS)
                     if self.operation == "lifecycle_regression":
                         required.update(LIFECYCLE_FIELDS)
                     if self.operation == "lifecycle_calendar_assert":

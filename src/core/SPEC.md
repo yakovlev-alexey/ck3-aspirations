@@ -82,7 +82,7 @@ No gold reward reimburses construction. No aspiration removes vanilla tyranny, s
 
 One visible story instance represents one aspiration. Current-player eligibility is revalidated before reservation; origin consumption, capacity and one-per-family-and-target guards precede creation. Debug forcing bypasses randomness only. Suspended instances remain owned by their original character; elapsed dates and owner-death cleanup continue.
 
-Core dispatch recognizes only `vengeance`, `holding_recovery` and `personal_bond`. Task 3 dispatches vengeance progress and terminal effects to its family module; holding_recovery and personal_bond remain inert until their owning stages. Unknown flags are rejected. Core never rewards unimplemented family progress.
+Core dispatch recognizes only `vengeance`, `holding_recovery` and `personal_bond`. Vengeance and holding_recovery dispatch progress and terminal effects to their owning family modules; personal_bond remains inert until its owning stage. Unknown flags are rejected. Core never rewards unimplemented family progress.
 
 Native scripted effects take parameters in braces and return no value. Task 2 probes confirmed direct story references through event options and actual save/load, numeric date values advancing by one per day, and native timer durations of 720 days for 24 months and 2920 days for eight years. Task 4 adds bounded registered lifecycle assertions and mandatory native UI/save/load/switch procedures for full review and pledge boundaries.
 
@@ -145,3 +145,8 @@ New optional schema-1 fields are the review notification latch, pledge audience/
 Dev `.54` snapshots the actual dead owner and successor before a stale management click; `.55` requires both Prestige/Stress snapshots and both empty story sets to remain exact afterwards.
 
 Event-facing declaration eligibility is evaluated from the live event character through `asp_event_can_declare_trigger`. It checks the selected Story link before entering any family predicate. A missing or ended link returns false, including during later-frame native tooltip construction; direct same-frame negative predicate assertions alone do not establish this render safety.
+
+
+## Recovery integration
+
+County-target recovery uses the existing core lifecycle, replacement and pledge ownership. Generic replacement validates the saved recovery county and consumed incident serial before releasing one exact selected Story; vengeance proposals clear stale county proposal state. Declaration and terminal progress dispatch explicitly to the recovery family. Event-character guards validate the saved live Story before entering county family predicates. County management and public-settlement wording use title getters; core captures the county transport flag before terminal destruction. Recovery never owns a second Stress, pledge or terminal payout latch.

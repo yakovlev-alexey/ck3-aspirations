@@ -1,0 +1,1 @@
+﻿asp_holding_recovery_tax_modifier = { icon = economy_positive tax_mult = 0.05 }

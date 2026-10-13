@@ -42,7 +42,7 @@ Reserve `asp_test_automation.1` for bootstrap and `asp_test_automation.2` for de
 
 ## Implemented Python interface
 
-`GameRunner(config)` accepts a validated `Config` or JSON configuration path. `run_scenario("automation-smoke", repeat=1)` `run_scenario("core-regression", repeat=1)` and `run_scenario("vengeance-regression", repeat=1)` accept integer repeat counts 1–10. `observe()` and `advance_days(days)` lazily open an owned baseline session; days is an integer 1–30. `close()` is idempotent and returns a JSON object. Each operation returns a JSON-serializable report. Invalid scenario/argument/configuration raises `ValueError` before game input; concurrent calls return `transport_error`. Native/Windows/log failures return `transport_error`, and absent completion returns `timeout`. The CLI prints only its final JSON report and exits 0 for `passed`, 1 for operational failure, or argparse's 2 for invalid CLI arguments.
+`GameRunner(config)` accepts a validated `Config` or JSON configuration path. `run_scenario(scenario, repeat=1)` for `automation-smoke`, `core-regression`, `vengeance-regression`, `lifecycle-regression` and `recovery-regression` accept integer repeat counts 1–10. `observe()` and `advance_days(days)` lazily open an owned baseline session; days is an integer 1–30. `close()` is idempotent and returns a JSON object. Each operation returns a JSON-serializable report. Invalid scenario/argument/configuration raises `ValueError` before game input; concurrent calls return `transport_error`. Native/Windows/log failures return `transport_error`, and absent completion returns `timeout`. The CLI prints only its final JSON report and exits 0 for `passed`, 1 for operational failure, or argparse's 2 for invalid CLI arguments.
 
 A runner holds an exclusive directory lock in the selected user-data directory until `close()`. CLI and MCP must reuse this implementation, including its lock; the MCP adapter must close the runner on stdio shutdown. A stale lock is not adopted or automatically removed. Transport failure stops the exact owned process and clears its session; a later operation starts again with a new identity. Runner instances may not adopt an existing CK3 process.
 
@@ -117,7 +117,7 @@ This is a local subprocess transport implementing **MCP 2025-11-25** explicitly,
 
 | Tool | Arguments | Runner operation |
 | --- | --- | --- |
-| `aspirations_run_scenario` | Required `scenario: "automation-smoke"` or `"core-regression"`; optional integer `repeat: 1..10`, default 1 | `run_scenario` |
+| `aspirations_run_scenario` | Required `scenario` in `automation-smoke`, `core-regression`, `vengeance-regression`, `lifecycle-regression`, `recovery-regression`; optional integer `repeat: 1..10`, default 1 | `run_scenario` |
 | `aspirations_observe` | Empty object or omitted arguments | `observe` |
 | `aspirations_advance_days` | Required integer `days: 1..30` | `advance_days` |
 
@@ -153,3 +153,10 @@ This operation does not open or choose selector events. C03 requires a real clic
 The bounded `lifecycle-regression` scenario runs shared P01-P06 effects with complete integer telemetry, independently checks costs/counts/absence and UI-replay memory postconditions, and verifies exact cached replay. It snapshots that logic interval, restarts from the same unchanged baseline, prepares shared near-boundary calendar state, verifies its exact saved-state precondition, advances one real native day, and checks review/declaration/expiry measurements plus replay. Separate fresh sessions prevent intentional logic-fixture deaths and delayed native grief from contaminating the calendar test. The precondition is not actual save/load; native Save Game/load and UI/player-switch/succession procedures remain mandatory in core scenarios.
 
 Reports retain both logic and calendar logs, request/session identities, baseline hash, raw deltas and an aspiration parser/runtime diagnostic count. Any such diagnostic in either interval fails the scenario, while known static unused-state and unrelated vanilla frames are classified separately. All operations remain private scenario implementation; there is no arbitrary script API or new framework. CLI and MCP expose only the registered scenario name and existing bounded repeat/day parameters.
+
+
+## Registered recovery-regression
+
+`recovery-regression` invokes the shared dev-only H01–H05 effects. All 18 numeric fields in `RECOVERY_FIELDS` are mandatory: five case flags, Stress/XP/modifier payout, independent nominal-base10 abandonment and base15 pledge Stress controls, Prestige penalty, invalid-payer/cancellation/replay counts, and recorded origin Control. The runner independently compares actual outcomes, rejects missing/malformed telemetry, verifies fresh session/date/baseline, checks exact cached replay and rejects aspiration runtime/parser diagnostics. ACK or native PASS alone cannot pass.
+
+H03 includes native child-on_action dispatch after slot reservation: slot0 must retain a valid original-payer start token and completion proof. Its scripted occupancy model is ongoing0; actual GUI ongoing1/payment/completion/three-year modifier and later-frame UI procedures remain mandatory in the owning recovery scenarios. H04 typed transfer fixtures establish policy, not a played lost war. There is no arbitrary effect API, new dependency or change to deterministic `-disable_ai` launch policy; the separately bounded AI payer capability launch is evidence only.

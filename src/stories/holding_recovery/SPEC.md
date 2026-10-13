@@ -1,6 +1,6 @@
 # Holding recovery specification
 
-Status: authoritative living contract migrated from the approved 2026-10-12 design. Runtime implementation is pending.
+Status: implemented on CK3 1.20.0.4; registered H01–H05, real GUI payment/completion/reward and later-frame stale-window acceptance observed. Independent Task 5 source review remains separate.
 
 [Core lifecycle and balancing](../../core/SPEC.md) · [Product intent](../../../docs/design.md) · [Acceptance scenarios](tests/scenarios.md)
 
@@ -24,7 +24,7 @@ Stable family flag: `holding_recovery`; class: ambition. Store county, origin in
 
 Character entry: `asp_start_holding_recovery_effect = { COUNTY = <county title> }`; validate incident, county ownership/control and eligible construction, consume origin, reserve capacity and retain the created story reference. Story interfaces are `asp_holding_recovery_check_progress_effect` and `asp_holding_recovery_resolve_effect = { OUTCOME = <flag> REWARDS = <flag> }` through core dispatch.
 
-Namespace: `asp_holding_recovery`; dev namespace: `asp_test_holding_recovery`. Task 1 allocates no event IDs. Planned files use `game/common/.../asp_holding_recovery.txt`, including the non-stacking county modifier, `game/events/asp_holding_recovery_events.txt` and `game/localization/english/asp_holding_recovery_l_english.yml`. Shared fields and operations are owned by core.
+Namespace: `asp_holding_recovery`; dev namespace: `asp_test_holding_recovery`. Source files use `game/common/.../asp_recovery.txt`, including the non-stacking county modifier, `game/events/asp_recovery_events.txt` and `game/localization/english/asp_recovery_l_english.yml`. Shared fields and operations are owned by core.
 
 ## Parameters, transitions and consequences
 
@@ -42,4 +42,40 @@ Declaration uses core's age/deadline policy and requires both control below 80 a
 
 Explain incident, recorded control, exact two-part condition and eligible building categories without naming an unavailable building. Show ownership loss and voluntary grant consequences. Use English localization and game-provided art references; no original or extracted art in Task 1.
 
-Required surfaces: siege/raid, construction start/completion, title ownership callbacks, county control and modifiers, stories/memories. Verify payment, calendar and uninterrupted-ownership evidence before implementation; never infer payment from holder substitution. CK3 1.20.0.4 source inspected; runtime acceptance pending. No DLC-dependent branch promised; schema 1 and core migration policy apply.
+Required surfaces: siege/raid, construction start/completion, title ownership callbacks, county control and modifiers, stories/memories. Native payment/start/cancellation/completion and actual GUI grant probes establish the implemented callback route; never infer payment from holder substitution. CK3 1.20.0.4 runtime acceptance is recorded in the scenarios. No DLC-dependent branch promised; schema 1 and core migration policy apply.
+
+## Task 5 stable allocations
+
+Runtime `asp_holding_recovery.1` is the origin, `.2` terminal narrative. Dev `.1` is H01-H05, `.10` attribution setup, `.11` attribution observations. Dev hooks measure only native callbacks and remain excluded from release.
+
+Dev `.12` prepares a funded AI engine build attempt; `.14` observes a typed conquest batch. Neither is represented as an actual GUI grant or war.
+
+## Task 5 approved availability boundary
+
+The prototype's explicit candidate pool is Tribal Markets and Palisades levels 1–2, and Pastures, Cereal Fields and Hill Farms level 1. Eligibility must establish the next building's native holding, terrain, slot, category absence or upgrade prerequisite, government and innovation restrictions. An empty slot alone is insufficient. Origin and story text list exactly these supported categories. Other constructions cannot satisfy this prototype objective.
+
+“Available” means legally and technologically possible to construct next. Treasury affordability is not an origin gate: an ambition may emerge before the ruler has saved the money. Native costs and discounts remain authoritative; the mod promises no fixed construction price and grants no reimbursement. Actual payment is established through the original native payer callback, never the current holder. Registered native and actual GUI acceptance are recorded in the scenarios.
+
+Dev `.13` checks an actual AI start callback, exact original payer and resource decrease after `.12` prepares a legal vacancy in an existing AI holding. The dedicated AI capability launch omits the deterministic runner’s `-disable_ai`; its policy remains unchanged.
+
+## Implemented callback contract
+
+Runtime namespace `asp_holding_recovery`, origin `.1`, terminal `.2`; source files use `asp_recovery.txt`. Incident observation is a character effect with fixed county and explicit cause, deduplicated per county/owner/day. The incident serial is consumed before selection and capacity decisions. A duplicate active target receives no new Story or payout. At capacity the generic core replacement event preserves three exact old Story references and requires revalidation of the consumed recovery county/serial before abandonment. No implicit replacement occurs.
+
+Legal candidate scope is a personally held holding in the personally held county. Native tribal government/holding prerequisites, tier-I-to-II technology (innovation_barracks or native permafrost alternative), category absence and available slots apply to Markets/Palisades. Native castle/city/temple holding level, government exclusion, terrain and category absence/slots apply to the three level-I economy categories. Ongoing work cannot supply the origin candidate.
+
+Province callbacks retain original payer and a monotonically allocated start serial. Each new start invalidates the old pending token; an accepted start snapshots exact Province, payer, serial, date, supported category levels and which categories were legally possible. Completion needs the same serial and payer, the original owner still holding the county, and an increase in a supported eligible category. Province lists mark work already ongoing at origin; its delayed native start callback is excluded until cancellation/completion clears the block. Missing/foreign payer cannot substitute the current holder. Cancellation invalidates the pending token; a fresh verified restart may qualify. Completed evidence is a milestone, but control80 must also be met.
+
+Title loss irreversibly marks the original Story and invalidates its pending tokens. Only exact native transfer_type=granted is voluntary; conquest, other classified causes, and absent/unknown causes take conservative free impossible closure. Actual GUI Grant has confirmed the granted flag. Registered typed cause fixtures do not claim to be a played war. Reacquisition cannot revive the original Story or construction token.
+
+Core remains sole terminal latch, Stress and pledge settlement owner. Recovery supplies a memory and, only with normal fulfilled reward policy, 100 Stewardship experience and one non-stacking county tax modifier for three years. Native Stress controls must independently match modified release/pledge costs. Absence/death follows core's no-retrospective-reward policy. Three interpretations share the objective, preserve cause/age when reconsidered, and are guarded from live event-character context before weak Story traversal. Stale origin has native harmless Close fallback.
+
+Dev `.20` prepares a disposable active recovery for real GUI construction, `.21` only sets the control milestone, `.22` reuses registered H02 measurement logic to observe actual payment/reward. These are explicit UI acceptance exceptions, not a second scripted construction system.
+
+## Verified native reservation boundary
+
+Generated native trigger documentation says `free_building_slots` includes buildings in construction. Actual GUI callback at09:19:49 confirmed slots0/ongoing1/original-payer-owner1/strict-origin-legality0 before any start snapshot. Thus slot availability is an origin prerequisite only. An authoritative native start callback supplies the already selected/reserved work; its tracking predicate retains holding, government, terrain, category and innovation requirements and snapshots the original payer/serial/category levels, without demanding another free slot. Completion must still prove the same pending work and supported category increase.
+
+Registered H03 invokes the native child on_action at slot0 with a verified original payer and checks both token and completion. Its scripted occupancy model reports ongoing0 and makes no actual payment claim; actual GUI ongoing1/payment is a separate mandatory acceptance. This covers the specific reserved-slot defect rather than merely rerunning the old direct helper path.
+
+Repeat incidents preserve the active Story's original control/date/serial; the county stores the latest observed damage context. They cannot start a duplicate Story or reset its age. Origin displays the recorded Control, and county management explains both milestones and valid payment.

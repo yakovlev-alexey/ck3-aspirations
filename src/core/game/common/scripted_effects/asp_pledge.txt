@@ -15,6 +15,8 @@ asp_settle_pledge_effect = {
         save_scope_as = asp_settling_story
         asp_pledge_$RESULT$_consequences_effect = yes
         var:asp_target = { save_scope_as = asp_pledge_event_target }
+        save_scope_value_as = { name = asp_pledge_event_county value = no }
+        if = { limit = { var:asp_family = flag:holding_recovery } save_scope_value_as = { name = asp_pledge_event_county value = yes } }
         story_owner = { trigger_event = asp_pledge.2 }
     }
 }

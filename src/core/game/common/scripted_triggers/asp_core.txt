@@ -31,8 +31,7 @@ asp_story_review_due_trigger = {
 # Initial age, independent of retained reminders.
 asp_story_free_release_trigger = { asp_story_age_days >= asp_initial_review_days }
 asp_family_can_declare_trigger = {
-    var:asp_family = flag:vengeance
-    asp_vengeance_can_declare_trigger = yes
+    OR = { AND = { var:asp_family = flag:vengeance asp_vengeance_can_declare_trigger = yes } AND = { var:asp_family = flag:holding_recovery asp_holding_recovery_can_declare_trigger = yes } }
 }
 asp_can_declare_story_trigger = {
     asp_can_manage_story_trigger = yes
@@ -47,13 +46,11 @@ asp_pledge_due_trigger = {
     asp_time_until_pledge_days <= 0
 }
 asp_family_public_fulfillment_trigger = {
-    var:asp_family = flag:vengeance
-    OR = { var:asp_interpretation = flag:accountability has_variable = asp_vengeance_public_fulfillment }
+    OR = { AND = { var:asp_family = flag:vengeance OR = { var:asp_interpretation = flag:accountability has_variable = asp_vengeance_public_fulfillment } } AND = { var:asp_family = flag:holding_recovery asp_recovery_fulfilled_trigger = yes } }
 }
 
 asp_family_has_terminal_progress_trigger = {
-    var:asp_family = flag:vengeance
-    asp_vengeance_has_terminal_progress_trigger = yes
+    OR = { AND = { var:asp_family = flag:vengeance asp_vengeance_has_terminal_progress_trigger = yes } AND = { var:asp_family = flag:holding_recovery asp_recovery_has_terminal_progress_trigger = yes } }
 }
 
 asp_story_owned_by_event_root_trigger = {
@@ -67,4 +64,10 @@ asp_event_can_declare_trigger = {
         scope:asp_selected_story = { asp_can_declare_story_trigger = yes asp_story_owned_by_event_root_trigger = yes }
     }
     trigger_else = { always = no }
+}
+
+# Live event-character dispatch for already consumed major-incident replacement.
+asp_replacement_cause_valid_trigger = {
+    trigger_if = { limit = { exists = scope:asp_replacement_cause_county } asp_recovery_replacement_cause_valid_trigger = yes }
+    trigger_else = { asp_vengeance_replacement_cause_valid_trigger = yes }
 }

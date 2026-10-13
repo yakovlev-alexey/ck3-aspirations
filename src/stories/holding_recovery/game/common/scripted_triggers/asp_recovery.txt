@@ -1,0 +1,89 @@
+﻿# Province scope; scope:holder is the actual personal holding owner captured by caller.
+# RESERVED=no checks origin availability. RESERVED=yes is only for an authoritative
+# native start callback: the engine has already occupied the selected slot.
+# Holding, terrain, category and technology checks remain identical in both phases.
+asp_recovery_tribal_legal_trigger = {
+    has_building_or_higher = tribe_01
+    building_requirement_tribal = yes
+    scope:holder = { NOT = { government_has_flag = government_is_wanua } }
+}
+asp_recovery_tribal_upgrade_legal_trigger = {
+    asp_recovery_tribal_legal_trigger = yes
+    OR = { mpo_permafrost_building_trigger = yes scope:holder.culture = { has_innovation = innovation_barracks } }
+}
+asp_recovery_market_villages_legal_trigger = {
+    asp_recovery_tribal_legal_trigger = yes
+    NOT = { has_building_or_higher = market_villages_02 }
+    OR = { AND = { has_building = market_villages_01 asp_recovery_tribal_upgrade_legal_trigger = yes } AND = { NOT = { has_building_or_higher = market_villages_01 } OR = { free_building_slots > 0 always = $RESERVED$ } } }
+}
+asp_recovery_palisades_legal_trigger = {
+    asp_recovery_tribal_legal_trigger = yes
+    NOT = { has_building_or_higher = palisades_02 }
+    OR = { AND = { has_building = palisades_01 asp_recovery_tribal_upgrade_legal_trigger = yes } AND = { NOT = { has_building_or_higher = palisades_01 } OR = { free_building_slots > 0 always = $RESERVED$ } } }
+}
+asp_recovery_pastures_legal_trigger = {
+    building_requirement_castle_city_church = { LEVEL = 01 }
+    building_requirement_tribal = no
+    building_pastures_requirement_terrain = yes
+    OR = { free_building_slots > 0 always = $RESERVED$ }
+    NOT = { has_building_or_higher = pastures_01 }
+}
+asp_recovery_cereal_fields_legal_trigger = {
+    building_requirement_castle_city_church = { LEVEL = 01 }
+    building_requirement_tribal = no
+    building_cereal_fields_requirement_terrain = yes
+    OR = { free_building_slots > 0 always = $RESERVED$ }
+    NOT = { has_building_or_higher = cereal_fields_01 }
+}
+asp_recovery_hill_farms_legal_trigger = {
+    building_requirement_castle_city_church = { LEVEL = 01 }
+    building_requirement_tribal = no
+    building_hill_farms_requirement_terrain = yes
+    OR = { free_building_slots > 0 always = $RESERVED$ }
+    NOT = { has_building_or_higher = hill_farms_01 }
+}
+asp_recovery_province_legal_trigger = {
+    exists = scope:holder
+    barony.holder = scope:holder
+    OR = { asp_recovery_market_villages_legal_trigger = { RESERVED = $RESERVED$ } asp_recovery_palisades_legal_trigger = { RESERVED = $RESERVED$ } asp_recovery_pastures_legal_trigger = { RESERVED = $RESERVED$ } asp_recovery_cereal_fields_legal_trigger = { RESERVED = $RESERVED$ } asp_recovery_hill_farms_legal_trigger = { RESERVED = $RESERVED$ } }
+}
+# Character scope. The county, holding and technologies are real native prerequisites; price is not fixed.
+asp_recovery_origin_valid_trigger = {
+    is_alive = yes is_ai = no is_adult = yes is_ruler = yes is_landed = yes
+    exists = $COUNTY$
+    $COUNTY$ = {
+        holder = prev
+        county_control < 70
+        any_county_province = { NOT = { has_ongoing_construction = yes } asp_recovery_province_legal_trigger = { RESERVED = no } }
+    }
+}
+asp_holding_recovery_can_declare_trigger = {
+    has_variable = asp_recovery_incident
+    NOT = { has_variable = asp_recovery_lost }
+    NOT = { has_variable = asp_recovery_completed }
+    trigger_if = { limit = { exists = var:asp_target } var:asp_target = { holder = prev.story_owner county_control < 80 } }
+    trigger_else = { always = no }
+}
+asp_recovery_fulfilled_trigger = {
+    has_variable = asp_recovery_incident
+    NOT = { has_variable = asp_recovery_lost }
+    has_variable = asp_recovery_completed
+    var:asp_target = { holder = prev.story_owner county_control >= 80 }
+}
+asp_recovery_has_terminal_progress_trigger = {
+    has_variable = asp_recovery_incident
+    OR = { has_variable = asp_recovery_lost var:asp_target = { NOT = { holder = prev.story_owner } } asp_recovery_fulfilled_trigger = yes }
+}
+# Always guard a weak Story from the live event-character context first.
+asp_recovery_event_can_manage_trigger = {
+    trigger_if = { limit = { exists = $STORY$ } $STORY$ = { asp_can_manage_story_trigger = yes asp_story_owned_by_event_root_trigger = yes var:asp_family = flag:holding_recovery } }
+    trigger_else = { always = no }
+}
+
+asp_recovery_replacement_cause_valid_trigger = {
+    exists = scope:asp_replacement_cause_owner this = scope:asp_replacement_cause_owner
+    exists = scope:asp_replacement_cause_county exists = scope:asp_replacement_cause_incident
+    asp_recovery_origin_valid_trigger = { COUNTY = scope:asp_replacement_cause_county }
+    scope:asp_replacement_cause_county = { var:asp_recovery_consumed_incident = scope:asp_replacement_cause_incident var:asp_recovery_incident_serial = scope:asp_replacement_cause_incident var:asp_recovery_incident_owner = scope:asp_replacement_cause_owner }
+    NOT = { any_owned_story = { asp_is_active_story_trigger = yes var:asp_family = flag:holding_recovery var:asp_target = scope:asp_replacement_cause_county } }
+}

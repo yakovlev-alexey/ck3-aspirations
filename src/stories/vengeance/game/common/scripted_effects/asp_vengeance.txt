@@ -120,6 +120,8 @@ asp_vengeance_resolve_effect = {
 asp_vengeance_offer_or_create_effect = {
     if = { limit = { asp_active_ambitions < asp_ambition_cap } asp_vengeance_create_effect = yes }
     else = {
+        clear_saved_scope = asp_replacement_cause_county
+        clear_saved_scope = asp_replacement_cause_incident
         save_scope_as = asp_replacement_cause_owner
         scope:asp_vengeance_origin_victim = { save_scope_as = asp_replacement_cause_victim }
         scope:asp_vengeance_origin_killer = { save_scope_as = asp_replacement_cause_killer }

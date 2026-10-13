@@ -242,14 +242,21 @@ asp_offer_due_review_effect = {
     }
 }
 asp_confirm_replacement_effect = {
-    if = { limit = { asp_vengeance_replacement_cause_valid_trigger = yes asp_active_ambitions <= asp_ambition_cap
+    if = { limit = { asp_replacement_cause_valid_trigger = yes asp_active_ambitions <= asp_ambition_cap
         scope:asp_selected_story ?= { asp_can_manage_story_trigger = yes story_owner = root var:asp_class = flag:ambition } }
         # No mutation of the old story occurs until all new-cause guards pass.
         scope:asp_selected_story = { asp_resolve_story_effect = { OUTCOME = abandoned REWARDS = normal } }
-        save_scope_as = asp_vengeance_origin_owner
-        scope:asp_replacement_cause_victim = { save_scope_as = asp_vengeance_origin_victim }
-        scope:asp_replacement_cause_killer = { save_scope_as = asp_vengeance_origin_killer }
-        asp_vengeance_create_effect = yes
+        if = { limit = { exists = scope:asp_replacement_cause_county }
+            save_scope_as = asp_recovery_origin_owner
+            scope:asp_replacement_cause_county = { save_scope_as = asp_recovery_origin_county }
+            asp_recovery_create_effect = yes
+        }
+        else = {
+            save_scope_as = asp_vengeance_origin_owner
+            scope:asp_replacement_cause_victim = { save_scope_as = asp_vengeance_origin_victim }
+            scope:asp_replacement_cause_killer = { save_scope_as = asp_vengeance_origin_killer }
+            asp_vengeance_create_effect = yes
+        }
         clear_saved_scope = asp_selected_story
         clear_saved_scope = asp_replacement_cause_owner
     }
@@ -258,6 +265,13 @@ asp_confirm_replacement_effect = {
 asp_reinterpret_story_effect = {
     if = { limit = { asp_can_manage_story_trigger = yes var:asp_family = flag:vengeance has_variable = asp_vengeance_victim NOT = { has_variable = asp_declared }
         var:asp_target = { is_alive = yes NOT = { is_imprisoned_by = prev.story_owner } } }
+        set_variable = { name = asp_interpretation value = flag:$INTERPRETATION$ }
+        asp_retain_story_effect = yes
+    }
+}
+
+asp_reinterpret_recovery_effect = {
+    if = { limit = { asp_can_manage_story_trigger = yes has_variable = asp_recovery_incident NOT = { has_variable = asp_declared } NOT = { has_variable = asp_recovery_lost } }
         set_variable = { name = asp_interpretation value = flag:$INTERPRETATION$ }
         asp_retain_story_effect = yes
     }

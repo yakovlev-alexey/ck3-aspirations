@@ -1,0 +1,11 @@
+﻿namespace = asp_test_holding_recovery
+asp_test_holding_recovery.1 = {
+    type = character_event
+    hidden = yes
+    immediate = { asp_test_holding_recovery_regression_effect = yes }
+}
+
+# Actual UI is driven separately; these effects only prepare/observe its state.
+asp_test_holding_recovery.20 = { type = character_event hidden = yes immediate = { asp_test_recovery_gui_setup_effect = yes } }
+asp_test_holding_recovery.21 = { type = character_event hidden = yes immediate = { capital_county = { change_county_control = { value = 80 subtract = county_control } } debug_log = "ASP_GUI RECOVERY CONTROL80" } }
+asp_test_holding_recovery.22 = { type = character_event hidden = yes immediate = { asp_test_recovery_gui_assert_effect = yes } }

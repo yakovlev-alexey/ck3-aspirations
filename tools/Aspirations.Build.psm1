@@ -247,7 +247,18 @@ function Get-GeneratedPaths {
 }
 function Assert-DevGameStopped {
     param([string]$Profile)
-    if ($Profile -eq 'dev' -and @(Get-Process -Name ck3 -ErrorAction SilentlyContinue).Count) { throw 'Close CK3 before replacing development output.' }
+    if ($Profile -ne 'dev') { return }
+    try { $processes = @(Get-Process -Name ck3 -ErrorAction Stop) }
+    catch {
+        if ($_.FullyQualifiedErrorId -like 'NoProcessFoundForGivenName,*') { return }
+        throw 'Cannot verify CK3 process liveness; development output replacement rejected.'
+    }
+    foreach ($process in $processes) {
+        try { $exited = $process.HasExited }
+        catch { throw 'Cannot verify CK3 process liveness; development output replacement rejected.' }
+        if ($exited -isnot [bool]) { throw 'Cannot verify CK3 process liveness; development output replacement rejected.' }
+        if (-not $exited) { throw 'Close CK3 before replacing development output.' }
+    }
 }
 function Build-Aspirations {
     param([string]$RepositoryRoot, [ValidateSet('dev','release')][string]$Profile)

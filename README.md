@@ -2,7 +2,7 @@
 
 An English-only, player-character CK3 prototype for contextual vengeance, holding recovery and personal bonds. [Design](docs/design.md) · [Core specification](src/core/SPEC.md) · [Repository contract](docs/repository.md) · [Engine findings](docs/modding-notes.md)
 
-Current status: deterministic packaging and a verified disposable CK3 automation smoke runner with a local MCP stdio adapter. Task 2 gameplay core passed bounded native regression, actual selector/stale-action UI and real save/load acceptance on CK3 1.20.0.4. Family gameplay, reviews and pledges remain later-stage work. See the [automation contract](tools/game_runner/SPEC.md) and [acceptance scenarios](tools/game_runner/tests/scenarios.md).
+Current status: native core lifecycle/pledges, vengeance and holding recovery with registered disposable regression scenarios on CK3 1.20.0.4. Recovery acceptance includes actual GUI-funded construction, completion and its three-year county modifier. Personal bonds remain later-stage work. See the [automation contract](tools/game_runner/SPEC.md) and [acceptance scenarios](tools/game_runner/tests/scenarios.md).
 
 Use installed PowerShell 7 and Git. No additional dependencies are needed. The installed game is a read-only scripting reference; author native files under `src/core/game/` or the owning `src/stories/<family>/game/` when implementing a family.
 
@@ -33,9 +33,10 @@ For bounded real-game smoke tests, use the existing Python runtime with standard
 python -m unittest discover -s tools/game_runner/tests -v
 python -m tools.game_runner --config .local/automation/config.json run automation-smoke --repeat 3
 python -m tools.game_runner --config .local/automation/config.json run core-regression --repeat 1
+python -m tools.game_runner --config .local/automation/config.json run recovery-regression --repeat 1
 ```
 
-Both commands restart only their own game from the same baseline, check native measured state and duplicate delivery, record JSON/log evidence, and clean up the owned session. Only automation-smoke advances one actual day. `observe` and `advance-days 1` are also supported. Configuration, bounds and failure behavior are documented in the [automation contract](tools/game_runner/SPEC.md). No game-install edits or additional packages are needed.
+Registered scenario commands restart only their own game from the same baseline, check native measured state and duplicate delivery, record JSON/log evidence, and clean up the owned session. Automation-smoke and lifecycle-regression advance one actual day. `observe` and `advance-days 1` are also supported. Configuration, bounds and failure behavior are documented in the [automation contract](tools/game_runner/SPEC.md). No game-install edits or additional packages are needed.
 
 The launch preflight requires the actual Windows Documents CK3 profile and its exact `game.autosave` preference `NO_AUTOSAVE`, preserving existing autosaves across date advancement. Alternate profiles and missing/ambiguous settings are rejected. The runner reads the preference and never changes it; restore any test-owned preference change after cleanup.
 

@@ -1,0 +1,295 @@
+﻿# Shared manual .1 / registered recovery-regression native behavior fixture.
+# Setup is scripted. Genuine payer callbacks and actual GUI construction have separate acceptance.
+asp_test_recovery_clear_effect = {
+    asp_test_clear_stories_effect = yes
+    every_owned_story = { limit = { asp_is_active_story_trigger = yes } asp_resolve_story_effect = { OUTCOME = impossible REWARDS = none } }
+    clear_saved_scope = asp_test_recovery_story
+    capital_county = { save_scope_as = asp_test_recovery_county remove_variable = asp_recovery_incident_date remove_variable = asp_recovery_consumed_incident remove_county_modifier = asp_holding_recovery_tax_modifier change_county_control = { value = 69 subtract = county_control } }
+    capital_province = { save_scope_as = asp_test_recovery_province remove_variable = asp_recovery_construction_serial remove_variable = asp_recovery_before_market_villages remove_variable = asp_recovery_allow_market_villages remove_variable = asp_recovery_before_palisades remove_variable = asp_recovery_allow_palisades remove_variable = asp_recovery_before_pastures remove_variable = asp_recovery_allow_pastures remove_variable = asp_recovery_before_cereal_fields remove_variable = asp_recovery_allow_cereal_fields remove_variable = asp_recovery_before_hill_farms remove_variable = asp_recovery_allow_hill_farms }
+    save_scope_as = asp_test_recovery_owner
+    save_scope_value_as = { name = asp_recovery_force value = yes }
+    add_stress = { value = 70 subtract = stress }
+}
+asp_test_recovery_find_effect = {
+    clear_saved_scope = asp_test_recovery_story
+    every_owned_story = { limit = { asp_is_active_story_trigger = yes var:asp_family = flag:holding_recovery var:asp_target = scope:asp_test_recovery_county } save_scope_as = asp_test_recovery_story }
+}
+asp_test_recovery_origin_effect = {
+    asp_holding_recovery_observe_incident_effect = { COUNTY = scope:asp_test_recovery_county CAUSE = raid }
+    asp_test_recovery_find_effect = yes
+}
+asp_test_recovery_age_effect = {
+    scope:asp_test_recovery_story ?= { set_variable = { name = asp_origin_date value = { value = current_date subtract = 361 } } }
+}
+asp_test_recovery_paid_start_effect = {
+    save_scope_as = character
+    scope:asp_test_recovery_province = { asp_holding_recovery_construction_started_effect = yes }
+}
+asp_test_recovery_paid_finish_effect = {
+    save_scope_as = character
+    scope:asp_test_recovery_province = { if = { limit = { NOT = { has_building = market_villages_02 } } if = { limit = { has_building = market_villages_01 } remove_building = market_villages_01 } add_building = market_villages_02 } asp_holding_recovery_construction_completed_effect = yes }
+    scope:asp_test_recovery_story ?= { asp_refresh_story_effect = yes }
+}
+asp_test_recovery_legal_setup_effect = {
+    # Baseline Sibi has Market Villages II; restore category I to expose a legal upgrade.
+    scope:asp_test_recovery_province = { if = { limit = { has_building = market_villages_02 } remove_building = market_villages_02 } if = { limit = { NOT = { has_building = market_villages_01 } } add_building = market_villages_01 } }
+}
+asp_test_h01_effect = {
+    debug_log = "ASP_TEST H01 BEGIN"
+    asp_test_recovery_clear_effect = yes
+    asp_test_recovery_legal_setup_effect = yes
+    asp_test_recovery_origin_effect = yes
+    set_variable = { name = asp_test_origin_control value = scope:asp_test_recovery_county.county_control }
+    set_variable = { name = asp_test_h01 value = 0 }
+    if = { limit = { exists = scope:asp_test_recovery_story asp_active_ambitions = 1 } set_variable = { name = asp_test_h01 value = 1 } }
+    # Exact 70 boundary rejects a fresh incident.
+    asp_test_recovery_clear_effect = yes
+    scope:asp_test_recovery_county = { change_county_control = 1 }
+    asp_test_recovery_origin_effect = yes
+    if = { limit = { asp_active_ambitions > 0 } set_variable = { name = asp_test_h01 value = 0 } }
+    # Another owner's county rejects even if damaged.
+    asp_test_recovery_clear_effect = yes
+    title:d_timbuktu.holder.capital_county = { save_scope_as = asp_test_recovery_foreign_county }
+    asp_holding_recovery_observe_incident_effect = { COUNTY = scope:asp_test_recovery_foreign_county CAUSE = siege }
+    if = { limit = { asp_active_ambitions > 0 } set_variable = { name = asp_test_h01 value = 0 } }
+    # Supported Markets are at tier II; full slots prevent a new Palisades category.
+    scope:asp_test_recovery_province = { if = { limit = { NOT = { has_building = market_villages_02 } } if = { limit = { has_building = market_villages_01 } remove_building = market_villages_01 } add_building = market_villages_02 } }
+    asp_test_recovery_origin_effect = yes
+    if = { limit = { asp_active_ambitions > 0 } set_variable = { name = asp_test_h01 value = 0 } }
+
+    if = { limit = { var:asp_test_h01 = 1 var:asp_test_origin_control = 69 } debug_log = "ASP_TEST H01 PASS" }
+    else = { debug_log = "ASP_TEST H01 FAIL" }
+}
+asp_test_h02_effect = {
+    debug_log = "ASP_TEST H02 BEGIN"
+    asp_test_recovery_clear_effect = yes
+    asp_test_recovery_legal_setup_effect = yes
+    # Start before origin cannot provide a post-origin token.
+    asp_test_recovery_paid_start_effect = yes
+    asp_test_recovery_origin_effect = yes
+    scope:asp_test_recovery_county = { change_county_control = 11 }
+    scope:asp_test_recovery_story ?= { asp_refresh_story_effect = yes }
+    set_variable = { name = asp_test_h02 value = 0 }
+    if = { limit = { exists = scope:asp_test_recovery_story asp_active_ambitions = 1 } set_variable = { name = asp_test_h02 value = 1 } }
+    asp_test_recovery_paid_finish_effect = yes
+    if = { limit = { NOT = { asp_active_ambitions = 1 } } set_variable = { name = asp_test_h02 value = 0 } }
+    scope:asp_test_recovery_province = { remove_building = market_villages_02 if = { limit = { NOT = { has_building = market_villages_01 } } add_building = market_villages_01 } }
+    asp_test_recovery_paid_start_effect = yes
+    set_variable = { name = asp_test_reward_before value = stress }
+    set_variable = { name = asp_test_xp_before value = stewardship_lifestyle_xp }
+    asp_test_recovery_paid_finish_effect = yes
+    asp_test_recovery_measure_reward_effect = yes
+    set_variable = { name = asp_test_replay_before value = stress }
+    asp_test_recovery_paid_finish_effect = yes
+    set_variable = { name = asp_test_replayed value = { value = stress subtract = var:asp_test_replay_before } }
+    if = { limit = { var:asp_test_h02 = 1 var:asp_test_reward_stress = -20 var:asp_test_reward_xp = 100 var:asp_test_modifier_count = 1 asp_active_ambitions = 0 var:asp_test_replayed = 0 } debug_log = "ASP_TEST H02 PASS" }
+    else = { set_variable = { name = asp_test_h02 value = 0 } debug_log = "ASP_TEST H02 FAIL" }
+}
+asp_test_h03_effect = {
+    debug_log = "ASP_TEST H03 BEGIN"
+    asp_test_recovery_clear_effect = yes
+    asp_test_recovery_legal_setup_effect = yes
+    asp_test_recovery_origin_effect = yes
+    asp_test_recovery_paid_start_effect = yes
+    scope:asp_test_recovery_province = { asp_holding_recovery_construction_cancelled_effect = yes }
+    asp_test_recovery_paid_finish_effect = yes
+    set_variable = { name = asp_test_cancelled value = 0 }
+    scope:asp_test_recovery_story ?= { if = { limit = { has_variable = asp_recovery_completed } story_owner = { set_variable = { name = asp_test_cancelled value = 1 } } } }
+    scope:asp_test_recovery_province = { remove_building = market_villages_02 if = { limit = { NOT = { has_building = market_villages_01 } } add_building = market_villages_01 } }
+    clear_saved_scope = character
+    scope:asp_test_recovery_province = { asp_holding_recovery_construction_started_effect = yes if = { limit = { NOT = { has_building = market_villages_02 } } if = { limit = { has_building = market_villages_01 } remove_building = market_villages_01 } add_building = market_villages_02 } asp_holding_recovery_construction_completed_effect = yes }
+    set_variable = { name = asp_test_unproven value = 0 }
+    scope:asp_test_recovery_story ?= { if = { limit = { has_variable = asp_recovery_completed } story_owner = { set_variable = { name = asp_test_unproven value = 1 } } } }
+    scope:asp_test_recovery_province = { remove_building = market_villages_02 if = { limit = { NOT = { has_building = market_villages_01 } } add_building = market_villages_01 } }
+    title:d_timbuktu.holder = { save_scope_as = character }
+    scope:asp_test_recovery_province = { asp_holding_recovery_construction_started_effect = yes if = { limit = { NOT = { has_building = market_villages_02 } } if = { limit = { has_building = market_villages_01 } remove_building = market_villages_01 } add_building = market_villages_02 } asp_holding_recovery_construction_completed_effect = yes }
+    set_variable = { name = asp_test_foreign value = 0 }
+    scope:asp_test_recovery_story ?= { if = { limit = { has_variable = asp_recovery_completed } story_owner = { set_variable = { name = asp_test_foreign value = 1 } } } }
+    scope:asp_test_recovery_province = { remove_building = market_villages_02 if = { limit = { NOT = { has_building = market_villages_01 } } add_building = market_villages_01 } }
+    asp_test_recovery_paid_start_effect = yes
+    asp_test_recovery_paid_finish_effect = yes
+    set_variable = { name = asp_test_h03 value = 0 }
+    if = { limit = { exists = scope:asp_test_recovery_story scope:asp_test_recovery_story = { has_variable = asp_recovery_completed } var:asp_test_unproven = 0 var:asp_test_foreign = 0 var:asp_test_cancelled = 0 } set_variable = { name = asp_test_h03 value = 1 } debug_log = "ASP_TEST H03 PASS" }
+    else = { debug_log = "ASP_TEST H03 FAIL" }
+    # The engine reserves the final slot before native on_building_started. Reproduce its
+    # authoritative slot0/real action dispatch without pretending this scripted slot setup paid a cost.
+    asp_test_recovery_clear_effect = yes
+    scope:asp_test_recovery_province = {
+        if = { limit = { has_building = market_villages_02 } remove_building = market_villages_02 }
+        if = { limit = { has_building = market_villages_01 } remove_building = market_villages_01 }
+    }
+    asp_test_recovery_origin_effect = yes
+    scope:asp_test_recovery_province = { add_building = war_camps_01 }
+    save_scope_as = character
+    scope:asp_test_recovery_province = {
+        asp_test_recovery_observe_native_start_effect = yes
+        trigger_event = { on_action = asp_recovery_building_started }
+    }
+    if = { limit = { scope:asp_test_recovery_province = { free_building_slots = 0 exists = var:asp_recovery_work_story has_variable = asp_recovery_allow_palisades var:asp_recovery_work_payer = scope:character } } debug_log = "ASP_TEST H03 NATIVE_SLOT0_TOKEN_PASS" }
+    else = { set_variable = { name = asp_test_h03 value = 0 } debug_log = "ASP_TEST H03 NATIVE_SLOT0_TOKEN_FAIL" }
+    scope:asp_test_recovery_province = { remove_building = war_camps_01 add_building = palisades_01 trigger_event = { on_action = asp_recovery_building_completed } }
+    if = { limit = { exists = scope:asp_test_recovery_story scope:asp_test_recovery_story = { has_variable = asp_recovery_completed } } debug_log = "ASP_TEST H03 NATIVE_SLOT0_COMPLETION_PASS" }
+    else = { set_variable = { name = asp_test_h03 value = 0 } debug_log = "ASP_TEST H03 NATIVE_SLOT0_COMPLETION_FAIL" }
+    scope:asp_test_recovery_province = { if = { limit = { has_building = palisades_01 } remove_building = palisades_01 } add_building = market_villages_01 }
+}
+asp_test_h04_effect = {
+    debug_log = "ASP_TEST H04 BEGIN"
+    asp_test_recovery_clear_effect = yes
+    asp_test_recovery_legal_setup_effect = yes
+    # Independent engine-modified base stress controls, same owner/traits/session.
+    set_variable = { name = asp_test_before value = stress }
+    add_stress = 10
+    set_variable = { name = asp_test_loss_control value = { value = stress subtract = var:asp_test_before } }
+    add_stress = { value = var:asp_test_before subtract = stress }
+    add_stress = 15
+    set_variable = { name = asp_test_pledge_control value = { value = stress subtract = var:asp_test_before } }
+    add_stress = { value = var:asp_test_before subtract = stress }
+    asp_test_recovery_origin_effect = yes
+    asp_holding_recovery_title_lost_effect = { COUNTY = scope:asp_test_recovery_county TYPE = conquest }
+    scope:asp_test_recovery_story ?= { asp_refresh_story_effect = yes }
+    set_variable = { name = asp_test_h04 value = 0 }
+    if = { limit = { asp_active_ambitions = 0 stress = var:asp_test_before } set_variable = { name = asp_test_h04 value = 1 } }
+    asp_test_recovery_clear_effect = yes
+    asp_test_recovery_origin_effect = yes
+    set_variable = { name = asp_test_before value = stress }
+    asp_holding_recovery_title_lost_effect = { COUNTY = scope:asp_test_recovery_county TYPE = granted }
+    scope:asp_test_recovery_story ?= { asp_refresh_story_effect = yes }
+    set_variable = { name = asp_test_loss_stress value = { value = stress subtract = var:asp_test_before } }
+    asp_test_recovery_clear_effect = yes
+    asp_test_recovery_origin_effect = yes
+    asp_test_recovery_age_effect = yes
+    scope:asp_test_recovery_story ?= { asp_declare_story_effect = yes }
+    set_variable = { name = asp_test_before value = stress }
+    set_variable = { name = asp_test_prestige_before value = prestige }
+    asp_test_recovery_paid_start_effect = yes
+    asp_holding_recovery_title_lost_effect = { COUNTY = scope:asp_test_recovery_county TYPE = granted }
+    scope:asp_test_recovery_story ?= { asp_refresh_story_effect = yes }
+    asp_test_recovery_paid_finish_effect = yes
+    set_variable = { name = asp_test_pledge_stress value = { value = stress subtract = var:asp_test_before } }
+    set_variable = { name = asp_test_pledge_prestige value = { value = prestige subtract = var:asp_test_prestige_before } }
+    # Genuine engine typed transfer/reacquisition; this is not a played war.
+    asp_test_recovery_clear_effect = yes
+    asp_test_recovery_legal_setup_effect = yes
+    asp_test_recovery_origin_effect = yes
+    asp_test_recovery_paid_start_effect = yes
+    set_variable = { name = asp_test_transfer_before value = stress }
+    create_title_and_vassal_change = { type = conquest save_scope_as = asp_test_recovery_transfer }
+    scope:asp_test_recovery_county = { change_title_holder = { holder = title:d_timbuktu.holder change = scope:asp_test_recovery_transfer } }
+    resolve_title_and_vassal_change = scope:asp_test_recovery_transfer
+    scope:asp_test_recovery_story ?= { asp_refresh_story_effect = yes }
+    create_title_and_vassal_change = { type = conquest save_scope_as = asp_test_recovery_transfer }
+    scope:asp_test_recovery_county = { change_title_holder = { holder = scope:asp_test_recovery_owner change = scope:asp_test_recovery_transfer } }
+    resolve_title_and_vassal_change = scope:asp_test_recovery_transfer
+    asp_test_recovery_paid_finish_effect = yes
+    asp_test_recovery_origin_effect = yes
+    if = { limit = { OR = { asp_active_ambitions > 0 NOT = { stress = var:asp_test_transfer_before } scope:asp_test_recovery_county = { has_county_modifier = asp_holding_recovery_tax_modifier } } } set_variable = { name = asp_test_h04 value = 0 } }
+    # Unknown cause uses conservative free closure too.
+    asp_test_recovery_clear_effect = yes
+    asp_test_recovery_legal_setup_effect = yes
+    asp_test_recovery_origin_effect = yes
+    set_variable = { name = asp_test_transfer_before value = stress }
+    asp_holding_recovery_title_lost_effect = { COUNTY = scope:asp_test_recovery_county TYPE = other_or_unknown }
+    scope:asp_test_recovery_story ?= { asp_refresh_story_effect = yes }
+    if = { limit = { OR = { asp_active_ambitions > 0 NOT = { stress = var:asp_test_transfer_before } } } set_variable = { name = asp_test_h04 value = 0 } }
+    if = { limit = { var:asp_test_h04 = 1 var:asp_test_loss_stress = var:asp_test_loss_control var:asp_test_pledge_stress = var:asp_test_pledge_control var:asp_test_pledge_prestige = -100 asp_active_ambitions = 0 } debug_log = "ASP_TEST H04 PASS" }
+    else = { set_variable = { name = asp_test_h04 value = 0 } debug_log = "ASP_TEST H04 FAIL" }
+}
+asp_test_h05_effect = {
+    debug_log = "ASP_TEST H05 BEGIN"
+    asp_test_recovery_clear_effect = yes
+    asp_test_recovery_legal_setup_effect = yes
+    asp_test_recovery_origin_effect = yes
+    asp_test_recovery_age_effect = yes
+    set_variable = { name = asp_test_h05 value = 0 }
+    if = { limit = { exists = scope:asp_test_recovery_story scope:asp_test_recovery_story = { asp_holding_recovery_can_declare_trigger = yes } } set_variable = { name = asp_test_h05 value = 1 } }
+    asp_test_recovery_origin_effect = yes
+    if = { limit = { NOT = { asp_active_ambitions = 1 } } set_variable = { name = asp_test_h05 value = 0 } }
+    scope:asp_test_recovery_county = { change_county_control = 11 }
+    if = { limit = { scope:asp_test_recovery_story ?= { asp_holding_recovery_can_declare_trigger = yes } } set_variable = { name = asp_test_h05 value = 0 } }
+    scope:asp_test_recovery_county = { change_county_control = -11 }
+    asp_test_recovery_paid_start_effect = yes
+    asp_test_recovery_paid_finish_effect = yes
+    if = { limit = { scope:asp_test_recovery_story ?= { asp_holding_recovery_can_declare_trigger = yes } } set_variable = { name = asp_test_h05 value = 0 } }
+    if = { limit = { NOT = { asp_active_ambitions = 1 } } set_variable = { name = asp_test_h05 value = 0 } }
+    # New recovery incident at cap offers a fixed explicit replacement, never automatic eviction.
+    asp_test_recovery_clear_effect = yes
+    asp_test_recovery_legal_setup_effect = yes
+    while = { count = 3 asp_test_create_story_effect = { CLASS = ambition } }
+    scope:asp_new_story = { save_scope_as = asp_test_recovery_replaced }
+    set_variable = { name = asp_test_cap_id value = var:asp_next_instance_id }
+    asp_test_recovery_origin_effect = yes
+    if = { limit = { OR = { NOT = { asp_active_ambitions = 3 } NOT = { var:asp_next_instance_id = var:asp_test_cap_id } NOT = { exists = scope:asp_replacement_cause_county } } } set_variable = { name = asp_test_h05 value = 0 } }
+    scope:asp_test_recovery_replaced = { save_scope_as = asp_selected_story }
+    scope:asp_test_recovery_county = { change_county_control = 11 }
+    asp_confirm_replacement_effect = yes
+    if = { limit = { NOT = { exists = scope:asp_test_recovery_replaced } } set_variable = { name = asp_test_h05 value = 0 } }
+    scope:asp_test_recovery_county = { change_county_control = -11 }
+    set_variable = { name = asp_test_cap_before value = stress }
+    asp_confirm_replacement_effect = yes
+    asp_confirm_replacement_effect = yes
+    if = { limit = { OR = { NOT = { asp_active_ambitions = 3 } exists = scope:asp_test_recovery_replaced NOT = { exists = scope:asp_recovery_new_story } NOT = { stress = { value = var:asp_test_cap_before add = var:asp_test_loss_control } } } } set_variable = { name = asp_test_h05 value = 0 } }
+    if = { limit = { var:asp_test_h05 = 1 asp_active_ambitions = 3 scope:asp_test_recovery_county = { NOT = { has_county_modifier = asp_holding_recovery_tax_modifier } } } debug_log = "ASP_TEST H05 PASS" }
+    else = { set_variable = { name = asp_test_h05 value = 0 } debug_log = "ASP_TEST H05 FAIL" }
+}
+asp_test_holding_recovery_regression_effect = {
+    asp_test_h01_effect = yes
+    asp_test_h02_effect = yes
+    asp_test_h03_effect = yes
+    asp_test_h04_effect = yes
+    asp_test_h05_effect = yes
+}
+
+# The registered H02 fixture and separately driven real GUI use exactly this measurement helper.
+asp_test_recovery_measure_reward_effect = {
+    set_variable = { name = asp_test_reward_stress value = { value = stress subtract = var:asp_test_reward_before } }
+    set_variable = { name = asp_test_reward_xp value = { value = stewardship_lifestyle_xp subtract = var:asp_test_xp_before } }
+    set_variable = { name = asp_test_modifier_count value = 0 }
+    if = { limit = { scope:asp_test_recovery_county = { has_county_modifier = asp_holding_recovery_tax_modifier } } set_variable = { name = asp_test_modifier_count value = 1 } }
+}
+asp_test_recovery_gui_setup_effect = {
+    asp_test_recovery_clear_effect = yes
+    scope:asp_test_recovery_province = {
+        if = { limit = { has_building = market_villages_02 } remove_building = market_villages_02 }
+        if = { limit = { has_building = market_villages_01 } remove_building = market_villages_01 }
+    }
+    add_gold = 1000
+    add_prestige = 1000
+    set_variable = { name = asp_test_gui_gold value = gold }
+    set_variable = { name = asp_test_gui_prestige value = prestige }
+    asp_test_recovery_origin_effect = yes
+    set_variable = { name = asp_test_reward_before value = stress }
+    set_variable = { name = asp_test_xp_before value = stewardship_lifestyle_xp }
+    set_variable = { name = asp_test_gui_story value = scope:asp_test_recovery_story }
+    debug_log = "ASP_GUI RECOVERY SETUP_READY"
+}
+asp_test_recovery_gui_assert_effect = {
+    capital_county = { save_scope_as = asp_test_recovery_county }
+    asp_test_recovery_measure_reward_effect = yes
+    if = { limit = { var:asp_test_reward_stress = -20 var:asp_test_reward_xp = 100 var:asp_test_modifier_count = 1 asp_active_ambitions = 0 capital_county = { county_control >= 80 } gold < var:asp_test_gui_gold prestige < var:asp_test_gui_prestige }
+        debug_log = "ASP_GUI RECOVERY REWARD_AND_PAYMENT_PASS"
+    }
+    else = { debug_log = "ASP_GUI RECOVERY REWARD_AND_PAYMENT_FAIL" }
+}
+
+# Shared observer: the real callback and registered H03 native-action fixture use the same fields.
+asp_test_recovery_observe_native_start_effect = {
+    save_scope_as = asp_test_native_work
+    county.holder = { save_scope_as = holder }
+    set_variable = { name = asp_test_callback_slots value = free_building_slots }
+    set_variable = { name = asp_test_callback_ongoing value = 0 }
+    if = { limit = { has_ongoing_construction = yes } set_variable = { name = asp_test_callback_ongoing value = 1 } }
+    set_variable = { name = asp_test_callback_payer value = 0 }
+    if = { limit = { exists = scope:character scope:character = county.holder } set_variable = { name = asp_test_callback_payer value = 1 } }
+    set_variable = { name = asp_test_callback_strict_legal value = 0 }
+    if = { limit = { asp_recovery_province_legal_trigger = { RESERVED = no } } set_variable = { name = asp_test_callback_strict_legal value = 1 } }
+    set_variable = { name = asp_test_callback_baseline value = 0 }
+    if = { limit = { has_variable = asp_recovery_before_palisades } set_variable = { name = asp_test_callback_baseline value = 1 } }
+    county.holder = {
+        set_variable = { name = asp_test_callback_slots value = scope:asp_test_native_work.var:asp_test_callback_slots }
+        set_variable = { name = asp_test_callback_ongoing value = scope:asp_test_native_work.var:asp_test_callback_ongoing }
+        set_variable = { name = asp_test_callback_payer value = scope:asp_test_native_work.var:asp_test_callback_payer }
+        set_variable = { name = asp_test_callback_strict_legal value = scope:asp_test_native_work.var:asp_test_callback_strict_legal }
+        set_variable = { name = asp_test_callback_baseline value = scope:asp_test_native_work.var:asp_test_callback_baseline }
+        debug_log = asp_test_callback_start_state
+    }
+}

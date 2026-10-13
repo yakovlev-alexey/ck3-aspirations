@@ -1,0 +1,54 @@
+﻿on_building_started = { on_actions = { asp_test_recovery_started } }
+on_building_completed = { on_actions = { asp_test_recovery_completed } }
+on_building_cancelled = { on_actions = { asp_test_recovery_cancelled } }
+on_title_lost = { on_actions = { asp_test_recovery_title_lost } }
+asp_test_recovery_started = { trigger = { county.holder = { OR = { has_variable = asp_probe_gold has_variable = asp_probe_ai_before_gold has_variable = asp_test_gui_gold } } } effect = {
+ debug_log = "ASP_PROBE RECOVERY STARTED BEGIN"
+ asp_test_recovery_observe_native_start_effect = yes
+ set_variable = { name = asp_probe_started_payer value = 0 }
+ if = { limit = { exists = scope:character }
+  set_variable = { name = asp_probe_started_payer value = 1 }
+  set_variable = { name = asp_probe_started_character value = scope:character }
+  scope:character = { if = { limit = { has_variable = asp_probe_ai_before_gold has_variable = asp_test_gui_gold }
+   set_variable = { name = asp_probe_ai_started_province value = root }
+   set_variable = { name = asp_probe_ai_started_character value = this }
+   debug_log = "ASP_PROBE AI_NATIVE_START_PAYER"
+  } }
+  if = { limit = { scope:character = root.county.holder } debug_log = "ASP_PROBE RECOVERY STARTED PAYER_HOLDER" }
+  else = { debug_log = "ASP_PROBE RECOVERY STARTED PAYER_FOREIGN" }
+ }
+ else = { debug_log = "ASP_PROBE RECOVERY STARTED PAYER_ABSENT" }
+ debug_log = "ASP_PROBE RECOVERY STARTED END"
+} }
+asp_test_recovery_completed = { trigger = { county.holder = { OR = { has_variable = asp_probe_gold has_variable = asp_probe_ai_before_gold has_variable = asp_test_gui_gold } } } effect = {
+ debug_log = "ASP_PROBE RECOVERY COMPLETED BEGIN"
+ set_variable = { name = asp_probe_completed_payer value = 0 }
+ if = { limit = { exists = scope:character }
+  set_variable = { name = asp_probe_completed_payer value = 1 }
+  set_variable = { name = asp_probe_completed_character value = scope:character }
+  if = { limit = { scope:character = root.county.holder } debug_log = "ASP_PROBE RECOVERY COMPLETED PAYER_HOLDER" }
+  else = { debug_log = "ASP_PROBE RECOVERY COMPLETED PAYER_FOREIGN" }
+ }
+ else = { debug_log = "ASP_PROBE RECOVERY COMPLETED PAYER_ABSENT" }
+ debug_log = "ASP_PROBE RECOVERY COMPLETED END"
+} }
+asp_test_recovery_cancelled = { trigger = { county.holder = { OR = { has_variable = asp_probe_gold has_variable = asp_probe_ai_before_gold has_variable = asp_test_gui_gold } } } effect = {
+ debug_log = "ASP_PROBE RECOVERY CANCELLED BEGIN"
+ set_variable = { name = asp_probe_cancelled_payer value = 0 }
+ if = { limit = { exists = scope:character }
+  set_variable = { name = asp_probe_cancelled_payer value = 1 }
+  set_variable = { name = asp_probe_cancelled_character value = scope:character }
+  if = { limit = { scope:character = root.county.holder } debug_log = "ASP_PROBE RECOVERY CANCELLED PAYER_HOLDER" }
+  else = { debug_log = "ASP_PROBE RECOVERY CANCELLED PAYER_FOREIGN" }
+ }
+ else = { debug_log = "ASP_PROBE RECOVERY CANCELLED PAYER_ABSENT" }
+ debug_log = "ASP_PROBE RECOVERY CANCELLED END"
+} }
+asp_test_recovery_title_lost = { trigger = { has_variable = asp_probe_gold is_ai = no } effect = {
+ debug_log = "ASP_PROBE RECOVERY TITLE_LOST BEGIN"
+ if = { limit = { exists = scope:transfer_type } debug_log = "ASP_PROBE RECOVERY TITLE_TRANSFER_PRESENT" }
+ else = { debug_log = "ASP_PROBE RECOVERY TITLE_TRANSFER_ABSENT" }
+ if = { limit = { scope:transfer_type = flag:granted } debug_log = "ASP_PROBE RECOVERY TITLE_GRANTED" }
+ if = { limit = { scope:transfer_type = flag:conquest } debug_log = "ASP_PROBE RECOVERY TITLE_CONQUEST" }
+ debug_log = "ASP_PROBE RECOVERY TITLE_LOST END"
+} }

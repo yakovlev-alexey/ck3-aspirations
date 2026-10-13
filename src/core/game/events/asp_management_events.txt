@@ -214,11 +214,12 @@ asp_management.2 = {
     title = asp_management_selected_title
     desc = {
         first_valid = {
+            triggered_desc = { trigger = { asp_recovery_event_can_manage_trigger = { STORY = scope:asp_selected_story } scope:asp_selected_story ?= { has_variable = asp_declared } } desc = asp_recovery_declared_county_desc }
             triggered_desc = {
                 trigger = {
                     scope:asp_selected_story ?= { asp_can_manage_story_trigger = yes var:asp_family = flag:holding_recovery }
                 }
-                desc = asp_management_selected_county_desc
+                desc = asp_recovery_private_county_desc
             }
             triggered_desc = {
                 trigger = { scope:asp_selected_story ?= { asp_can_manage_story_trigger = yes has_variable = asp_declared } }
@@ -276,13 +277,31 @@ asp_management.2 = {
 asp_management.3 = {
     type = character_event
     title = asp_core_review_title
-    desc = { first_valid = { triggered_desc = { trigger = { scope:asp_selected_story ?= { asp_can_manage_story_trigger = yes asp_story_owned_by_event_root_trigger = yes } } desc = asp_review_choices_desc } desc = asp_management_closed_desc } }
+    desc = { first_valid = { triggered_desc = { trigger = { scope:asp_selected_story ?= { asp_can_manage_story_trigger = yes asp_story_owned_by_event_root_trigger = yes } } desc = { first_valid = { triggered_desc = { trigger = { asp_recovery_event_can_manage_trigger = { STORY = scope:asp_selected_story } } desc = asp_recovery_review_desc } desc = asp_review_choices_desc } } } desc = asp_management_closed_desc } }
     theme = stewardship
     option = {
         name = asp_retain
         trigger = { scope:asp_selected_story ?= { asp_can_manage_story_trigger = yes asp_story_review_due_trigger = yes asp_story_owned_by_event_root_trigger = yes } }
         custom_tooltip = asp_retain_tooltip
         hidden_effect = { scope:asp_selected_story ?= { if = { limit = { story_owner = root } asp_retain_story_effect = yes } } }
+    }
+    option = { name = asp_recovery_protection
+        trigger = { asp_recovery_event_can_manage_trigger = { STORY = scope:asp_selected_story } scope:asp_selected_story ?= { NOT = { has_variable = asp_declared } NOT = { var:asp_interpretation = flag:protection } } }
+        custom_tooltip = asp_recovery_condition
+        custom_tooltip = asp_reinterpret_tooltip
+        hidden_effect = { scope:asp_selected_story ?= { if = { limit = { story_owner = root } asp_reinterpret_recovery_effect = { INTERPRETATION = protection } } } }
+    }
+    option = { name = asp_recovery_family_prestige
+        trigger = { asp_recovery_event_can_manage_trigger = { STORY = scope:asp_selected_story } scope:asp_selected_story ?= { NOT = { has_variable = asp_declared } NOT = { var:asp_interpretation = flag:family_prestige } } }
+        custom_tooltip = asp_recovery_condition
+        custom_tooltip = asp_reinterpret_tooltip
+        hidden_effect = { scope:asp_selected_story ?= { if = { limit = { story_owner = root } asp_reinterpret_recovery_effect = { INTERPRETATION = family_prestige } } } }
+    }
+    option = { name = asp_recovery_income
+        trigger = { asp_recovery_event_can_manage_trigger = { STORY = scope:asp_selected_story } scope:asp_selected_story ?= { NOT = { has_variable = asp_declared } NOT = { var:asp_interpretation = flag:income } } }
+        custom_tooltip = asp_recovery_condition
+        custom_tooltip = asp_reinterpret_tooltip
+        hidden_effect = { scope:asp_selected_story ?= { if = { limit = { story_owner = root } asp_reinterpret_recovery_effect = { INTERPRETATION = income } } } }
     }
     option = {
         name = asp_vengeance_personal
@@ -316,11 +335,11 @@ asp_management.3 = {
 asp_management.4 = {
     type = character_event
     title = asp_replace_title
-    desc = { first_valid = { triggered_desc = { trigger = { scope:asp_selected_story ?= { asp_can_manage_story_trigger = yes asp_story_owned_by_event_root_trigger = yes } asp_vengeance_replacement_cause_valid_trigger = yes } desc = asp_replace_desc } desc = asp_replace_invalid_desc } }
+    desc = { first_valid = { triggered_desc = { trigger = { scope:asp_selected_story ?= { asp_can_manage_story_trigger = yes asp_story_owned_by_event_root_trigger = yes } asp_replacement_cause_valid_trigger = yes } desc = { first_valid = { triggered_desc = { trigger = { exists = scope:asp_replacement_cause_county } desc = asp_recovery_replace_desc } desc = asp_replace_desc } } } desc = asp_replace_invalid_desc } }
     theme = intrigue
     option = {
         name = asp_replace_confirm
-        trigger = { asp_vengeance_replacement_cause_valid_trigger = yes scope:asp_selected_story ?= { asp_can_manage_story_trigger = yes asp_story_owned_by_event_root_trigger = yes var:asp_class = flag:ambition } }
+        trigger = { asp_replacement_cause_valid_trigger = yes scope:asp_selected_story ?= { asp_can_manage_story_trigger = yes asp_story_owned_by_event_root_trigger = yes var:asp_class = flag:ambition } }
         if = { limit = { scope:asp_selected_story ?= { has_variable = asp_declared } }
             custom_tooltip = asp_public_release_cost
             show_as_tooltip = { add_prestige = asp_pledge_failure_prestige add_stress = asp_pledge_failure_stress }

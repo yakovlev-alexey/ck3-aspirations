@@ -1,0 +1,33 @@
+﻿on_siege_completion = { on_actions = { asp_recovery_siege_incident } }
+asp_recovery_siege_incident = {
+    trigger = { exists = scope:county exists = scope:county.holder scope:county.holder = { is_ai = no } is_at_war_with = scope:county.holder }
+    effect = { scope:county.holder = { asp_holding_recovery_observe_incident_effect = { COUNTY = scope:county CAUSE = siege } } }
+}
+on_raid_action_completion = { on_actions = { asp_recovery_raid_incident } }
+asp_recovery_raid_incident = {
+    trigger = { exists = scope:county exists = scope:raider exists = scope:county.holder scope:county.holder = { is_ai = no } NOT = { scope:raider = scope:county.holder } }
+    effect = { scope:county.holder = { asp_holding_recovery_observe_incident_effect = { COUNTY = scope:county CAUSE = raid } } }
+}
+on_building_started = { on_actions = { asp_recovery_building_started } }
+asp_recovery_building_started = {
+    trigger = { county.holder ?= { any_owned_story = { asp_is_active_story_trigger = yes var:asp_family = flag:holding_recovery var:asp_target = root.county } } }
+    effect = { asp_holding_recovery_construction_started_effect = yes }
+}
+on_building_completed = { on_actions = { asp_recovery_building_completed } }
+asp_recovery_building_completed = {
+    trigger = { county.holder ?= { any_owned_story = { asp_is_active_story_trigger = yes var:asp_family = flag:holding_recovery var:asp_target = root.county } } }
+    effect = { asp_holding_recovery_construction_completed_effect = yes }
+}
+on_building_cancelled = { on_actions = { asp_recovery_building_cancelled } }
+asp_recovery_building_cancelled = {
+    trigger = { county.holder ?= { any_owned_story = { asp_is_active_story_trigger = yes var:asp_family = flag:holding_recovery var:asp_target = root.county } } }
+    effect = { asp_holding_recovery_construction_cancelled_effect = yes }
+}
+on_title_lost = { on_actions = { asp_recovery_title_lost } }
+asp_recovery_title_lost = {
+    trigger = { exists = scope:title any_owned_story = { asp_is_active_story_trigger = yes var:asp_family = flag:holding_recovery var:asp_target = scope:title } }
+    effect = {
+        if = { limit = { exists = scope:transfer_type scope:transfer_type = flag:granted } asp_holding_recovery_title_lost_effect = { COUNTY = scope:title TYPE = granted } }
+        else = { asp_holding_recovery_title_lost_effect = { COUNTY = scope:title TYPE = other_or_unknown } }
+    }
+}

@@ -1,0 +1,7 @@
+﻿asp_recovery_selection_chance = { value = 50 if = { limit = { asp_active_ambitions = 1 } multiply = 0.7 } else_if = { limit = { asp_active_ambitions >= 2 } multiply = 0.4 } }
+asp_recovery_stewardship_reward = 100
+asp_recovery_market_villages_level = { value = 0 if = { limit = { has_building_or_higher = market_villages_01 } add = 1 } if = { limit = { has_building_or_higher = market_villages_02 } add = 1 } }
+asp_recovery_palisades_level = { value = 0 if = { limit = { has_building_or_higher = palisades_01 } add = 1 } if = { limit = { has_building_or_higher = palisades_02 } add = 1 } }
+asp_recovery_pastures_level = { value = 0 if = { limit = { has_building_or_higher = pastures_01 } add = 1 } }
+asp_recovery_cereal_fields_level = { value = 0 if = { limit = { has_building_or_higher = cereal_fields_01 } add = 1 } }
+asp_recovery_hill_farms_level = { value = 0 if = { limit = { has_building_or_higher = hill_farms_01 } add = 1 } }
