@@ -36,11 +36,11 @@
 **Consumes:** existing Config, GameRunner, SessionGuard, strict diagnostics and `.build/<profile>/manifest.json`.
 **Produces:** a documented one-command managed regression session, bounded subprocess lifetime, targeted profile preparation/restoration, and generated machine-readable plus concise human-readable evidence report. Record exact additive CLI/API in the owning SPEC for Task 2.
 
-- [ ] Inspect existing setup helpers and runner ownership; write focused failing tests for normal and failed cleanup, external mutation, deadlines and provenance.
-- [ ] Implement the smallest complete prepare/run/collect/restore workflow with explicit safe boundaries and failure results. Extend the existing source map, not a parallel source registry.
-- [ ] Make reports identify revision/dirty state, built files/hashes, scenarios/assertions, evidence files, durations, process cleanup and profile restoration; missing/stale evidence cannot count as success.
-- [ ] Run bounded offline suites and one live registered regression through the new command, retaining fresh evidence and restoration checks.
-- [ ] Update living docs and commit scoped changes. Independent review before Task 2.
+- [x] Inspect existing setup helpers and runner ownership; write focused failing tests for normal and failed cleanup, external mutation, deadlines and provenance.
+- [x] Implement the smallest complete prepare/run/collect/restore workflow with explicit safe boundaries and failure results. Extend the existing source map, not a parallel source registry.
+- [x] Make reports identify revision/dirty state, built files/hashes, scenarios/assertions, evidence files, durations, process cleanup and profile restoration; missing/stale evidence cannot count as success.
+- [x] Run bounded offline suites and one live registered regression through the new command, retaining fresh evidence and restoration checks.
+- [x] Update living docs and commit scoped changes. Independent review before Task 2.
 
 ### Task 2: Reproducible UI operations (priority 2)
 
@@ -48,11 +48,11 @@
 **Consumes:** Task 1 managed session and evidence reporting, existing native Story identity/management callbacks.
 **Produces:** bounded named operations for opening aspirations, selecting an exact Story, declaring an eligible goal, and saving/reloading a disposable campaign, exposed through a registered scenario and reusable within the runner.
 
-- [ ] Inspect actual current UI and existing local helpers; design against supported window geometry and centralize screenshot/client/DPI coordinate conversion.
-- [ ] Add failing tests for coordinate conversion, stale/wrong selection, identity/confirmation, missing evidence and cleanup. Do not implement a click-only success oracle.
-- [ ] Implement named operations with native measured assertions and actual screenshots, using scoped fixtures for deterministic setup. Unsupported geometry/state must fail clearly.
-- [ ] Run the registered UI sequence in real CK3, inspect frames, prove exact Story identity/declaration and save/reload persistence, then prove restoration.
-- [ ] Update SPEC/scenarios, commit and pass independent review.
+- [x] Inspect actual current UI and existing local helpers; design against supported window geometry and centralize screenshot/client/DPI coordinate conversion.
+- [x] Add failing tests for coordinate conversion, stale/wrong selection, identity/confirmation, missing evidence and cleanup. Do not implement a click-only success oracle.
+- [x] Implement named operations with native measured assertions and actual screenshots, using scoped fixtures for deterministic setup. Unsupported geometry/state must fail clearly.
+- [x] Run the registered UI sequence in real CK3, inspect frames, prove exact Story identity/declaration and save/reload persistence, then prove restoration.
+- [x] Update SPEC/scenarios, commit and pass independent review.
 
 ### Task 3: Shared story contract and agent knowledge base (priority 3 plus new request)
 
@@ -60,14 +60,22 @@
 **Consumes:** existing three family contracts, durable modding notes and final runner interfaces.
 **Produces:** reusable story authoring/acceptance guide plus checks, versioned searchable knowledge index and topic notes, and mandatory agent read/update workflow.
 
-- [ ] Establish shared acceptance requirements for origin/target identity, lifecycle, completion/abandonment, stale actions, visible card keys/state and reproducible regression references; preserve legitimate family differences.
-- [ ] Add meaningful negative/positive contract tests to existing tooling. Keep prose authority with existing SPEC files; do not add a new game DSL or claim static semantics validation.
-- [ ] Create indexed topic notes with status, CK3 version, observation, evidence/reproduction, implications and limits. Seed construction reservation/payer/token ownership, Story scopes/localization, lifecycle/calendar, automation/profile/DPI and known unsupported knowledge hooks from verified project findings.
-- [ ] Make AGENTS require consulting relevant notes first and updating findings in the same change; explicitly record no new durable finding when appropriate. Prefer portable tracked references over ignored historical reports as the only evidence.
-- [ ] Replace duplication in modding-notes with navigation or carefully scoped retained material, update links and verify checks. Commit and pass independent review.
+- [x] Establish shared acceptance requirements for origin/target identity, lifecycle, completion/abandonment, stale actions, visible card keys/state and reproducible regression references; preserve legitimate family differences.
+- [x] Add meaningful negative/positive contract tests to existing tooling. Keep prose authority with existing SPEC files; do not add a new game DSL or claim static semantics validation.
+- [x] Create indexed topic notes with status, CK3 version, observation, evidence/reproduction, implications and limits. Seed construction reservation/payer/token ownership, Story scopes/localization, lifecycle/calendar, automation/profile/DPI and known unsupported knowledge hooks from verified project findings.
+- [x] Make AGENTS require consulting relevant notes first and updating findings in the same change; explicitly record no new durable finding when appropriate. Prefer portable tracked references over ignored historical reports as the only evidence.
+- [x] Replace duplication in modding-notes with navigation or carefully scoped retained material, update links and verify checks. Commit and pass independent review.
 
 ## Completion
 
-- [ ] Bounded relevant offline/tooling checks and dev/release build/check pass; all new native operations have measured live evidence or an explicit unresolved blocker.
-- [ ] Final independent review covers combined changes and knowledge discoverability; parent validates reports, manifests and native screenshots.
-- [ ] Owned processes stopped, profile restored, baseline unchanged, worktree clean; report usable commands, evidence, limits and commits.
+- [x] Bounded relevant offline/tooling checks and dev/release build/check pass; all new native operations have measured live evidence or an explicit unresolved blocker.
+- [x] Final independent review covers combined changes and knowledge discoverability; parent validates reports, manifests and native screenshots.
+- [x] Owned processes stopped, profile restored, baseline unchanged, worktree clean; report usable commands, evidence, limits and commits.
+
+## Completion record
+
+All three tasks and the final independent integration review are approved. The final implementation revision is `1180223523bf0d7a811f3000017389c984adc40d` on `feat/aspirations-prototype`.
+
+Final verification: 165 Python tests, 24 tooling cases and 17 shared contract cases passed; dev/release content checks passed with 66/40 files. The registered managed UI regression passed all ten assertions in real CK3 1.20.1, including exact second-Story declaration, genuine native save/fresh-process reload and zero Aspiration runtime diagnostics. The measured UI environment is 2560x1440, DPI120 and GUI scale1.3. Later common evidence/error-path fixes passed focused tests and offline revalidation of the same actual artifacts; they do not claim another game launch.
+
+All owned CK3 processes stopped, profile bytes were restored and the immutable baseline remained unchanged. Living reproduction contracts are in [the runner SPEC](../../../tools/game_runner/SPEC.md), [runner scenarios](../../../tools/game_runner/tests/scenarios.md), [story authoring](../../story-authoring.md) and [the knowledge index](../../knowledge/README.md). Local review transcripts and raw evidence remain ignored, outside the distributable mod.
