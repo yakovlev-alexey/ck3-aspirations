@@ -12,6 +12,7 @@ from pathlib import Path
 
 from .protocol import LogCursor, ProtocolError, Telemetry, atomic_request, safe_path
 from .windows import WindowsBackend
+from .registry import SCENARIOS
 
 
 _ASPIRATION_RUNTIME_TAGS = (
@@ -177,7 +178,15 @@ class GameRunner:
             effect = f"asp_test_automation_request_effect = {{ VERSION = 1 SESSION = {session} REQUEST = {request} OP = {operation} DAYS = {days} }}"
         cursor = LogCursor(self.config.user_data / "logs" / "debug.log")
         parser = Telemetry(session, request, operation=operation)
-        atomic_request(self.request_root, self.request_path, "hidden_effect = { " + effect + " }\n")
+        request_text = "hidden_effect = { " + effect + " }\n"
+        journal = getattr(self, "request_journal", None)
+        if journal is not None:
+            previous = self.request_path.read_bytes() if self.request_path.exists() else b""
+            hashes = [hashlib.sha256(previous).hexdigest(), hashlib.sha256(request_text.encode("utf-8-sig")).hexdigest()]
+            temporary = journal.with_suffix(".pending")
+            temporary.write_text(json.dumps({"hashes": hashes, "owned_pids": list(getattr(self.backend, "started_pids", []))}), encoding="utf-8")
+            os.replace(temporary, journal)
+        atomic_request(self.request_root, self.request_path, request_text)
         self.backend.command("run asp_automation_request.txt")
         if operation == "advance" and not replay:
             # tick_day is a bounded native console command; delayed event verifies elapsed date.
@@ -224,7 +233,7 @@ class GameRunner:
         return self._report_operation("advance", days)
 
     def run_scenario(self, name, repeat=1):
-        if name not in ("automation-smoke", "core-regression", "vengeance-regression", "lifecycle-regression", "recovery-regression", "bond-regression", "integrated-regression") or type(repeat) is not int or not 1 <= repeat <= 10:
+        if name not in SCENARIOS or type(repeat) is not int or not 1 <= repeat <= 10:
             raise ValueError("Only registered scenarios with repeat 1 through 10 are implemented")
         if not self.flight.acquire(blocking=False):
             return {"status": "transport_error", "error": "Concurrent operation rejected"}

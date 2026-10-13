@@ -3,6 +3,7 @@ import argparse
 import json
 import sys
 from .runner import Config, GameRunner
+from .registry import SCENARIOS
 
 
 def main():
@@ -10,8 +11,12 @@ def main():
     parser.add_argument("--config", required=True)
     commands = parser.add_subparsers(dest="command", required=True)
     scenario = commands.add_parser("run")
-    scenario.add_argument("scenario", choices=["automation-smoke", "core-regression", "vengeance-regression", "lifecycle-regression", "recovery-regression", "bond-regression", "integrated-regression"])
+    scenario.add_argument("scenario", choices=SCENARIOS)
     scenario.add_argument("--repeat", type=int, default=1, choices=range(1, 11))
+    managed = commands.add_parser("session", help="Prepare, run, collect evidence and restore a disposable session")
+    managed.add_argument("scenario", choices=SCENARIOS)
+    managed.add_argument("--repeat", type=int, default=1, choices=range(1, 11))
+    managed.add_argument("--deadline", type=int, default=240, choices=range(1, 901), metavar="SECONDS")
     commands.add_parser("observe")
     commands.add_parser("mcp", help="Serve MCP 2025-11-25 over local stdio")
     advance = commands.add_parser("advance-days")
@@ -27,6 +32,14 @@ def main():
             print("MCP configuration failed: " + str(error), file=sys.stderr)
             return 1
         return serve(runner)
+    if args.command == "session":
+        from .session import run_managed_session
+        try:
+            result = run_managed_session(args.config, args.scenario, args.repeat, args.deadline)
+        except (RuntimeError, ValueError, OSError) as error:
+            result = {"status": "transport_error", "error": str(error)}
+        print(json.dumps(result, indent=2))
+        return 0 if result["status"] == "passed" else 1
     runner = None
     try:
         runner = GameRunner(Config.load(args.config))

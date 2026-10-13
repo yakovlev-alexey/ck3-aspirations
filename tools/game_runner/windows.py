@@ -1,5 +1,6 @@
 """PID/HWND-bound Windows console input and exact owned-process cleanup."""
 import ctypes
+import json
 import os
 import re
 from pathlib import Path
@@ -77,6 +78,27 @@ def require_safe_profile(user_data, documents):
         raise ValueError("Set CK3 game.autosave to NO_AUTOSAVE for the disposable automation session; launch rejected to preserve user saves")
 
 
+def resolve_documents():
+    shell32 = ctypes.WinDLL("shell32", use_last_error=True)
+    shell32.SHGetFolderPathW.argtypes = [wintypes.HWND, ctypes.c_int, wintypes.HANDLE, wintypes.DWORD, wintypes.LPWSTR]
+    shell32.SHGetFolderPathW.restype = wintypes.LONG
+    documents = ctypes.create_unicode_buffer(260)
+    if shell32.SHGetFolderPathW(None, 5, None, 0, documents) != 0:
+        raise ValueError("Actual Windows Documents path could not be resolved")
+    return documents.value
+
+
+def require_idle_profile(timeout=10):
+    try:
+        listing = subprocess.run(["tasklist", "/FO", "CSV", "/NH"], capture_output=True, text=True, check=True, timeout=timeout, creationflags=subprocess.CREATE_NO_WINDOW)
+    except subprocess.TimeoutExpired as error:
+        raise TimeoutError("Profile process inventory deadline exceeded") from error
+    except subprocess.CalledProcessError as error:
+        raise RuntimeError("Profile process inventory failed") from error
+    if any('"' + name + '"' in listing.stdout.lower() for name in ("ck3.exe", "dowser.exe", "paradox launcher.exe")):
+        raise RuntimeError("CK3 or its launcher is running; refusing profile preparation")
+
+
 class WindowsBackend:
     def __init__(self, config):
         if os.name != "nt":
@@ -125,6 +147,11 @@ class WindowsBackend:
         args = [str(self.config.game_executable), "-debug_mode", "-suppress_error_log", "-skip_checksum", "-disable_ai", "-loadsave=" + save_name]
         self.process = subprocess.Popen(args, cwd=self.config.game_executable.parent, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
         self.started_pids.append(self.process.pid)
+        journal = getattr(self, 'process_journal', None)
+        if journal is not None:
+            temporary = journal.with_suffix('.pending')
+            temporary.write_text(json.dumps({'owned_pids': self.started_pids}), encoding='utf-8')
+            os.replace(temporary, journal)
         deadline = time.monotonic() + self.config.startup_timeout
         callback_type = ctypes.WINFUNCTYPE(wintypes.BOOL, wintypes.HWND, wintypes.LPARAM)
         while time.monotonic() < deadline:
