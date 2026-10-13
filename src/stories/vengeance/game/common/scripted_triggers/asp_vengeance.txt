@@ -48,7 +48,7 @@ asp_vengeance_replacement_cause_valid_trigger = {
     # The qualifying bond was captured by the original death hook; death can remove that relation.
     asp_vengeance_knows_incident_trigger = { VICTIM = scope:asp_replacement_cause_victim KILLER = scope:asp_replacement_cause_killer }
     any_in_list = { variable = asp_vengeance_consumed this = scope:asp_replacement_cause_victim }
-    NOT = { any_owned_story = { asp_is_active_story_trigger = yes var:asp_family = flag:vengeance var:asp_target = scope:asp_replacement_cause_killer } }
+    NOT = { any_owned_story = { trigger_if = { limit = { has_variable = asp_schema } trigger_if = { limit = { var:asp_family = flag:vengeance } asp_is_active_story_trigger = yes var:asp_target = scope:asp_replacement_cause_killer } trigger_else = { always = no } } trigger_else = { always = no } } }
 }
 
 asp_vengeance_has_terminal_progress_trigger = {

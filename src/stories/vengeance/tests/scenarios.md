@@ -35,3 +35,5 @@ Observed Task 3 results on CK3 1.20.0.4: registered V01-V06 passed, including li
 ## Task 4 pledge and lifecycle entry
 
 `event asp_test_vengeance.2` executes shared P01-P06 assertions from core’s `lifecycle-regression`; the `.1` V01-V06 entry remains unchanged. Required actual calendar, save/load, review/declaration/replacement UI, switch/return, owner death and succession procedures are documented in [core scenarios](../../../core/tests/scenarios.md). Secret fulfillment withdraws an unexpired public pledge, public fulfillment adds one core +100, and owner-caused impossibility cannot excuse a pledge. No direct-exposure knowledge gap is silently broadened.
+
+Task 7 registered [combined core scenarios](../../../core/tests/scenarios.md#task-7-combined-registered-and-actual-acceptance) exercise replacement duplicate filters with unlike Character/Title targets and invisible bond contexts. Explicit schema/family branches must preserve real same-family duplicate rejection and produce no native tooltip diagnostics. Existing family reward/eligibility contracts are unchanged.

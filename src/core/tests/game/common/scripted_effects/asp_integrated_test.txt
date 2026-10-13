@@ -1,0 +1,196 @@
+﻿# Integrated fixtures are controlled state setup, never natural-play evidence.
+asp_test_integrated_setup_effect = {
+    asp_test_recovery_clear_effect = yes
+    asp_test_recovery_legal_setup_effect = yes
+    asp_test_recovery_origin_effect = yes
+    scope:asp_test_recovery_story ?= { save_scope_as = asp_i_recovery }
+    save_scope_value_as = { name = asp_vengeance_force value = yes }
+    save_scope_value_as = { name = asp_bond_force value = yes }
+    save_scope_value_as = { name = asp_bond_silent value = yes }
+    if = { limit = { NOT = { has_perk = befriend_perk } } add_perk = befriend_perk }
+    clear_variable_list = asp_test_i_stories
+    asp_test_vengeance_pair_effect = yes
+    asp_test_vengeance_origin_effect = yes
+    scope:asp_test_vengeance_story ?= { set_variable = { name = asp_interpretation value = flag:personal_vengeance } save_scope_as = asp_i_v1 }
+    asp_test_vengeance_pair_effect = yes
+    asp_test_vengeance_origin_effect = yes
+    scope:asp_test_vengeance_story ?= { set_variable = { name = asp_interpretation value = flag:personal_vengeance } save_scope_as = asp_i_v2 }
+    create_character = { name = "Integrated Contact 1" age = 30 gender = female random_traits = no culture = root.culture faith = root.faith employer = root save_scope_as = asp_i_contact1 }
+    remove_variable = asp_bond_next_routine_date
+    asp_start_personal_bond_effect = { TARGET = scope:asp_i_contact1 MODE = friendship }
+    scope:asp_bond_new_story ?= { save_scope_as = asp_i_b1 }
+    create_character = { name = "Integrated Contact 2" age = 30 gender = female random_traits = no culture = root.culture faith = root.faith employer = root save_scope_as = asp_i_contact2 }
+    remove_variable = asp_bond_next_routine_date
+    asp_start_personal_bond_effect = { TARGET = scope:asp_i_contact2 MODE = friendship }
+    scope:asp_bond_new_story ?= { save_scope_as = asp_i_b2 }
+    create_character = { name = "Integrated Contact 3" age = 30 gender = female random_traits = no culture = root.culture faith = root.faith employer = root save_scope_as = asp_i_contact3 }
+    remove_variable = asp_bond_next_routine_date
+    asp_start_personal_bond_effect = { TARGET = scope:asp_i_contact3 MODE = friendship }
+    scope:asp_bond_new_story ?= { save_scope_as = asp_i_b3 }
+    create_character = { name = "Integrated Contact 4" age = 30 gender = female random_traits = no culture = root.culture faith = root.faith employer = root save_scope_as = asp_i_contact4 }
+    remove_variable = asp_bond_next_routine_date
+    asp_start_personal_bond_effect = { TARGET = scope:asp_i_contact4 MODE = friendship }
+    scope:asp_bond_new_story ?= { save_scope_as = asp_i_b4 }
+    create_character = { name = "Integrated Contact 5" age = 30 gender = female random_traits = no culture = root.culture faith = root.faith employer = root save_scope_as = asp_i_contact5 }
+    remove_variable = asp_bond_next_routine_date
+    asp_start_personal_bond_effect = { TARGET = scope:asp_i_contact5 MODE = friendship }
+    scope:asp_bond_new_story ?= { save_scope_as = asp_i_b5 }
+    set_variable = { name = asp_test_i_recovery value = scope:asp_i_recovery }
+    set_variable = { name = asp_test_i_vengeance value = scope:asp_i_v1 }
+    set_variable = { name = asp_test_i_bond value = scope:asp_i_b1 }
+    set_variable = { name = asp_test_i_other value = title:d_timbuktu.holder }
+    add_stress = { value = 70 subtract = stress }
+    every_owned_story = { limit = { asp_is_active_story_trigger = yes }
+        set_variable = { name = asp_test_i_target value = var:asp_target }
+        set_variable = { name = asp_test_i_id value = var:asp_instance_id }
+        set_variable = { name = asp_test_i_origin value = var:asp_origin_date }
+        set_variable = { name = asp_test_i_review value = var:asp_next_review_date }
+        set_variable = { name = asp_test_i_mode value = var:asp_interpretation }
+        save_scope_as = asp_i_snapshot
+        root = { add_to_variable_list = { name = asp_test_i_stories target = scope:asp_i_snapshot } }
+    }
+}
+asp_test_integrated_identity_effect = {
+    set_variable = { name = asp_test_i_other_stories value = 0 }
+    set_variable = { name = asp_test_i_identity_preserved value = 1 }
+    every_owned_story = { limit = { asp_is_active_story_trigger = yes }
+        if = { limit = { var:asp_target = var:asp_test_i_target var:asp_instance_id = var:asp_test_i_id var:asp_origin_date = var:asp_test_i_origin var:asp_next_review_date = var:asp_test_i_review var:asp_interpretation = var:asp_test_i_mode }
+            root = { change_variable = { name = asp_test_i_other_stories add = 1 } }
+        }
+        else = { root = { set_variable = { name = asp_test_i_identity_preserved value = 0 } } }
+    }
+}
+asp_test_integrated_regression_effect = {
+    debug_log = "ASP_TEST I01 BEGIN"
+    asp_test_integrated_setup_effect = yes
+    asp_test_integrated_setup_effect = yes
+    set_variable = { name = asp_test_i_ambitions value = asp_active_ambitions }
+    set_variable = { name = asp_test_i_desires value = asp_active_desires }
+    set_variable = { name = asp_test_i_caps_rejected value = 0 }
+    set_variable = { name = asp_test_i_allocation value = var:asp_next_instance_id }
+    create_character = { name = "Integrated Extra" age = 30 gender = female random_traits = no culture = root.culture faith = root.faith employer = root save_scope_as = asp_i_extra }
+    remove_variable = asp_bond_next_routine_date
+    asp_start_personal_bond_effect = { TARGET = scope:asp_i_extra MODE = friendship }
+    asp_test_vengeance_pair_effect = yes
+    asp_test_vengeance_origin_effect = yes
+    if = { limit = { asp_active_ambitions = 3 asp_active_desires = 5 var:asp_next_instance_id = var:asp_test_i_allocation } set_variable = { name = asp_test_i_caps_rejected value = 1 } }
+    set_variable = { name = asp_test_i_replacement_valid value = 0 }
+    set_variable = { name = asp_test_i_replacement_duplicate value = 0 }
+    if = { limit = { asp_vengeance_replacement_cause_valid_trigger = yes } set_variable = { name = asp_test_i_replacement_valid value = 1 } }
+    scope:asp_i_v1 = { var:asp_target = { save_scope_as = asp_replacement_cause_killer } var:asp_vengeance_victim = { save_scope_as = asp_replacement_cause_victim } }
+    if = { limit = { NOT = { asp_vengeance_replacement_cause_valid_trigger = yes } } set_variable = { name = asp_test_i_replacement_duplicate value = 1 } }
+    asp_test_integrated_identity_effect = yes
+    set_variable = { name = asp_test_i_persistence_identity value = 0 }
+    if = { limit = { var:asp_test_i_other_stories = 8 var:asp_test_i_identity_preserved = 1 } set_variable = { name = asp_test_i_persistence_identity value = 1 } }
+    set_variable = { name = asp_test_i_before_stress value = stress }
+    set_variable = { name = asp_test_i_before_xp value = diplomacy_lifestyle_xp }
+    set_variable = { name = asp_test_i_before_prestige value = prestige }
+    set_variable = { name = asp_test_i_before_stewardship value = stewardship_lifestyle_xp }
+    scope:asp_i_b1 = { save_scope_as = asp_selected_story }
+    set_relation_friend = scope:asp_i_contact1
+    scope:asp_selected_story ?= { asp_refresh_story_effect = yes }
+    set_variable = { name = asp_test_i_selected_stress value = { value = stress subtract = var:asp_test_i_before_stress } }
+    set_variable = { name = asp_test_i_selected_xp value = { value = diplomacy_lifestyle_xp subtract = var:asp_test_i_before_xp } }
+    set_variable = { name = asp_test_i_selected_prestige value = { value = prestige subtract = var:asp_test_i_before_prestige } }
+    set_variable = { name = asp_test_i_selected_stewardship value = { value = stewardship_lifestyle_xp subtract = var:asp_test_i_before_stewardship } }
+    set_variable = { name = asp_test_i_after_ambitions value = asp_active_ambitions }
+    set_variable = { name = asp_test_i_after_desires value = asp_active_desires }
+    asp_test_integrated_identity_effect = yes
+    set_variable = { name = asp_test_i_before_xp value = diplomacy_lifestyle_xp }
+    every_owned_story = { limit = { asp_is_active_story_trigger = yes } asp_refresh_story_effect = yes }
+    set_variable = { name = asp_test_i_replay_xp value = { value = diplomacy_lifestyle_xp subtract = var:asp_test_i_before_xp } }
+    if = { limit = { var:asp_test_i_ambitions = 3 var:asp_test_i_desires = 5 var:asp_test_i_caps_rejected = 1 var:asp_test_i_other_stories = 7 var:asp_test_i_identity_preserved = 1 var:asp_test_i_selected_stress = -10 var:asp_test_i_selected_xp = 50 var:asp_test_i_selected_prestige = 0 var:asp_test_i_selected_stewardship = 0 var:asp_test_i_replay_xp = 0 } debug_log = "ASP_TEST I01 PASS" }
+    else = { debug_log = "ASP_TEST I01 FAIL" }
+    # Test the exact public no-reward transport, preserving native economics.
+    scope:asp_i_v1 = { set_variable = { name = asp_origin_date value = { value = current_date subtract = 361 } } asp_declare_story_effect = yes set_variable = { name = asp_suspended value = yes } }
+    set_variable = { name = asp_test_i_before_stress value = stress }
+    set_variable = { name = asp_test_i_before_prestige value = prestige }
+    scope:asp_i_v1 = { asp_settle_pledge_effect = { RESULT = fulfilled } }
+    set_variable = { name = asp_test_i_pledge_stress value = { value = stress subtract = var:asp_test_i_before_stress } }
+    set_variable = { name = asp_test_i_pledge_prestige value = { value = prestige subtract = var:asp_test_i_before_prestige } }
+    set_variable = { name = asp_test_i_pledge_result value = scope:asp_pledge_event_result }
+    scope:asp_i_recovery = { set_variable = { name = asp_origin_date value = { value = current_date subtract = 361 } } asp_declare_story_effect = yes set_variable = { name = asp_suspended value = yes } asp_settle_pledge_effect = { RESULT = fulfilled } }
+    set_variable = { name = asp_test_i_county_result value = scope:asp_pledge_event_result }
+    scope:asp_i_v2 = { set_variable = { name = asp_origin_date value = { value = current_date subtract = 361 } } asp_declare_story_effect = yes }
+    set_variable = { name = asp_test_i_before_prestige value = prestige }
+    scope:asp_i_v2 = { asp_settle_pledge_effect = { RESULT = fulfilled } }
+    set_variable = { name = asp_test_i_normal_result value = scope:asp_pledge_event_result }
+    set_variable = { name = asp_test_i_normal_prestige value = { value = prestige subtract = var:asp_test_i_before_prestige } }
+    if = { limit = { var:asp_test_i_pledge_result = 5 var:asp_test_i_county_result = 5 var:asp_test_i_pledge_stress = 0 var:asp_test_i_pledge_prestige = 0 var:asp_test_i_normal_result = 1 var:asp_test_i_normal_prestige = 100 } debug_log = "ASP_TEST I02 PRESENTATION PASS" }
+    else = { debug_log = "ASP_TEST I02 PRESENTATION FAIL" }
+}
+
+asp_test_integrated_persistence_setup_effect = {
+    asp_test_integrated_setup_effect = yes
+    scope:asp_i_recovery = { set_variable = { name = asp_origin_date value = { value = current_date subtract = 361 } } asp_declare_story_effect = yes }
+    scope:asp_i_v1 = { set_variable = { name = asp_origin_date value = { value = current_date subtract = 361 } } asp_declare_story_effect = yes }
+    asp_test_recovery_paid_start_effect = yes
+    every_owned_story = { limit = { asp_is_active_story_trigger = yes }
+        set_variable = { name = asp_test_i_origin value = var:asp_origin_date }
+        if = { limit = { has_variable = asp_pledge_deadline } set_variable = { name = asp_test_i_deadline value = var:asp_pledge_deadline } }
+    }
+    set_variable = { name = asp_test_i_owner value = this }
+    var:asp_test_i_other = { set_variable = { name = asp_test_i_owner value = root } }
+    set_variable = { name = asp_test_i_before_stress value = stress }
+    set_variable = { name = asp_test_i_before_prestige value = prestige }
+    set_variable = { name = asp_test_i_before_xp value = diplomacy_lifestyle_xp }
+    set_variable = { name = asp_test_i_before_stewardship value = stewardship_lifestyle_xp }
+    debug_log = "ASP_TEST I02 ACTUAL_SETUP_READY"
+}
+asp_test_integrated_reload_effect = {
+    asp_test_integrated_identity_effect = yes
+    if = { limit = { var:asp_test_i_other_stories = 8 var:asp_test_i_identity_preserved = 1 var:asp_test_i_recovery = { has_variable = asp_declared var:asp_pledge_deadline = var:asp_test_i_deadline } var:asp_test_i_vengeance = { has_variable = asp_declared var:asp_pledge_deadline = var:asp_test_i_deadline } capital_province = { var:asp_recovery_work_story = root.var:asp_test_i_recovery var:asp_recovery_work_payer = root } } debug_log = "ASP_TEST I02 ACTUAL_RELOAD_PASS" }
+    else = { debug_log = "ASP_TEST I02 ACTUAL_RELOAD_FAIL" }
+}
+asp_test_integrated_away_effect = {
+    set_variable = { name = asp_test_i_new_stress value = stress }
+    set_variable = { name = asp_test_i_new_prestige value = prestige }
+    if = { limit = { asp_active_ambitions = 0 asp_active_desires = 0 var:asp_test_i_owner = { is_ai = yes asp_active_ambitions = 3 asp_active_desires = 5 var:asp_test_i_recovery = { has_variable = asp_suspended } var:asp_test_i_bond = { has_variable = asp_suspended } } } debug_log = "ASP_TEST I02 ACTUAL_AWAY_PASS" }
+    else = { debug_log = "ASP_TEST I02 ACTUAL_AWAY_FAIL" }
+}
+asp_test_integrated_unfinished_return_effect = {
+    asp_test_integrated_identity_effect = yes
+    if = { limit = { var:asp_test_i_other_stories = 8 var:asp_test_i_identity_preserved = 1 stress = var:asp_test_i_before_stress prestige = var:asp_test_i_before_prestige diplomacy_lifestyle_xp = var:asp_test_i_before_xp stewardship_lifestyle_xp = var:asp_test_i_before_stewardship var:asp_test_i_other = { stress = var:asp_test_i_new_stress prestige = var:asp_test_i_new_prestige asp_active_ambitions = 0 asp_active_desires = 0 } } debug_log = "ASP_TEST I02 ACTUAL_RETURN_PASS" }
+    else = { debug_log = "ASP_TEST I02 ACTUAL_RETURN_FAIL" }
+}
+asp_test_integrated_absent_completion_effect = {
+    var:asp_test_i_owner = {
+        save_scope_as = asp_i_absent_owner
+        var:asp_test_i_bond = { var:asp_target = { save_scope_as = asp_i_absent_friend } }
+        set_relation_friend = scope:asp_i_absent_friend
+        save_scope_as = character
+        capital_province = { if = { limit = { has_building = market_villages_01 } remove_building = market_villages_01 } add_building = market_villages_02 asp_holding_recovery_construction_completed_effect = yes }
+        var:asp_test_i_recovery = { var:asp_target = { change_county_control = { value = 80 subtract = county_control } } }
+        var:asp_test_i_vengeance = { var:asp_target = { death = { killer = scope:asp_i_absent_owner death_reason = death_duel } } }
+        if = { limit = { is_ai = yes asp_active_ambitions = 3 asp_active_desires = 5 var:asp_test_i_recovery = { has_variable = asp_suspended has_variable = asp_recovery_completed } var:asp_test_i_vengeance = { has_variable = asp_vengeance_owner_responsible } } debug_log = "ASP_TEST I02 ACTUAL_ABSENT_PENDING_PASS" }
+        else = { debug_log = "ASP_TEST I02 ACTUAL_ABSENT_PENDING_FAIL" }
+    }
+}
+asp_test_integrated_absent_return_effect = {
+    if = { limit = { asp_active_ambitions = 1 asp_active_desires = 4 stress = var:asp_test_i_before_stress prestige = var:asp_test_i_before_prestige diplomacy_lifestyle_xp = var:asp_test_i_before_xp stewardship_lifestyle_xp = var:asp_test_i_before_stewardship capital_county = { NOT = { has_county_modifier = asp_holding_recovery_tax_modifier } } any_memory = { has_memory_type = asp_recovery_fulfilled_memory } any_memory = { has_memory_type = asp_bond_friendship_memory } any_memory = { has_memory_type = asp_vengeance_personal_memory } var:asp_test_i_other = { stress = var:asp_test_i_new_stress prestige = var:asp_test_i_new_prestige asp_active_ambitions = 0 asp_active_desires = 0 } } debug_log = "ASP_TEST I02 ACTUAL_ABSENT_RETURN_PASS" }
+    else = { debug_log = "ASP_TEST I02 ACTUAL_ABSENT_RETURN_FAIL" }
+}
+asp_test_integrated_loss_effect = {
+    # Same native base15 control as registered lifecycle/recovery pledge-loss coverage.
+    asp_test_lifecycle_penalty_control_effect = yes
+    var:asp_test_i_bond ?= { var:asp_target = { if = { limit = { is_alive = yes } death = { death_reason = death_natural_causes } } } }
+    var:asp_test_i_vengeance ?= { var:asp_target = { if = { limit = { is_alive = yes } death = { death_reason = death_natural_causes } } } }
+    every_owned_story = { limit = { asp_is_active_story_trigger = yes } asp_refresh_story_effect = yes }
+    if = { limit = { trigger_if = { limit = { has_variable = asp_test_penalty_control } asp_active_ambitions = 1 asp_active_desires = 4 stress = { value = var:asp_test_i_before_stress add = var:asp_test_penalty_control } prestige = { value = var:asp_test_i_before_prestige subtract = 100 } NOT = { exists = var:asp_test_i_recovery } NOT = { exists = var:asp_test_i_bond } NOT = { exists = var:asp_test_i_vengeance } any_memory = { has_memory_type = asp_recovery_abandoned_memory } any_memory = { has_memory_type = asp_bond_loss_memory } any_memory = { has_memory_type = asp_vengeance_impossible_memory } } trigger_else = { always = no } }
+        debug_log = "ASP_TEST I02 ACTUAL_LOSS_PASS"
+    }
+    else = { debug_log = "ASP_TEST I02 ACTUAL_LOSS_FAIL" }
+}
+
+asp_test_integrated_death_setup_effect = {
+    asp_test_integrated_persistence_setup_effect = yes
+    primary_heir = { set_variable = { name = asp_test_i_dead_owner value = root } }
+    debug_log = "ASP_TEST I02 DEATH_SETUP_READY"
+}
+asp_test_integrated_successor_effect = {
+    if = { limit = { var:asp_test_i_dead_owner = { is_alive = no asp_active_ambitions = 0 asp_active_desires = 0 } asp_active_ambitions = 0 asp_active_desires = 0 NOT = { has_variable = asp_next_instance_id } } debug_log = "ASP_TEST I02 ACTUAL_SUCCESSION_PASS" }
+    else = { debug_log = "ASP_TEST I02 ACTUAL_SUCCESSION_FAIL" }
+}
+asp_test_integrated_selector_effect = { asp_open_management_effect = yes debug_log = "ASP_TEST I01 SELECTOR_READY" }
+asp_test_integrated_ui_observe_effect = { asp_test_integrated_identity_effect = yes if = { limit = { var:asp_test_i_other_stories = 7 var:asp_test_i_identity_preserved = 1 asp_active_desires = 4 asp_active_ambitions = 3 NOT = { exists = var:asp_test_i_bond } } debug_log = "ASP_TEST I01 ACTUAL_SELECTED_PASS" } else = { debug_log = "ASP_TEST I01 ACTUAL_SELECTED_FAIL" } }
+asp_test_integrated_romance_card_effect = { asp_test_bond_setup_effect = yes add_perk = befriend_perk asp_test_bond_start_romance_effect = yes debug_log = "ASP_TEST I05 ROMANCE_CARD_READY" }

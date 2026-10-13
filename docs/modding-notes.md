@@ -19,13 +19,13 @@ The inspected installation reports CK3 1.20.0.4 (Crozier) in `launcher/launcher-
 The installed RICE reference uses historical aspiration modifiers, important actions, and events. Its Polabian content includes the sons of Gottschalk avenging their father; its Red Sea content includes the sons of Najah. These illustrate contextual goals but do not prove compatibility of this new system with RICE or every installed mod.
 ## Outstanding probes
 
-These are implementation obligations, not verified runtime findings:
+The original capability questions are resolved by the versioned findings below, with these boundaries:
 
-- Read-side knowledge of a killer must be verified independently of a hidden engine killer reference. No omniscient fallback.
-- Construction start/completion must prove player payment and continuous county ownership; holder substitution is insufficient.
-- Exact deadline comparisons and elapsed age through suspension still require Task 4 native boundary fixtures; Task 2 proved numeric initial dates and core save/load.
-- Later family events must keep the chosen story reference through their own options; Task 2 proved core event-held selection and stale-action rejection.
-- Additive native on-actions for natural causes remain to be observed in-game; Task 2 observed core story entries in the Situations panel.
+- Known-secret/public-death routes are verified; direct public exposure before a known-secret observation remains unsupported. No omniscient fallback.
+- Original player/AI payer callbacks, reservation and exact-token ownership are verified for the explicit recovery construction pool; holder substitution is insufficient.
+- Native numeric dates, declaration/review/deadline boundaries and actual shared save/load/switch behavior were measured in Tasks 2/4; combined family procedures remain separately identified.
+- Core and family event-held references and later-frame stale rendering have scoped measured/UI coverage; bounded native Trigger Localization notices are disclosed separately.
+- Native death, prison, relation, construction and title callbacks are verified through registered fixtures and separate actual actions. Natural-session observations do not certify every siege/raid/war combination.
 
 The initial repository-bootstrap task did not launch CK3 or pass a native gameplay fixture. Later automation findings are documented below; they do not certify unrelated gameplay. Durable findings include game version, game-relative source reference, probe and observed result. Machine paths, saves, backups, logs, screenshots and transient attempts belong in ignored `.local/MODLOG.md`.
 
@@ -116,3 +116,17 @@ Origin/rival release tooltips require their event-held context. Reusing manageme
 Native `fallback=yes` Close guarantees valid dismissal after origin/rival regular choices become stale; this UI also rendered Return alongside valid choices. The Return itself keeps the existing desire and grants no reward. A later-frame exact retired-origin hover/close had zero fresh errors. Exact retired-management Release input changed no resources; its fresh interval contained only the previously bounded ten Trigger Localization notices, with no DataFactory, argument, weak-Story/link or no-valid-options error. Those actual errors must fail regression acceptance even when state stayed unchanged.
 
 Task6 confirms the implicit visible Story title/description requirement in native Situations: `asp_personal_bond_story` and `asp_personal_bond_story_desc` plus the `Story.MakeScope` body render the exact contact and age/review. Missing implicit keys can show raw identifiers without an error-log line; an exact-key regression and actual render are both required.
+
+## Combined native presentation and mixed targets — CK3 1.20.0.4
+
+Native tooltip generation does not short-circuit adjacent filter predicates. Enumerating all owned Stories in replacement cause validation can visit invisible bond context Stories without aspiration fields, or compare a recovery Title target against a vengeance Character target despite a false adjacent family condition. Use explicit native trigger_if schema presence, then exact family, with false trigger_else branches before reading aspiration identity/target. Registered combined mixed-cap RED/GREEN and valid/distinct versus duplicate target checks cover that route. This does not replace the live-event-character guards around weak ended Story links.
+
+Suspended public fulfillment retains persisted fulfilled state and zero Prestige economics, but transports numeric event result5 for the withheld-reward narrative. Character and county settlements both explicitly state no retrospective rewards; ordinary result1 still grants100 Prestige. Actual mixed-family return screenshots and measured zero-resource/memory checks establish the presentation separately from scripted transport.
+
+Personal-bond cards use existing Story.Custom composition in the native Story context to render the selected Friend/Best Friend or Lover/Soulmate condition. Story.MakeScope retains exact target, age and review. Both native mode frames and focused implicit-key/branch checks are required; no gameplay mode or reward changes are implied by this presentation correction.
+
+## Release-only ordinary campaign — CK3 1.20.0.4
+
+A fresh character-of-the-week campaign began on 1 October 1178 with only the packaged release mod, AI and ordinary selection enabled. By 19 September 1182, native Situations showed three active Stories: romantic desires concerning Ina and Salimata and a custody-oriented vengeance ambition concerning the player's brother Bello and known battle killer Sakoura. An initial Ina offer appeared 6 October 1178; a Fadima offer on 6 October 1179 was declined and produced its memory event; Salimata was kept on 6 October 1180. Bello's battle death on 21 April 1180 added 25 native Stress and opened the vengeance interpretation the next day. Ina's scheduled reviews appeared in September 1180, 1181 and 1182, with the player retaining the desire. Final Stress was 31/300. No debug fixture, forced goal, accelerated scheme or cadence change was used in this campaign.
+
+This is one observed ruler and roughly four game years, not a frequency estimate or proof that every eligible context fires. The release launch mounted the manual mod and loaded the native event namespaces. Its error log contains 32 startup unused-variable/event-target warnings with `asp_` names at 16:12:39–40 and no later `asp_` lines; numerous unrelated vanilla/DLC script errors remain in the aggregate log. Do not treat the aggregate log as error-free or the startup warnings as runtime failures of the observed aspirations.

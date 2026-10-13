@@ -1,0 +1,14 @@
+﻿namespace = asp_test_core
+asp_test_core.60 = { type = character_event hidden = yes immediate = { asp_test_integrated_regression_effect = yes } }
+asp_test_core.61 = { type = character_event hidden = yes immediate = { asp_test_integrated_persistence_setup_effect = yes } }
+asp_test_core.62 = { type = character_event hidden = yes immediate = { asp_test_integrated_reload_effect = yes } }
+asp_test_core.63 = { type = character_event hidden = yes immediate = { asp_test_integrated_away_effect = yes } }
+asp_test_core.64 = { type = character_event hidden = yes immediate = { asp_test_integrated_unfinished_return_effect = yes } }
+asp_test_core.65 = { type = character_event hidden = yes immediate = { asp_test_integrated_absent_completion_effect = yes } }
+asp_test_core.66 = { type = character_event hidden = yes immediate = { asp_test_integrated_absent_return_effect = yes } }
+asp_test_core.67 = { type = character_event hidden = yes immediate = { asp_test_integrated_loss_effect = yes } }
+asp_test_core.68 = { type = character_event hidden = yes immediate = { asp_test_integrated_death_setup_effect = yes } }
+asp_test_core.69 = { type = character_event hidden = yes immediate = { asp_test_integrated_successor_effect = yes } }
+asp_test_core.70 = { type = character_event hidden = yes immediate = { asp_test_integrated_selector_effect = yes } }
+asp_test_core.71 = { type = character_event hidden = yes immediate = { asp_test_integrated_ui_observe_effect = yes } }
+asp_test_core.72 = { type = character_event hidden = yes immediate = { asp_test_integrated_romance_card_effect = yes } }

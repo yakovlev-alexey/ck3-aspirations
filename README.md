@@ -34,6 +34,8 @@ python -m unittest discover -s tools/game_runner/tests -v
 python -m tools.game_runner --config .local/automation/config.json run automation-smoke --repeat 3
 python -m tools.game_runner --config .local/automation/config.json run core-regression --repeat 1
 python -m tools.game_runner --config .local/automation/config.json run recovery-regression --repeat 1
+python -m tools.game_runner --config .local/automation/config.json run bond-regression --repeat 1
+python -m tools.game_runner --config .local/automation/config.json run integrated-regression --repeat 1
 ```
 
 Registered scenario commands restart only their own game from the same baseline, check native measured state and duplicate delivery, record JSON/log evidence, and clean up the owned session. Automation-smoke and lifecycle-regression advance one actual day. `observe` and `advance-days 1` are also supported. Configuration, bounds and failure behavior are documented in the [automation contract](tools/game_runner/SPEC.md). No game-install edits or additional packages are needed.
@@ -41,3 +43,11 @@ Registered scenario commands restart only their own game from the same baseline,
 The launch preflight requires the actual Windows Documents CK3 profile and its exact `game.autosave` preference `NO_AUTOSAVE`, preserving existing autosaves across date advancement. Alternate profiles and missing/ambiguous settings are rejected. The runner reads the preference and never changes it; restore any test-owned preference change after cleanup.
 
 For a local MCP client, start `python -m tools.game_runner --config '<absolute configuration JSON path>' mcp` from the repository directory. It supports MCP 2025-11-25 initialization, a fixed three-tool list and calls to `aspirations_run_scenario`, `aspirations_observe` and `aspirations_advance_days`. Calls share the same bounded runner and ownership lock; close client stdin to stop the owned game and restore temporary runner files. No global MCP registration or SDK is needed. See the [stdio examples and implementation limits](tools/game_runner/SPEC.md#mcp-stdio-interface), including serial dispatch without progress or interruptible cancellation.
+
+## Prototype coverage and limits
+
+Tested game version: CK3 1.20.0.4 Crozier. The supported prototype is single player with an adult landed current ruler, English localization and ordinary native UI. Registered combined regression covers mixed three-ambition/five-desire capacity, exact selected-instance rewards, unlike family target types and suspended public settlement. Separate actual acceptance covers all-family save/reload, player switching, absence closure, native title transfer, owner death/succession and the mixed selector. A fresh release-only campaign was observed from 1 October 1178 to 19 September 1182 with ordinary AI and randomness: natural bond offers, a battle-death vengeance origin and scheduled reviews appeared. This one-character sample does not establish offer frequency or balance. Source assembly checks alone do not certify those behaviors.
+
+Construction/action acceptance includes disclosed setup and acceleration: the recovery test prepared Control80 and accelerated already paid native construction; the bond test accelerated an already started Befriend scheme. Ordinary construction or scheme duration is not certified. Recovery supports only the explicit Markets/Palisades1–2 and Pastures/Cereal Fields/Hill Farms1 pool. Direct public murder exposure before known-secret observation can be missed. Landless/government expansion, multiplayer, external-mod/RICE compatibility and additional pursuit routes remain outside verified coverage.
+
+Manual deliverable: `dist/aspirations-0.1.0.zip`. Upload source for any future Workshop publication: `.build/release/mod/` itself. No push, PR, Workshop upload or subscribed-download acceptance has occurred. The public license is undecided; see the packaged credits and installation instructions before public distribution.

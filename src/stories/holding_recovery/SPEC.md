@@ -1,6 +1,6 @@
 # Holding recovery specification
 
-Status: implemented on CK3 1.20.0.4; registered H01–H05, real GUI payment/completion/reward and later-frame stale-window acceptance observed. Independent Task 5 source review remains separate.
+Status: implemented on CK3 1.20.0.4; registered H01–H05, real GUI payment/completion/reward and later-frame stale-window acceptance observed. Independent Task 5 source review accepted the exact token-ownership fix; combined actual persistence is owned by core scenarios.
 
 [Core lifecycle and balancing](../../core/SPEC.md) · [Product intent](../../../docs/design.md) · [Acceptance scenarios](tests/scenarios.md)
 
@@ -86,3 +86,5 @@ Repeat incidents preserve the active Story's original control/date/serial; the c
 A Story's historical started-Province list grants no ownership of a newer Story's token. Title-loss and terminal cleanup may remove pending Story/payer references only when the Province currently points to that exact old Story. Registered H04 models a suspended older AI owner's historical list and a current player's fresh start in the same Province; it tests matching ordinary cleanup, title-loss isolation, no-reward terminal isolation and the newer Story's subsequent one-time reward. This is scripted native state/callback coverage, not an actual player switch or payment claim.
 
 Registered H03 also dispatches the dev native start observer with original AI payer, initialized AI snapshot and absent GUI state; fresh setup must clear cached payer/Province. The AI observer and GUI observer are independent. This assertion does not replace earlier genuine AI payment evidence.
+
+Task 7 combined replacement tooltips exclude invisible context Stories with a native schema-presence branch before reading aspiration fields. Registered integrated-regression exercises mixed caps and rejects native tooltip diagnostics.

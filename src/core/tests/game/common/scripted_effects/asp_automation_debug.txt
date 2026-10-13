@@ -124,6 +124,30 @@ asp_test_automation_complete_effect = {
             set_variable = { name = asp_test_automation_result_reload_identity value = var:asp_test_reload_identity }
             debug_log = asp_test_automation_reload_done
         }
+        else_if = { limit = { var:asp_test_automation_operation = flag:integrated_regression }
+            set_variable = { name = asp_test_automation_result_ambitions value = var:asp_test_i_ambitions }
+            set_variable = { name = asp_test_automation_result_desires value = var:asp_test_i_desires }
+            set_variable = { name = asp_test_automation_result_caps_rejected value = var:asp_test_i_caps_rejected }
+            set_variable = { name = asp_test_automation_result_other_stories value = var:asp_test_i_other_stories }
+            set_variable = { name = asp_test_automation_result_identity_preserved value = var:asp_test_i_identity_preserved }
+            set_variable = { name = asp_test_automation_result_selected_stress value = var:asp_test_i_selected_stress }
+            set_variable = { name = asp_test_automation_result_selected_xp value = var:asp_test_i_selected_xp }
+            set_variable = { name = asp_test_automation_result_selected_prestige value = var:asp_test_i_selected_prestige }
+            set_variable = { name = asp_test_automation_result_selected_stewardship value = var:asp_test_i_selected_stewardship }
+            set_variable = { name = asp_test_automation_result_after_ambitions value = var:asp_test_i_after_ambitions }
+            set_variable = { name = asp_test_automation_result_after_desires value = var:asp_test_i_after_desires }
+            set_variable = { name = asp_test_automation_result_replay_xp value = var:asp_test_i_replay_xp }
+            set_variable = { name = asp_test_automation_result_pledge_stress value = var:asp_test_i_pledge_stress }
+            set_variable = { name = asp_test_automation_result_pledge_prestige value = var:asp_test_i_pledge_prestige }
+            set_variable = { name = asp_test_automation_result_pledge_result value = var:asp_test_i_pledge_result }
+            set_variable = { name = asp_test_automation_result_county_result value = var:asp_test_i_county_result }
+            set_variable = { name = asp_test_automation_result_normal_result value = var:asp_test_i_normal_result }
+            set_variable = { name = asp_test_automation_result_normal_prestige value = var:asp_test_i_normal_prestige }
+            set_variable = { name = asp_test_automation_result_persistence_identity value = var:asp_test_i_persistence_identity }
+            set_variable = { name = asp_test_automation_result_replacement_valid value = var:asp_test_i_replacement_valid }
+            set_variable = { name = asp_test_automation_result_replacement_duplicate value = var:asp_test_i_replacement_duplicate }
+            debug_log = asp_test_automation_integrated_done
+        }
         else_if = { limit = { var:asp_test_automation_operation = flag:bond_regression }
             set_variable = { name = asp_test_automation_result_b01 value = var:asp_test_bond_b01 }
             set_variable = { name = asp_test_automation_result_b02 value = var:asp_test_bond_b02 }
@@ -256,6 +280,7 @@ asp_test_automation_request_effect = {
                 else_if = { limit = { var:asp_test_automation_operation = flag:lifecycle_regression } debug_log = asp_test_automation_lifecycle_done }
                 else_if = { limit = { var:asp_test_automation_operation = flag:lifecycle_calendar_assert } debug_log = asp_test_automation_calendar_done }
                 else_if = { limit = { var:asp_test_automation_operation = flag:lifecycle_reload_assert } debug_log = asp_test_automation_reload_done }
+                else_if = { limit = { var:asp_test_automation_operation = flag:integrated_regression } debug_log = asp_test_automation_integrated_done }
                 else_if = { limit = { var:asp_test_automation_operation = flag:bond_regression } debug_log = asp_test_automation_bond_done }
                 else = { debug_log = asp_test_automation_done }
             }
@@ -277,6 +302,7 @@ asp_test_automation_request_effect = {
                 if = { limit = { var:asp_test_automation_operation = flag:core_regression } asp_test_core_regression_effect = yes }
                 if = { limit = { var:asp_test_automation_operation = flag:vengeance_regression } asp_test_vengeance_regression_effect = yes }
                 if = { limit = { var:asp_test_automation_operation = flag:recovery_regression } asp_test_holding_recovery_regression_effect = yes }
+                if = { limit = { var:asp_test_automation_operation = flag:integrated_regression } asp_test_integrated_regression_effect = yes }
                 if = { limit = { var:asp_test_automation_operation = flag:bond_regression } asp_test_bond_regression_effect = yes }
                 if = { limit = { var:asp_test_automation_operation = flag:lifecycle_regression } asp_test_lifecycle_regression_effect = yes }
                 if = { limit = { var:asp_test_automation_operation = flag:lifecycle_calendar } asp_test_lifecycle_calendar_setup_effect = yes }

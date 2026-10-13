@@ -205,7 +205,7 @@ class GameRunner:
         return self._report_operation("advance", days)
 
     def run_scenario(self, name, repeat=1):
-        if name not in ("automation-smoke", "core-regression", "vengeance-regression", "lifecycle-regression", "recovery-regression", "bond-regression") or type(repeat) is not int or not 1 <= repeat <= 10:
+        if name not in ("automation-smoke", "core-regression", "vengeance-regression", "lifecycle-regression", "recovery-regression", "bond-regression", "integrated-regression") or type(repeat) is not int or not 1 <= repeat <= 10:
             raise ValueError("Only registered scenarios with repeat 1 through 10 are implemented")
         if not self.flight.acquire(blocking=False):
             return {"status": "transport_error", "error": "Concurrent operation rejected"}
@@ -232,6 +232,27 @@ class GameRunner:
                         {"name": "baseline_unchanged", "passed": hashlib.sha256(self.config.baseline_save.read_bytes()).hexdigest() == self.baseline_hash},
                     ]
                     run = {"index": index, "initial": initial, "core": core, "duplicate": duplicate, "assertions": assertions, "logs": self._snapshot_logs(index)}
+                    report["runs"].append(run)
+                    if not all(item["passed"] for item in assertions):
+                        report["status"] = "assertion_failed"
+                        break
+                    continue
+                if name == "integrated-regression":
+                    bond = self._send("integrated_regression")
+                    duplicate = self._send("integrated_regression", replay=True)
+                    expected = {'ambitions': 3, 'desires': 5, 'caps_rejected': 1, 'other_stories': 7, 'identity_preserved': 1, 'selected_stress': -10, 'selected_xp': 50, 'selected_prestige': 0, 'selected_stewardship': 0, 'after_ambitions': 3, 'after_desires': 4, 'replay_xp': 0, 'pledge_stress': 0, 'pledge_prestige': 0, 'pledge_result': 5, 'county_result': 5, 'normal_result': 1, 'normal_prestige': 100, 'persistence_identity': 1, 'replacement_valid': 1, 'replacement_duplicate': 1}
+                    assertions = [{"name": "I01_I02_" + key, "passed": bond[key] == value} for key, value in expected.items()]
+                    assertions.extend([
+                        {"name": "duplicate_identity_and_measurements", "passed": duplicate == bond},
+                        {"name": "baseline_unchanged", "passed": hashlib.sha256(self.config.baseline_save.read_bytes()).hexdigest() == self.baseline_hash},
+                    ])
+                    run = {"index": index, "initial": initial, "integrated": bond, "duplicate": duplicate, "assertions": assertions, "logs": self._snapshot_logs(index)}
+                    errors = Path(run["logs"]) / "error.log"
+                    diagnostics = errors.read_text(encoding="utf-8-sig", errors="replace") if errors.exists() else ""
+                    blocks = re.split(r"(?=\[.*?\]\[E\])", diagnostics)
+                    aspiration_errors = [block for block in blocks if "asp_" in block and any(tag in block for tag in ("Script system error!", "pdx_persistent_reader.cpp", "jomini_script_argument.cpp", "jomini_eventtarget.cpp", "pdx_data_factory.cpp", "Unknown trigger:", "Unknown effect:", "Failed to parse", "Data error in", "triggered but has no valid options"))]
+                    assertions.append({"name": "aspiration_runtime_diagnostics_absent", "passed": not aspiration_errors})
+                    run["aspiration_runtime_error_count"] = len(aspiration_errors)
                     report["runs"].append(run)
                     if not all(item["passed"] for item in assertions):
                         report["status"] = "assertion_failed"

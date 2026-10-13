@@ -1,6 +1,6 @@
 # Vengeance specification
 
-Status: authoritative living contract migrated from the approved 2026-10-12 design. Task 3 implements the native family; acceptance evidence is recorded below. Task 4 first-story lifecycle implementation and native evidence are complete, pending independent stage review.
+Status: authoritative living contract migrated from the approved 2026-10-12 design. Task 3 implements the native family; acceptance evidence is recorded below. Task 4 first-story lifecycle implementation and native evidence are accepted; combined mixed-family acceptance is owned by core scenarios.
 
 [Core lifecycle and balancing](../../core/SPEC.md) · [Product intent](../../../docs/design.md) · [Acceptance scenarios](tests/scenarios.md)
 
@@ -79,3 +79,5 @@ The family story checks maintenance daily, while AI owners only suspend. Owner a
 Origin and reconsideration accountability visibility use character-context `asp_vengeance_event_can_choose_accountability_trigger = { STORY = <event-held reference> }`. It validates the link before entering the Story-scoped family predicate. Ended native modal references cannot expose an eligible action or trigger missing-target/weak-Story errors while rendering.
 
 The existing origin Close option is a native fallback: it appears when no interpretation remains valid, including a queued origin whose exact Story has ended. It never acts on state and does not introduce a close choice while normal interpretations are valid.
+
+Task 7 combined replacement tooltips exclude invisible context Stories with a native schema-presence branch before reading aspiration fields. Registered integrated-regression exercises mixed caps and rejects native tooltip diagnostics.

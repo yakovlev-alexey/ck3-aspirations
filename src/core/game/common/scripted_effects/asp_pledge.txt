@@ -37,6 +37,7 @@ asp_withdraw_selected_pledge_effect = {
 asp_pledge_fulfilled_consequences_effect = {
     save_scope_value_as = { name = asp_pledge_event_result value = 1 }
     if = { limit = { NOT = { has_variable = asp_suspended } } story_owner = { add_prestige = asp_pledge_success_prestige } }
+    else = { save_scope_value_as = { name = asp_pledge_event_result value = 5 } }
 }
 asp_pledge_withdrawn_consequences_effect = {
     story_owner = { add_prestige = asp_pledge_failure_prestige add_stress = asp_pledge_failure_stress }

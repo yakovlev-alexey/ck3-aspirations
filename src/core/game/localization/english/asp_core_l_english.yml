@@ -79,3 +79,5 @@
  asp_replace_3:0 "Consider replacing the ambition concerning [asp_replacement_3.MakeScope.Var('asp_target').Char.GetShortUIName]"
  asp_story_owned_by_you:0 "This aspiration belongs to you"
  asp_management_selected_declared_character_desc:0 "My intention concerns [asp_selected_story.MakeScope.Var('asp_target').Char.GetShortUIName]. Declared aspiration.\n\nPublic deadline: [asp_selected_story.MakeScope.ScriptValue('asp_time_until_pledge_days')|0] days remain. Expiry takes precedence at the recorded deadline. I may continue pursuing it or withdraw the commitment at its stated cost."
+ asp_pledge_fulfilled_absent_desc:0 "My commitment concerning [asp_pledge_event_target.GetShortUIName] was fulfilled while I was absent. I retain the memory of closure, but receive no retrospective Prestige or other aspiration reward."
+ asp_recovery_pledge_fulfilled_absent_desc:0 "My commitment to restore [asp_pledge_event_target.GetName] was fulfilled while I was absent. I retain the memory of closure, but receive no retrospective Prestige or other aspiration reward."

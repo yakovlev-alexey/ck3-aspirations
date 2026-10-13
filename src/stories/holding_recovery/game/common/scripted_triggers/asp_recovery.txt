@@ -85,5 +85,5 @@ asp_recovery_replacement_cause_valid_trigger = {
     exists = scope:asp_replacement_cause_county exists = scope:asp_replacement_cause_incident
     asp_recovery_origin_valid_trigger = { COUNTY = scope:asp_replacement_cause_county }
     scope:asp_replacement_cause_county = { var:asp_recovery_consumed_incident = scope:asp_replacement_cause_incident var:asp_recovery_incident_serial = scope:asp_replacement_cause_incident var:asp_recovery_incident_owner = scope:asp_replacement_cause_owner }
-    NOT = { any_owned_story = { asp_is_active_story_trigger = yes var:asp_family = flag:holding_recovery var:asp_target = scope:asp_replacement_cause_county } }
+    NOT = { any_owned_story = { trigger_if = { limit = { has_variable = asp_schema } trigger_if = { limit = { var:asp_family = flag:holding_recovery } asp_is_active_story_trigger = yes var:asp_target = scope:asp_replacement_cause_county } trigger_else = { always = no } } trigger_else = { always = no } } }
 }

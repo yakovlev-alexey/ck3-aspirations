@@ -24,6 +24,7 @@ CALENDAR_FIELDS = ('calendar_before', 'calendar_after', 'calendar_reviews', 'cal
 RECOVERY_FIELDS = ('h01', 'h02', 'h03', 'h04', 'h05', 'reward_stress', 'reward_xp', 'modifier_count', 'loss_stress', 'loss_control', 'pledge_stress', 'pledge_control', 'pledge_prestige', 'unproven', 'foreign', 'cancelled', 'replayed', 'origin_control', 'token_loss', 'token_terminal', 'cleanup_loss', 'cleanup_terminal', 'token_stress', 'token_xp', 'token_modifier', 'token_replay', 'ai_observer', 'ai_cache_clean')
 
 
+INTEGRATED_FIELDS = ('ambitions', 'desires', 'caps_rejected', 'other_stories', 'identity_preserved', 'selected_stress', 'selected_xp', 'selected_prestige', 'selected_stewardship', 'after_ambitions', 'after_desires', 'replay_xp', 'pledge_stress', 'pledge_prestige', 'pledge_result', 'county_result', 'normal_result', 'normal_prestige', 'persistence_identity', 'replacement_valid', 'replacement_duplicate')
 BOND_FIELDS = ('b01', 'b02', 'b03', 'b04', 'b05', 'native_locked', 'native_unlocked', 'native_romance', 'friend_stress', 'friend_xp', 'romance_stress', 'romance_xp', 'replay_xp', 'memories', 'death_stress', 'temporary_retained', 'incompatible_stress', 'rival_fixed', 'chance0', 'chance1', 'chance2', 'chance3', 'chance4', 'chance5', 'cooldown', 'consumed', 'fresh', 'content', 'lustful_weight', 'b06', 'b07', 'bestfriend_stress', 'bestfriend_xp', 'soulmate_stress', 'soulmate_xp', 'blocked_cooldown', 'blocked_cap', 'absence_stress', 'absence_xp', 'early_stress', 'early_control', 'review_release', 'retained_days', 'origin_preserved', 'no_pledge', 'already_mode', 'routine_created', 'context_stable', 'f2r_eligible', 'f2r_mode', 'f2r_same_story', 'f2r_same_target', 'f2r_instance_delta', 'f2r_allocation_delta', 'f2r_origin_delta', 'f2r_incident_delta', 'f2r_signature_delta', 'f2r_serial_delta', 'f2r_consumed_delta', 'f2r_cooldown_delta', 'f2r_desires', 'f2r_stress', 'f2r_xp', 'f2r_memories', 'f2r_review_days', 'f2r_review_notified', 'r2f_eligible', 'r2f_mode', 'r2f_same_story', 'r2f_same_target', 'r2f_instance_delta', 'r2f_allocation_delta', 'r2f_origin_delta', 'r2f_incident_delta', 'r2f_signature_delta', 'r2f_serial_delta', 'r2f_consumed_delta', 'r2f_cooldown_delta', 'r2f_desires', 'r2f_stress', 'r2f_xp', 'r2f_memories', 'r2f_review_days', 'r2f_review_notified', 'f2r_before_mode', 'r2f_before_mode')
 
 
@@ -98,6 +99,8 @@ class Telemetry:
                         allowed.update(VENGEANCE_FIELDS)
                     if self.operation == "recovery_regression":
                         allowed.update(RECOVERY_FIELDS)
+                    if self.operation == "integrated_regression":
+                        allowed.update(INTEGRATED_FIELDS)
                     if self.operation == "bond_regression":
                         allowed.update(BOND_FIELDS)
                     if self.operation == "lifecycle_regression":
@@ -121,6 +124,8 @@ class Telemetry:
                         required.update(VENGEANCE_FIELDS)
                     if self.operation == "recovery_regression":
                         required.update(RECOVERY_FIELDS)
+                    if self.operation == "integrated_regression":
+                        required.update(INTEGRATED_FIELDS)
                     if self.operation == "bond_regression":
                         required.update(BOND_FIELDS)
                     if self.operation == "lifecycle_regression":

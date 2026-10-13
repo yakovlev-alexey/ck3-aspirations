@@ -1,7 +1,7 @@
 ﻿l_english:
  asp_personal_bond_story:0 "A wish for closeness"
  asp_personal_bond_story_desc:0 "A private desire to deepen a particular personal connection."
- asp_bond_story_information:0 "Personal bond with [Story.MakeScope.Var('asp_target').Char.GetShortUIName]. Form a new friendship or romantic relationship according to this desire's interpretation. Age: [Story.MakeScope.ScriptValue('asp_story_age_days')|0] days; review in [Story.MakeScope.ScriptValue('asp_time_until_review_days')|0] days. Private desire."
+ asp_bond_story_information:0 "Personal bond with [Story.MakeScope.Var('asp_target').Char.GetShortUIName]. [Story.Custom('asp_bond_story_mode')] Age: [Story.MakeScope.ScriptValue('asp_story_age_days')|0] days; review in [Story.MakeScope.ScriptValue('asp_time_until_review_days')|0] days. Private desire."
  asp_bond_origin_title:0 "A Wish for Closeness"
  asp_bond_origin_court_friendship:0 "[asp_bond_event_story.MakeScope.Var('asp_target').Char.GetShortUIName] is a current acquaintance in my court or among its guests. I would like this connection to become a friendship.\n\nOnly a new Friend or Best Friend relationship satisfies this desire. Befriend is currently available through the game's ordinary rules; this desire grants no relationship or scheme access. Its first review is after 24 months."
  asp_bond_origin_relation_friendship:0 "[asp_bond_event_story.MakeScope.Var('asp_target').Char.GetShortUIName] is someone I know through an existing positive personal relationship. I would like this connection to become a friendship.\n\nOnly a new Friend or Best Friend relationship satisfies this desire. Befriend is currently available through the game's ordinary rules; this desire grants no relationship or scheme access. Its first review is after 24 months."
@@ -43,3 +43,5 @@
  asp_bond_release_memory_second:0 "You released your wish for closeness with [target.GetShortUIName]."
  asp_bond_release_memory_third:0 "[owner.GetShortUIName] released a wish for closeness."
  asp_bond_release_cost:0 "Release before 24 months uses base [GetPlayer.MakeScope.ScriptValue('asp_desire_abandonment_stress')|0] Stress; your Stress Gain modifiers apply. From 24 months, release has no added Stress. No fulfillment reward. The effect preview shows the modified cost. "
+ asp_bond_story_friendship:0 "Friendship: form a new Friend or Best Friend relationship with this same person."
+ asp_bond_story_romance:0 "Romantic closeness: form a new Lover or Soulmate relationship with this same person."

@@ -1,0 +1,5 @@
+﻿asp_bond_story_mode = {
+    type = all
+    text = { trigger = { var:asp_interpretation = flag:romance } localization_key = asp_bond_story_romance }
+    text = { localization_key = asp_bond_story_friendship }
+}
