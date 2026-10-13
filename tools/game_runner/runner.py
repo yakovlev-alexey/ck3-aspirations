@@ -14,6 +14,25 @@ from .protocol import LogCursor, ProtocolError, Telemetry, atomic_request, safe_
 from .windows import WindowsBackend
 
 
+_ASPIRATION_RUNTIME_TAGS = (
+    "Script system error!", "pdx_persistent_reader.cpp", "jomini_script_argument.cpp",
+    "jomini_eventtarget.cpp", "pdx_data_factory.cpp", "Unknown trigger:",
+    "Unknown effect:", "Failed to parse", "Data error in",
+    "triggered but has no valid options",
+)
+
+
+def _assert_aspiration_diagnostics_absent(run, *log_directories):
+    errors = []
+    for directory in log_directories:
+        path = Path(directory) / "error.log"
+        diagnostics = path.read_text(encoding="utf-8-sig", errors="replace") if path.exists() else ""
+        blocks = re.split(r"(?=\[.*?\]\[E\])", diagnostics)
+        errors.extend(block for block in blocks if "asp_" in block and any(tag in block for tag in _ASPIRATION_RUNTIME_TAGS))
+    run["assertions"].append({"name": "aspiration_runtime_diagnostics_absent", "passed": not errors})
+    run["aspiration_runtime_error_count"] = len(errors)
+
+
 @dataclass
 class Config:
     game_executable: Path
@@ -232,6 +251,7 @@ class GameRunner:
                         {"name": "baseline_unchanged", "passed": hashlib.sha256(self.config.baseline_save.read_bytes()).hexdigest() == self.baseline_hash},
                     ]
                     run = {"index": index, "initial": initial, "core": core, "duplicate": duplicate, "assertions": assertions, "logs": self._snapshot_logs(index)}
+                    _assert_aspiration_diagnostics_absent(run, run["logs"])
                     report["runs"].append(run)
                     if not all(item["passed"] for item in assertions):
                         report["status"] = "assertion_failed"
@@ -247,12 +267,7 @@ class GameRunner:
                         {"name": "baseline_unchanged", "passed": hashlib.sha256(self.config.baseline_save.read_bytes()).hexdigest() == self.baseline_hash},
                     ])
                     run = {"index": index, "initial": initial, "integrated": bond, "duplicate": duplicate, "assertions": assertions, "logs": self._snapshot_logs(index)}
-                    errors = Path(run["logs"]) / "error.log"
-                    diagnostics = errors.read_text(encoding="utf-8-sig", errors="replace") if errors.exists() else ""
-                    blocks = re.split(r"(?=\[.*?\]\[E\])", diagnostics)
-                    aspiration_errors = [block for block in blocks if "asp_" in block and any(tag in block for tag in ("Script system error!", "pdx_persistent_reader.cpp", "jomini_script_argument.cpp", "jomini_eventtarget.cpp", "pdx_data_factory.cpp", "Unknown trigger:", "Unknown effect:", "Failed to parse", "Data error in", "triggered but has no valid options"))]
-                    assertions.append({"name": "aspiration_runtime_diagnostics_absent", "passed": not aspiration_errors})
-                    run["aspiration_runtime_error_count"] = len(aspiration_errors)
+                    _assert_aspiration_diagnostics_absent(run, run["logs"])
                     report["runs"].append(run)
                     if not all(item["passed"] for item in assertions):
                         report["status"] = "assertion_failed"
@@ -277,12 +292,7 @@ class GameRunner:
                         {"name": "baseline_unchanged", "passed": hashlib.sha256(self.config.baseline_save.read_bytes()).hexdigest() == self.baseline_hash},
                     ]
                     run = {"index": index, "initial": initial, "bond": bond, "duplicate": duplicate, "assertions": assertions, "logs": self._snapshot_logs(index)}
-                    errors = Path(run["logs"]) / "error.log"
-                    diagnostics = errors.read_text(encoding="utf-8-sig", errors="replace") if errors.exists() else ""
-                    blocks = re.split(r"(?=\[.*?\]\[E\])", diagnostics)
-                    aspiration_errors = [block for block in blocks if "asp_" in block and any(tag in block for tag in ("Script system error!", "pdx_persistent_reader.cpp", "jomini_script_argument.cpp", "jomini_eventtarget.cpp", "pdx_data_factory.cpp", "Unknown trigger:", "Unknown effect:", "Failed to parse", "Data error in", "triggered but has no valid options"))]
-                    assertions.append({"name": "aspiration_runtime_diagnostics_absent", "passed": not aspiration_errors})
-                    run["aspiration_runtime_error_count"] = len(aspiration_errors)
+                    _assert_aspiration_diagnostics_absent(run, run["logs"])
                     report["runs"].append(run)
                     if not all(item["passed"] for item in assertions):
                         report["status"] = "assertion_failed"
@@ -306,12 +316,7 @@ class GameRunner:
                         {"name": "baseline_unchanged", "passed": hashlib.sha256(self.config.baseline_save.read_bytes()).hexdigest() == self.baseline_hash},
                     ]
                     run = {"index": index, "initial": initial, "recovery": recovery, "duplicate": duplicate, "assertions": assertions, "logs": self._snapshot_logs(index)}
-                    errors = Path(run["logs"]) / "error.log"
-                    diagnostics = errors.read_text(encoding="utf-8-sig", errors="replace") if errors.exists() else ""
-                    blocks = re.split(r"(?=\[.*?\]\[E\])", diagnostics)
-                    aspiration_errors = [block for block in blocks if "asp_" in block and any(tag in block for tag in ("Script system error!", "pdx_persistent_reader.cpp", "Unknown trigger:", "Unknown effect:", "Failed to parse", "Data error in", "triggered but has no valid options"))]
-                    assertions.append({"name": "aspiration_runtime_diagnostics_absent", "passed": not aspiration_errors})
-                    run["aspiration_runtime_error_count"] = len(aspiration_errors)
+                    _assert_aspiration_diagnostics_absent(run, run["logs"])
                     report["runs"].append(run)
                     if not all(item["passed"] for item in assertions):
                         report["status"] = "assertion_failed"
@@ -352,15 +357,7 @@ class GameRunner:
                         {"name": "calendar_duplicate_identity", "passed": calendar == calendar_duplicate},
                     ])
                     run = {"index": index, "initial": initial, "lifecycle": lifecycle, "duplicate": duplicate, "logic_logs": logic_logs, "reload_precondition": reload_precondition, "calendar_setup": calendar_setup, "calendar_day": calendar_day, "calendar": calendar, "calendar_duplicate": calendar_duplicate, "assertions": assertions, "logs": self._snapshot_logs(index)}
-                    errors = Path(run["logs"]) / "error.log"
-                    diagnostics = errors.read_text(encoding="utf-8-sig", errors="replace") if errors.exists() else ""
-                    logic_errors = Path(logic_logs) / "error.log"
-                    if logic_errors.exists():
-                        diagnostics += "\n" + logic_errors.read_text(encoding="utf-8-sig", errors="replace")
-                    runtime_blocks = re.split(r"(?=\[.*?\]\[E\])", diagnostics)
-                    aspiration_errors = [block for block in runtime_blocks if "asp_" in block and any(tag in block for tag in ("Script system error!", "pdx_persistent_reader.cpp", "Unknown trigger:", "Unknown effect:", "Failed to parse", "Data error in", "triggered but has no valid options"))]
-                    assertions.append({"name": "aspiration_runtime_diagnostics_absent", "passed": not aspiration_errors})
-                    run["aspiration_runtime_error_count"] = len(aspiration_errors)
+                    _assert_aspiration_diagnostics_absent(run, logic_logs, run["logs"])
                     report["runs"].append(run)
                     if not all(item["passed"] for item in assertions):
                         report["status"] = "assertion_failed"
@@ -382,6 +379,7 @@ class GameRunner:
                         {"name": "baseline_unchanged", "passed": hashlib.sha256(self.config.baseline_save.read_bytes()).hexdigest() == self.baseline_hash},
                     ]
                     run = {"index": index, "initial": initial, "vengeance": vengeance, "duplicate": duplicate, "assertions": assertions, "logs": self._snapshot_logs(index)}
+                    _assert_aspiration_diagnostics_absent(run, run["logs"])
                     report["runs"].append(run)
                     if not all(item["passed"] for item in assertions):
                         report["status"] = "assertion_failed"

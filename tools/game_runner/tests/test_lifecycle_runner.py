@@ -45,6 +45,14 @@ class LifecycleTests(unittest.TestCase):
         report=self.runner.run_scenario("lifecycle-regression")
         self.assertEqual(report["status"],"assertion_failed")
         self.assertGreaterEqual(report["runs"][0]["aspiration_runtime_error_count"],1)
+    def test_compile_link_and_factory_diagnostics_rejected(self):
+        for source in ("jomini_script_argument.cpp", "jomini_eventtarget.cpp", "pdx_data_factory.cpp"):
+            with self.subTest(source=source):
+                self.backend.runtime_error=True
+                self.backend.diagnostic=f"[00:00:00][E][{source}:1]: Native invalid script/data scope\n Script location: common/scripted_effects/asp_core.txt\n"
+                report=self.runner.run_scenario("lifecycle-regression")
+                self.assertEqual(report["status"],"assertion_failed")
+                self.assertEqual(report["runs"][0]["aspiration_runtime_error_count"],2)
     def test_no_valid_options_rejected_despite_native_pass(self):
         self.backend.runtime_error=True
         self.backend.diagnostic="[05:13:22][E][event_window_data.cpp:286]: Event 'asp_vengeance.1' triggered but has no valid options for Test Aspirant\n"

@@ -32,6 +32,8 @@ class VengeanceBoundary(runner_tests.NativeIOBoundary):
         with log.open("ab") as stream:
             stream.write(data)
         self.cached = (session, request, data)
+        if getattr(self, "diagnostic", None):
+            (self.config.user_data / "logs" / "error.log").write_text(self.diagnostic, encoding="utf-8")
 
 class VengeanceRunnerTests(unittest.TestCase):
     def setUp(self):
@@ -48,7 +50,24 @@ class VengeanceRunnerTests(unittest.TestCase):
         result = report["runs"][0]
         self.assertEqual(result["vengeance"]["v04_prestige_delta"], 100)
         self.assertEqual(result["duplicate"], result["vengeance"])
-        self.assertEqual(len(result["assertions"]), 10)
+        self.assertEqual(len(result["assertions"]), 11)
+
+    def test_vengeance_runtime_diagnostic_cannot_pass_complete_measurements(self):
+        diagnostics = [
+            "[00:00:00][E][test.cpp:1]: Script system error!\n Error: invalid scope\n Script location: common/scripted_effects/asp_vengeance.txt\n",
+            "[00:00:00][E][event_window_data.cpp:286]: Event 'asp_vengeance.1' triggered but has no valid options\n",
+        ]
+        diagnostics.extend(
+            f"[00:00:00][E][{source}:1]: Native invalid script/data scope\n Script location: common/scripted_effects/asp_vengeance.txt\n"
+            for source in ("jomini_script_argument.cpp", "jomini_eventtarget.cpp", "pdx_data_factory.cpp")
+        )
+        for diagnostic in diagnostics:
+            with self.subTest(diagnostic=diagnostic):
+                self.backend.diagnostic = diagnostic
+                report = self.runner.run_scenario("vengeance-regression")
+                self.assertEqual(report["status"], "assertion_failed")
+                self.assertEqual(report["runs"][0]["aspiration_runtime_error_count"], 1)
+                self.assertIn("aspiration_runtime_diagnostics_absent", {item["name"] for item in report["runs"][0]["assertions"] if not item["passed"]})
 
     def test_wrong_native_delta_cannot_pass_even_with_pass_flag(self):
         self.backend.override = {"v04_prestige_delta": 200}

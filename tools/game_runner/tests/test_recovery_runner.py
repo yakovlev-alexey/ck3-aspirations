@@ -17,7 +17,7 @@ class Boundary(base.NativeIOBoundary):
         with log.open("ab") as stream: stream.write(data)
         self.cached=(session,request,data)
         if getattr(self,"runtime_error",False):
-            (self.config.user_data/"logs"/"error.log").write_text('[00:00:00][E][test.cpp:1]: Script system error!\n Error: invalid scope\n Script location: file: common/scripted_effects/asp_recovery.txt line: 1\n',encoding="utf-8")
+            (self.config.user_data/"logs"/"error.log").write_text(getattr(self,"diagnostic",'[00:00:00][E][test.cpp:1]: Script system error!\n Error: invalid scope\n Script location: file: common/scripted_effects/asp_recovery.txt line: 1\n'),encoding="utf-8")
 class RecoveryRunnerTests(unittest.TestCase):
     def setUp(self):
         base.RunnerIOTests.setUp(self);self.backend=Boundary(self.config);self.runner.backend=self.backend
@@ -43,6 +43,15 @@ class RecoveryRunnerTests(unittest.TestCase):
         report=self.runner.run_scenario("recovery-regression")
         self.assertEqual(report["status"],"assertion_failed")
         self.assertGreater(report["runs"][0]["aspiration_runtime_error_count"],0)
+
+    def test_compile_link_and_factory_diagnostics_rejected(self):
+        for source in ("jomini_script_argument.cpp", "jomini_eventtarget.cpp", "pdx_data_factory.cpp"):
+            with self.subTest(source=source):
+                self.backend.runtime_error=True
+                self.backend.diagnostic=f"[00:00:00][E][{source}:1]: Native invalid script/data scope\n Script location: common/scripted_effects/asp_recovery.txt\n"
+                report=self.runner.run_scenario("recovery-regression")
+                self.assertEqual(report["status"],"assertion_failed")
+                self.assertEqual(report["runs"][0]["aspiration_runtime_error_count"],1)
 
     def test_old_story_cleanup_cannot_erase_new_token(self):
         for field in ("token_loss", "token_terminal", "cleanup_loss", "cleanup_terminal"):

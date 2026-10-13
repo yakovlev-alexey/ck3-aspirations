@@ -23,7 +23,9 @@ A04 also requires actual-profile/autosave launch preflight: missing, unsafe YEAR
 
 C03 selector clicks, C04 actual save/load and visible UI remain separate native acceptance in [core scenarios](../../../src/core/tests/scenarios.md); they are not inferred from A08.
 
-Vengeance registration: `vengeance-regression` invokes shared V01-V06 fixtures. Added standard-library tests cover measured results/replay, incorrect custody prestige despite a PASS flag, hidden origin despite a PASS flag, and incomplete telemetry. Native game evidence and mandatory actual GUI execution are recorded separately in the owning family scenarios/report.
+Vengeance registration: `vengeance-regression` invokes shared V01-V06 fixtures. Added standard-library tests cover measured results/replay, incorrect custody prestige despite a PASS flag, hidden origin despite a PASS flag, incomplete telemetry, and native aspiration diagnostics. Native game evidence and mandatory actual GUI execution are recorded separately in the owning family scenarios/report.
+
+Core, vengeance, lifecycle, recovery, bond and integrated runs share the same strict `asp_` runtime diagnostic assertion and numeric count for each fresh log interval. Script system, compiler argument, event-target, DataFactory and no-valid-options errors fail despite complete PASS measurements; lifecycle examines both logic and calendar intervals. Tests inject these formats at the existing fake native boundary. Startup unused-state/orphan-event notices and bounded Trigger Localization notices remain separately classified. Historical native reports are not rewritten by this runner correction.
 
 ## Registered lifecycle-regression
 

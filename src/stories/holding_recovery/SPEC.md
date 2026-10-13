@@ -80,6 +80,8 @@ Registered H03 invokes the native child on_action at slot0 with a verified origi
 
 Repeat incidents preserve the active Story's original control/date/serial; the county stores the latest observed damage context. They cannot start a duplicate Story or reset its age. Origin displays the recorded Control, and county management explains both milestones and valid payment.
 
+The visible Story card supplies the native implicit English title and description, and its private/declared body reads the exact fixed county, recorded raid or siege, frozen origin Control, chosen interpretation, age and next review from the Story. It states both Control 80 and new owner-funded supported construction. The declared state adds the public deadline, 100 Prestige success reward, and once-only withdrawal/expiry penalty. This is presentation of existing Story state; it does not change eligibility, payment or settlement.
+
 
 ## Exact Province token ownership regression
 

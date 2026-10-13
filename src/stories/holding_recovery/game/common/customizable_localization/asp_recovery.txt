@@ -1,0 +1,19 @@
+﻿# The Story scope exposes frozen origin context and the current public pledge.
+asp_recovery_story_information = {
+    type = all
+    text = { trigger = { has_variable = asp_declared } localization_key = asp_recovery_story_information_declared }
+    text = { localization_key = asp_recovery_story_information_private }
+}
+
+asp_recovery_story_cause = {
+    type = all
+    text = { trigger = { var:asp_recovery_origin_cause = flag:raid } localization_key = asp_recovery_story_cause_raid }
+    text = { trigger = { var:asp_recovery_origin_cause = flag:siege } localization_key = asp_recovery_story_cause_siege }
+}
+
+asp_recovery_story_interpretation = {
+    type = all
+    text = { trigger = { var:asp_interpretation = flag:protection } localization_key = asp_recovery_story_interpretation_protection }
+    text = { trigger = { var:asp_interpretation = flag:family_prestige } localization_key = asp_recovery_story_interpretation_family_prestige }
+    text = { trigger = { var:asp_interpretation = flag:income } localization_key = asp_recovery_story_interpretation_income }
+}

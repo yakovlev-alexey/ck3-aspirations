@@ -234,6 +234,8 @@ class NativeIOBoundary:
             self.core_fields.update(getattr(self, "core_fields_override", {}))
             self.core_fields.pop(getattr(self, "drop_core_field", ""), None)
         self.emit(log, session, request, "DONE")
+        if "OP = core_regression" in text and getattr(self, "diagnostic", None):
+            (self.config.user_data / "logs" / "error.log").write_text(self.diagnostic, encoding="utf-8")
 
     def emit(self, log, session, request, kind):
         line = f"ASP_AUTOMATION|1|{session}|{request}|{kind}"
@@ -301,6 +303,23 @@ class RunnerIOTests(unittest.TestCase):
         self.assertEqual(report["status"], "assertion_failed")
         self.assertIn("C01_exact_caps_and_rejection",
                       {item["name"] for item in report["runs"][0]["assertions"] if not item["passed"]})
+
+    def test_core_runtime_diagnostic_cannot_pass_complete_measurements(self):
+        diagnostics = [
+            "[00:00:00][E][test.cpp:1]: Script system error!\n Error: invalid scope\n Script location: common/scripted_effects/asp_core.txt\n",
+            "[00:00:00][E][event_window_data.cpp:286]: Event 'asp_core.1' triggered but has no valid options\n",
+        ]
+        diagnostics.extend(
+            f"[00:00:00][E][{source}:1]: Native invalid script/data scope\n Script location: common/scripted_effects/asp_core.txt\n"
+            for source in ("jomini_script_argument.cpp", "jomini_eventtarget.cpp", "pdx_data_factory.cpp")
+        )
+        for diagnostic in diagnostics:
+            with self.subTest(diagnostic=diagnostic):
+                self.backend.diagnostic = diagnostic
+                report = self.runner.run_scenario("core-regression")
+                self.assertEqual(report["status"], "assertion_failed")
+                self.assertEqual(report["runs"][0]["aspiration_runtime_error_count"], 1)
+                self.assertIn("aspiration_runtime_diagnostics_absent", {item["name"] for item in report["runs"][0]["assertions"] if not item["passed"]})
 
     def test_incomplete_core_terminal_is_transport_failure(self):
         self.backend.drop_core_field = "c11_active"
