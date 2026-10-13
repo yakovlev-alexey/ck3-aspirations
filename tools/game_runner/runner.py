@@ -181,12 +181,26 @@ class GameRunner:
         request_text = "hidden_effect = { " + effect + " }\n"
         journal = getattr(self, "request_journal", None)
         if journal is not None:
-            previous = self.request_path.read_bytes() if self.request_path.exists() else b""
-            hashes = [hashlib.sha256(previous).hexdigest(), hashlib.sha256(request_text.encode("utf-8-sig")).hexdigest()]
+            ownership = json.loads(journal.read_text())
+            if "expected_sha256" not in ownership:
+                raise ProtocolError("Managed request ownership is missing")
+            expected = ownership["expected_sha256"]
+            current = safe_path(self.request_path).read_bytes() if self.request_path.exists() else None
+            current_hash = hashlib.sha256(current).hexdigest() if current is not None else None
+            if current_hash != expected:
+                raise ProtocolError("Request changed externally; retained")
+            next_hash = hashlib.sha256(request_text.encode("utf-8-sig")).hexdigest()
+            hashes = ([] if expected is None else [expected]) + [next_hash]
+            ownership = {"hashes": hashes, "expected_sha256": expected, "owned_pids": list(getattr(self.backend, "started_pids", []))}
             temporary = journal.with_suffix(".pending")
-            temporary.write_text(json.dumps({"hashes": hashes, "owned_pids": list(getattr(self.backend, "started_pids", []))}), encoding="utf-8")
+            temporary.write_text(json.dumps(ownership), encoding="utf-8")
             os.replace(temporary, journal)
-        atomic_request(self.request_root, self.request_path, request_text)
+            atomic_request(self.request_root, self.request_path, request_text, expected_sha256=expected)
+            ownership["expected_sha256"] = next_hash
+            temporary.write_text(json.dumps(ownership), encoding="utf-8")
+            os.replace(temporary, journal)
+        else:
+            atomic_request(self.request_root, self.request_path, request_text)
         self.backend.command("run asp_automation_request.txt")
         if operation == "advance" and not replay:
             # tick_day is a bounded native console command; delayed event verifies elapsed date.

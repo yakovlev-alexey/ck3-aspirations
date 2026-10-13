@@ -1,4 +1,5 @@
 """Fresh byte-log transport with identity-bound terminal results."""
+import hashlib
 import os
 import re
 import tempfile
@@ -47,7 +48,10 @@ def safe_path(path):
     return path.resolve()
 
 
-def atomic_request(root, target, text):
+_UNCONDITIONAL = object()
+
+
+def atomic_request(root, target, text, *, expected_sha256=_UNCONDITIONAL):
     root, target = safe_path(root), safe_path(target)
     if target.parent != root or target.name != "asp_automation_request.txt":
         raise ValueError("Request must use the owned name directly under user data")
@@ -58,6 +62,11 @@ def atomic_request(root, target, text):
             stream.write(text.encode("utf-8-sig"))
             stream.flush()
             os.fsync(stream.fileno())
+        if expected_sha256 is not _UNCONDITIONAL:
+            current = safe_path(target).read_bytes() if target.exists() else None
+            current_hash = hashlib.sha256(current).hexdigest() if current is not None else None
+            if current_hash != expected_sha256:
+                raise ProtocolError("Request changed externally; retained")
         os.replace(temporary, target)
     finally:
         if temporary and temporary.exists():

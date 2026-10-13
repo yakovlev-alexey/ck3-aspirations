@@ -1,5 +1,7 @@
 """Targeted, reversible profile preparation for a managed disposable session."""
 import json
+import os
+import tempfile
 import re
 import secrets
 from pathlib import Path
@@ -101,9 +103,19 @@ def replace_target(path, parser, expected, replacement):
         raise ValueError('Owned target changed: ' + path.name)
     updated = text[:start] + replacement + text[end:]
     encoded = updated.encode('utf-8-sig' if raw.startswith(b'\xef\xbb\xbf') else 'utf-8')
-    if path.read_bytes() != raw:
-        raise ValueError('Concurrent file mutation: ' + path.name)
-    path.write_bytes(encoded)
+    temporary = None
+    try:
+        with tempfile.NamedTemporaryFile(dir=path.parent, prefix='.asp-profile-' + path.name + '-', delete=False) as stream:
+            temporary = Path(stream.name)
+            stream.write(encoded)
+            stream.flush()
+            os.fsync(stream.fileno())
+        if safe_path(path).read_bytes() != raw:
+            raise ValueError('Concurrent file mutation: ' + path.name)
+        os.replace(temporary, path)
+    finally:
+        if temporary is not None and temporary.exists():
+            temporary.unlink()
 
 
 class ManagedProfile:

@@ -86,29 +86,43 @@ def validate_evidence(native, started, output_root):
         assertions = run.get('assertions', [])
         if not assertions or any(item.get('passed') is not True for item in assertions):
             raise ValueError('Missing or failed native assertions')
-        logs = safe_path(run['logs'])
-        if not logs.is_relative_to(evidence):
-            raise ValueError('Log evidence escapes native directory')
-        debug = logs / 'debug.log'
-        session = run['initial']['session']
-        if not debug.exists() or ('ASP_AUTOMATION|1|' + str(session) + '|') not in debug.read_text(encoding='utf-8-sig', errors='replace'):
-            raise ValueError('Missing fresh identity-bound native log')
-        debug_text = debug.read_text(encoding='utf-8-sig', errors='replace')
-        measurements = [value for value in run.values() if isinstance(value, dict) and 'session' in value and 'request' in value]
+        measurements = {key: value for key, value in run.items() if isinstance(value, dict) and 'session' in value and 'request' in value}
         if not measurements:
             raise ValueError('Missing native request measurements')
-        for measurement in measurements:
-            request = measurement['request']
-            terminal = f"ASP_AUTOMATION|1|{session}|{request}|DONE|"
-            records = list(evidence.glob(f'{session}-{request}*.json'))
-            if terminal not in debug_text or not records or not any(json.loads(record.read_text()) == measurement for record in records):
-                raise ValueError('Missing identity-bound terminal/request evidence')
-            paths.extend(records)
-        paths.append(debug)
-        error_log = logs / 'error.log'
-        if not error_log.exists():
-            raise ValueError('Missing runtime diagnostic evidence')
-        paths.append(error_log)
+        logic_keys = {'initial', 'lifecycle', 'duplicate'}
+        if 'logic_logs' in run:
+            logic_session = run['initial']['session']
+            calendar_session = run['calendar_setup']['session']
+            if logic_session == calendar_session:
+                raise ValueError('Lifecycle calendar must use a fresh session')
+            intervals = [(run['logic_logs'], logic_session, {key: value for key, value in measurements.items() if key in logic_keys}),
+                         (run['logs'], calendar_session, {key: value for key, value in measurements.items() if key not in logic_keys})]
+        else:
+            intervals = [(run['logs'], run['initial']['session'], measurements)]
+        for directory, interval_session, interval_measurements in intervals:
+            logs = safe_path(directory)
+            if not logs.is_relative_to(evidence):
+                raise ValueError('Log evidence escapes native directory')
+            debug = logs / 'debug.log'
+            if not debug.exists():
+                raise ValueError('Missing fresh identity-bound native log')
+            debug_text = debug.read_text(encoding='utf-8-sig', errors='replace')
+            if not interval_measurements:
+                raise ValueError('Missing measurements for retained log interval')
+            for measurement in interval_measurements.values():
+                session, request = measurement['session'], measurement['request']
+                if session != interval_session:
+                    raise ValueError('Measurement does not belong to its recorded log interval')
+                terminal = f"ASP_AUTOMATION|1|{session}|{request}|DONE|"
+                records = list(evidence.glob(f'{session}-{request}*.json'))
+                if terminal not in debug_text or not records or not any(json.loads(record.read_text()) == measurement for record in records):
+                    raise ValueError('Missing identity-bound terminal/request evidence')
+                paths.extend(records)
+            paths.append(debug)
+            error_log = logs / 'error.log'
+            if not error_log.exists():
+                raise ValueError('Missing runtime diagnostic evidence')
+            paths.append(error_log)
     persisted = evidence / 'report.json'
     if not persisted.exists() or json.loads(persisted.read_text()) != native:
         raise ValueError('Missing or inconsistent native report')

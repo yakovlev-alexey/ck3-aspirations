@@ -32,6 +32,8 @@ class ManagedFiles:
             self.created_root = True
         self.original = self.request.read_bytes() if self.request.exists() else None
         self.captured = True
+        expected = hashlib.sha256(self.original).hexdigest() if self.original is not None else None
+        self.journal.write_text(json.dumps({'hashes': [], 'expected_sha256': expected}), encoding='utf-8')
         if self.original is not None:
             (self.directory / 'request.before').write_bytes(self.original)
         candidate = safe_path(self.config.user_data / 'save games' / ('asp_automation_' + secrets.token_hex(8) + '.ck3'))
