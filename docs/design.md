@@ -9,7 +9,8 @@ Approved on 2026-10-12. This living document owns product intent, language, pres
 - [Holding recovery](../src/stories/holding_recovery/SPEC.md)
 - [Personal bond](../src/stories/personal_bond/SPEC.md)
 - [Repository and distribution](repository.md)
-- [Versioned modding findings](modding-notes.md)
+- [Versioned CK3 knowledge](knowledge/README.md)
+- [Shared story authoring and acceptance](story-authoring.md)
 
 The prototype implements all three families, shared reviews/pledges, exact-instance management, suspension/return and explicit full-cap replacement on CK3 1.20.0.4. Registered native regressions and separate actual UI/save-load/player-change procedures are owned by the linked acceptance scenarios. A bounded ordinary campaign and local release installation were also observed; this remains a local development prototype.
 

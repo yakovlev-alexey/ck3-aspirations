@@ -32,7 +32,9 @@ ck3-aspirations/
   docs/
     design.md                       # Purpose, glossary, shared player-facing behavior
     repository.md                   # This repository and packaging contract
-    modding-notes.md                 # Durable CK3 findings and compatibility notes
+    modding-notes.md                 # Compatibility entry point to indexed knowledge
+    story-authoring.md              # Shared acceptance checklist, evidence index and template
+    knowledge/                      # Versioned topic notes and portable reproduction links
     decisions/                      # Significant architectural decisions, when needed
     superpowers/
       specs/                        # Historical review records or proposals with status
@@ -86,7 +88,8 @@ ck3-aspirations/
     check.ps1                       # Source and output checks
     install-dev.ps1                 # Local descriptor registration; no playset edits
     package.ps1                     # Release archive from release output
-    tests/                          # Focused tests of assembly and path handling
+    check-contracts.ps1             # Source-only story evidence and native card-key checks
+    tests/                          # Assembly, path and shared acceptance boundary tests
   .build/                           # Generated output and file maps; ignored
   .local/                           # Local paths, MODLOG.md, logs and screenshots; ignored
   dist/                             # Generated release archives; ignored
@@ -134,11 +137,15 @@ Every living story specification contains:
 
 Document concrete story parameters next to their implementing values; link shared parameters to core rather than maintaining conflicting copies. A behavior change updates the owning `SPEC.md`, affected localization, and acceptance scenarios in the same change as its scripts. If the implementation and specification disagree, identify whether the change is a bug fix or an intentional design change and reconcile both before calling it complete. Specifications remain current prose contracts; the build does not pretend to prove every narrative rule automatically.
 
-Keep durable discoveries in `docs/modding-notes.md` with game version and source references. Use `.local/MODLOG.md` for machine-specific paths, backup locations, current test attempts, and transient findings. Transfer reusable findings into the durable notes after validation; never commit saves, user profiles, launcher state, or raw runtime logs.
+Read [the knowledge index](knowledge/README.md) and relevant topic notes before relying on native capabilities. Keep validated reusable discoveries in the indexed topic notes with status, CK3 version, observation, portable tracked source or reproducible scenario/fixture, implication and limits. Update discoveries in the same change and reconcile contradictory observations explicitly; report "No new durable finding" when appropriate. `docs/modding-notes.md` remains a compatibility navigation page. Use `.local/MODLOG.md` for machine-specific setup, backup locations, attempts and transient findings; raw reports/screenshots/logs, saves, profiles and launcher state stay ignored. Do not make an ignored historical report the only evidence for a knowledge entry.
 
 ### Repository checks
 
-Require a `SPEC.md` for every story source directory and keep its acceptance scenario links valid. Static checks cover destination collisions, unexpected package files, missing required documentation, localization naming and encoding, and identifiable duplicate mod-owned IDs. CK3 remains the authority for script semantics; these checks are not a replacement for loading and exercising the mod.
+Require a `SPEC.md` for every story source directory and keep its acceptance scenario links valid. Use [the shared authoring guide](story-authoring.md) to review all current families and future additions without duplicating core/family behavior. Its evidence table links each family's origin/target, lifecycle, terminal/cancel, stale-action and presentation coverage to stable scenario IDs, plus a registered runner name and dev-only fixture.
+
+The source-only `tools/check-contracts.ps1` validates this index, scenario IDs, registry membership, portable knowledge links and visible Story title/implicit description/state-body keys. Normal `tools/check.ps1` runs it before output validation; the existing tooling suite includes positive/negative disposable contract fixtures. Table structure is a documented evidence-index convention, not a narrative DSL. Empty/missing categories, obsolete IDs, unknown registrations and missing native keys fail; prose semantics, applicability and actual UI remain review/live-test responsibilities.
+
+Static checks also cover destination collisions, unexpected package files, missing required documentation, localization naming and encoding, and identifiable duplicate mod-owned IDs. CK3 remains the authority for script semantics; these checks are not a replacement for loading and exercising the mod.
 
 Give the assembly tools focused tests for identical relative paths, case-only collisions, preservation of relative directories and file bytes, removal of stale output, dev-only fixture exclusion, and containment of output replacement. Reuse those checks for local development and any future CI; do not introduce a new test framework solely for the initial file-copy tool. Story scenarios stay with their story; only cross-story lifecycle scenarios live under `src/core/tests/`.
 
@@ -150,6 +157,7 @@ For these packaging commands, PowerShell 7 and Git already installed on the host
 
 ```powershell
 pwsh -NoProfile -File tools/tests/run.ps1
+pwsh -NoProfile -File tools/check-contracts.ps1
 pwsh -NoProfile -File tools/build.ps1 -Profile dev
 pwsh -NoProfile -File tools/check.ps1 -Profile dev
 pwsh -NoProfile -File tools/build.ps1 -Profile release

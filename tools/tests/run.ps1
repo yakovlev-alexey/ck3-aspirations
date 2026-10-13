@@ -20,6 +20,17 @@ function New-Fixture($Name) {
         Write-Text (Join-Path $root "src/$module/tests/scenarios.md") '# Fixture scenarios'
     }
     Write-Text (Join-Path $root 'packaging/descriptor.mod') "name=`"Aspirations`"`nversion=`"0.1.0`"`nsupported_version=`"1.20.*`"`ntags={ `"Gameplay`" }`n"
+    $rows = @()
+    foreach ($family in @('vengeance','holding_recovery','personal_bond')) {
+        $scenario = @{ vengeance = 'vengeance-regression'; holding_recovery = 'recovery-regression'; personal_bond = 'bond-regression' }[$family]
+        Write-Text (Join-Path $root "src/stories/$family/tests/scenarios.md") "# Fixture scenarios`n| F01 | Exact target | Once |`nRegistered ``$scenario``."
+        Write-Text (Join-Path $root "src/stories/$family/tests/game/events/asp_${family}_contract_fixture.txt") "asp_test_${family}_contract.1 = {}"
+        $case = "[``F01``](../src/stories/$family/tests/scenarios.md)"
+        $rows += "| ``$family`` | $case | $case | $case | $case | $case | ``$scenario`` [Fixture](../src/stories/$family/tests/game/events/asp_${family}_contract_fixture.txt) |"
+    }
+    Write-Text (Join-Path $root 'docs/story-authoring.md') ("# Fixture guide`n## Current family evidence`n" + ($rows -join "`n") + "`n## New family template`n")
+    Write-Text (Join-Path $root 'docs/knowledge/README.md') '# Fixture knowledge'
+    Write-Text (Join-Path $root 'tools/game_runner/scenarios.json') '["vengeance-regression", "recovery-regression", "bond-regression"]'
     return $root
 }
 function Run-Tool($Name, $Root, $Extra = @(), $ExpectFailure = $false) {
@@ -256,4 +267,6 @@ try {
     Write-Host "Fixtures: $testRoot"
 }
 if ($failures.Count) { Write-Host "$($failures.Count) test cases failed"; exit 1 }
-Write-Host 'All 24 tooling cases passed'; exit 0
+& $pwsh -NoProfile -File (Join-Path $PSScriptRoot 'contracts.ps1') -RepositoryRoot $repo
+if ($LASTEXITCODE -ne 0) { exit 1 }
+Write-Host 'All 24 tooling and 15 shared contract cases passed'; exit 0
