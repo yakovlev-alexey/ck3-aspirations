@@ -22,7 +22,8 @@ asp_owner_death = {
         }
     }
 }
-quarterly_playable_pulse = { on_actions = { asp_quarterly_maintenance } }
+quarterly_playable_pulse = { on_actions = { asp_quarterly_maintenance asp_routine_personal_bond } }
+asp_routine_personal_bond = { trigger = { is_ai = no } effect = { asp_try_personal_bond_effect = yes } }
 asp_quarterly_maintenance = {
     trigger = { is_ai = no }
     effect = {

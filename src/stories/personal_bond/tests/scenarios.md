@@ -1,6 +1,6 @@
 # Personal bond acceptance scenarios
 
-[Contract](../SPEC.md) · [Shared lifecycle scenarios](../../../core/tests/scenarios.md). Status: **pending implementation and in-game observation**. Task 1 creates no native fixture. Allocate future `asp_test_personal_bond` event IDs in SPEC and add observed results here. Reserved B01–B05 retain the reviewed plan mapping; extra coverage uses new IDs.
+[Contract](../SPEC.md) · [Shared lifecycle scenarios](../../../core/tests/scenarios.md). Status: **implemented with registered native regressions and mandatory actual pursuit acceptance**. Stable `asp_test_personal_bond` event IDs are allocated in SPEC. Reserved B01–B05 retain the reviewed plan mapping; extra coverage uses new IDs.
 
 Procedure: disposable adult landed current player save, selected connected adult within reach, eligibility and real pursuit route. Record current relationships, target, origin date, stress and diplomacy XP. Use natural relationship callbacks as well as forced selection; inspect fresh logs and truthful English presentation.
 
@@ -14,4 +14,32 @@ Procedure: disposable adult landed current player save, selected connected adult
 | B06 | Desire below 24-month review; original date/target captured | Abandon early, release at review, retain/reinterpret, switch away and achieve during absence | Early +5 stress once; review release zero; retaining next review in 12 months with unchanged origin; no passive stress. Absence fulfillment no retrospective stress/XP reward; core owner-death/save policies apply. |
 | B07 | Existing desired relationship, or live desire before reinterpretation | Attempt creation/reinterpretation toward already satisfied mode | Already fulfilled goal never creates or instantly pays a desire; target/origin preserved and no new reward opportunity. |
 
-Evidence record pending: fixture IDs, candidate/pursuit eligibility probes, game version, screenshots and observed deltas.
+## Reproducible registered acceptance
+
+Run the existing local runner with the selected dev build, immutable disposable baseline and No Autosave profile: `python -m tools.game_runner --config <local-config> run bond-regression --repeat 1`. The scenario invokes the same shared native assertions as `event asp_test_personal_bond.1`. It does not claim actual relationship play. The runner independently checks all mandatory numeric fields and cached replay, not just B01–B07 flags.
+
+B01 native controls use owner character scope and exact generated court targets: locked Befriend rejects; controlled Befriend perk permits `can_use_befriend_scheme_trigger`/`can_start_scheme`; native Seduce eligibility and start predicates accept the mutually attracted adult. No aspiration route unlocks a perk. Excluded stranger, locked desired route, existing desired relation and invalid attraction yield no desire. B02 friend/lover callbacks require−10/+50 and−10/+0, memories2 and replayXP0. B03 uses scripted death, a court transfer/return for temporary availability, explicit orientation change for incompatibility, and a Rival transition for fixed-target choice. B04 requires chance values20/12/6/2/2/0, cooldown360, consumed context refusal and fresh Potential Friend context acceptance. B05 requires Content eligible and Lustful romance weight15 versus base10; no statistical sampling claim.
+
+B06 creates Best Friend/Soulmate through native scripted effects and measures their mode rewards, independent engine-modified base5 early cost, old-desire declaration rejection, cap/cooldown refusal, due retention360 with same target/origin, review release0, and suspended fulfillment Stress/XP0. B07 attempts friendship reinterpretation of a romance desire toward an existing Friend and requires refusal; it exercises `asp_try_personal_bond_effect` with a single eligible contact and verifies an unchanged observed signature cannot increase context serial. Test-only incapacity and generated contacts/perks/date stamps are controlled setup, not natural play.
+
+## Mandatory actual Befriend action
+
+1. Open the disposable baseline with dev enabled and No Autosave. Invoke `event asp_test_personal_bond.10`; capture the origin and choose **I will keep this desire** with actual input.
+2. Open management through its ordinary decision/selector. Select the shown acquaintance and capture the exact friendship condition, age/review and absence of **Declare intention**. Close management.
+3. Open the named contact's native character context menu, select **Befriend**, and confirm **Start Scheme**. Capture the native interaction and active exact-target scheme. This is actual player input; `.10` did not start a scheme or grant the desired relationship.
+4. Invoke `event asp_test_personal_bond.11`. It must emit `GUI_EXISTING_SCHEME_ACCELERATED`; `GUI_NO_ACTUAL_SCHEME_FAIL` fails acceptance. Progress acceleration applies only to the matching already-started Befriend. Record phase progress; `.11` adds100 native units per call (the accepted11-month baseline used four calls). Advance bounded native days until the vanilla outcome forms the Friend relation, and actually dismiss/accept any resulting vanilla event choices.
+5. Invoke `event asp_test_personal_bond.12`; require `GUI_RELATION_REWARD_PASS` and measured started1/Stress−10/XP50, the exact target memory and zero active desires. Capture vanilla relationship and Aspirations fulfillment UI. Classify fresh logs by exact error cause.
+
+Scripted generated contact, Potential Friend and perk are disclosed setup; native progress/day advancement is disclosed acceleration. Ordinary duration and a naturally occurring friendship are not claimed. A mere scripted `set_relation_friend` cannot satisfy this mandatory action.
+
+Record final native results, manifests, screenshots, diagnostic classification and profile/process cleanup in the ignored task report. CK3 version1.20.0.4 (Crozier).
+
+## Mandatory rival, target loss and stale render procedures
+
+Rival: invoke `.13`; creation and native Rival relation are scripted setup. Capture the fixed-target reconsideration and release tooltip, actually select **I will keep this desire**, then invoke `.14` and require `GUI_RIVAL_RETAIN_PASS`. Registered B03 calls this same snapshot/assertion helper, including fixed target/origin, active desire, notification latch and unchanged Stress/XP. This is actual Keep input, not a naturally developed rivalry.
+
+Target loss: invoke `.10`, actually keep its origin, then `.20` (scripted target death/core refresh). Capture the loss narrative. `.21` must require no added Stress/XP, zero active desires and the exact target loss memory. B03 separately registers scripted death/free closure; this procedure establishes rendering, not a real killing action.
+
+Stale origin: invoke `.10` and leave its origin open. Invoke `.16` to retire only the saved exact Story with no reward. Allow a later frame; hover the old choices and actually dismiss the harmless remaining Close. `.17` requires no live saved Story, no active desire and unchanged Stress/XP. Stale management: repeat `.10`, actually keep the origin, invoke `.18` to open the exact saved management context, then `.16` while it stays open. Allow a later frame/hover, actually click the old Release control and invoke `.17`; its exact live-Story guard makes that stale action harmless. Record fresh error-log byte boundaries. Native tooltip-perspective notices are distinct from invalid weak Story, parser, unknown effect, DataFactory or no-valid-options failures. The focused own-localization checks and shared setup preserve the origin/rival fixed base5/native-modifier tooltip regression.
+
+Story card: use shared `.10`, actually keep the origin and open native Situations → Your Situations. Require the English A wish for closeness title, private connection description, exact named target and numeric age/review body, with no raw implicit identifiers or ERROR getters. The focused native-line/implicit-key checks reproduce this presentation boundary; retain fresh render diagnostics and screenshots.

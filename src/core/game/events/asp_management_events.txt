@@ -214,6 +214,8 @@ asp_management.2 = {
     title = asp_management_selected_title
     desc = {
         first_valid = {
+            triggered_desc = { trigger = { asp_bond_event_can_manage_trigger = { STORY = scope:asp_selected_story } scope:asp_selected_story ?= { var:asp_interpretation = flag:friendship } } desc = asp_bond_management_friendship }
+            triggered_desc = { trigger = { asp_bond_event_can_manage_trigger = { STORY = scope:asp_selected_story } scope:asp_selected_story ?= { var:asp_interpretation = flag:romance } } desc = asp_bond_management_romance }
             triggered_desc = { trigger = { asp_recovery_event_can_manage_trigger = { STORY = scope:asp_selected_story } scope:asp_selected_story ?= { has_variable = asp_declared } } desc = asp_recovery_declared_county_desc }
             triggered_desc = {
                 trigger = {
@@ -284,6 +286,21 @@ asp_management.3 = {
         trigger = { scope:asp_selected_story ?= { asp_can_manage_story_trigger = yes asp_story_review_due_trigger = yes asp_story_owned_by_event_root_trigger = yes } }
         custom_tooltip = asp_retain_tooltip
         hidden_effect = { scope:asp_selected_story ?= { if = { limit = { story_owner = root } asp_retain_story_effect = yes } } }
+    }
+    option = { name = asp_bond_choose_friendship
+        trigger = { asp_bond_event_can_reinterpret_trigger = { STORY = scope:asp_selected_story MODE = friendship } }
+        custom_tooltip = asp_bond_friendship_condition custom_tooltip = asp_reinterpret_tooltip
+        hidden_effect = { scope:asp_selected_story ?= { if = { limit = { story_owner = root } asp_bond_reinterpret_effect = { MODE = friendship } } } }
+    }
+    option = { name = asp_bond_choose_romance
+        trigger = { asp_bond_event_can_reinterpret_trigger = { STORY = scope:asp_selected_story MODE = romance } }
+        custom_tooltip = asp_bond_romance_condition custom_tooltip = asp_reinterpret_tooltip
+        hidden_effect = { scope:asp_selected_story ?= { if = { limit = { story_owner = root } asp_bond_reinterpret_effect = { MODE = romance } } } }
+    }
+    option = { name = asp_bond_release_free
+        trigger = { asp_bond_event_can_manage_trigger = { STORY = scope:asp_selected_story } scope:asp_selected_story ?= { asp_bond_permanently_incompatible_trigger = yes } }
+        custom_tooltip = asp_bond_free_condition
+        hidden_effect = { scope:asp_selected_story ?= { if = { limit = { story_owner = root } asp_bond_release_incompatible_effect = yes } } }
     }
     option = { name = asp_recovery_protection
         trigger = { asp_recovery_event_can_manage_trigger = { STORY = scope:asp_selected_story } scope:asp_selected_story ?= { NOT = { has_variable = asp_declared } NOT = { var:asp_interpretation = flag:protection } } }

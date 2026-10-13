@@ -1,0 +1,175 @@
+﻿# Owner-private invisible context Stories avoid sharing consumed keys between different owners.
+asp_bond_observe_context_effect = {
+    save_scope_as = asp_bond_observer
+    $TARGET$ = { save_scope_as = asp_bond_observed_target save_scope_value_as = { name = asp_bond_observed_signature value = asp_bond_context_signature } }
+    clear_saved_scope = asp_bond_context
+    every_owned_story = { type = asp_personal_bond_context_story
+        if = { limit = { var:asp_bond_context_target = scope:asp_bond_observed_target } save_scope_as = asp_bond_context }
+    }
+    if = { limit = { NOT = { exists = scope:asp_bond_context } scope:asp_bond_observed_signature > 0 }
+        create_story = { type = asp_personal_bond_context_story save_scope_as = asp_bond_context }
+        scope:asp_bond_context = {
+            set_variable = { name = asp_bond_context_target value = scope:asp_bond_observed_target }
+            set_variable = { name = asp_bond_context_signature value = scope:asp_bond_observed_signature }
+            set_variable = { name = asp_bond_context_serial value = 1 }
+        }
+    }
+    else_if = { limit = { exists = scope:asp_bond_context }
+        scope:asp_bond_context = {
+            if = { limit = { NOT = { var:asp_bond_context_signature = scope:asp_bond_observed_signature } }
+                set_variable = { name = asp_bond_context_signature value = scope:asp_bond_observed_signature }
+                change_variable = { name = asp_bond_context_serial add = 1 }
+            }
+        }
+    }
+}
+asp_start_personal_bond_effect = {
+    set_variable = { name = asp_bond_requested_mode value = flag:$MODE$ }
+    if = { limit = { has_variable = asp_bond_requested_mode asp_bond_candidate_trigger = { TARGET = $TARGET$ MODE = $MODE$ } }
+        asp_bond_observe_context_effect = { TARGET = $TARGET$ }
+        if = { limit = { exists = scope:asp_bond_context scope:asp_bond_context = { OR = { NOT = { has_variable = asp_bond_consumed_serial } NOT = { var:asp_bond_consumed_serial = var:asp_bond_context_serial } } } }
+            # One opportunity per observed target context, including a failed selection roll.
+            scope:asp_bond_context = { set_variable = { name = asp_bond_consumed_serial value = var:asp_bond_context_serial } }
+            $TARGET$ = { save_scope_as = asp_bond_origin_target }
+            if = { limit = { exists = scope:asp_bond_force scope:asp_bond_force = yes } asp_bond_create_effect = yes }
+            else = { random = { chance = asp_bond_selection_chance asp_bond_create_effect = yes } }
+        }
+    }
+    remove_variable = asp_bond_requested_mode
+}
+asp_bond_create_effect = {
+    clear_saved_scope = asp_bond_new_story
+    create_story = { type = asp_personal_bond_story save_scope_as = asp_bond_new_story }
+    scope:asp_bond_new_story ?= {
+        asp_initialize_story_effect = { FAMILY = personal_bond CLASS = desire TARGET = scope:asp_bond_origin_target }
+        if = { limit = { asp_is_active_story_trigger = yes }
+            set_variable = { name = asp_interpretation value = story_owner.var:asp_bond_requested_mode }
+            set_variable = { name = asp_bond_origin_context value = scope:asp_bond_context.var:asp_bond_context_signature }
+            set_variable = { name = asp_bond_origin_incident value = scope:asp_bond_context.var:asp_bond_context_serial }
+            set_variable = { name = asp_bond_relationship_at_origin value = no }
+            if = { limit = { var:asp_target = { OR = { is_courtier_of = prev.story_owner is_foreign_court_or_pool_guest_of = prev.story_owner } } } set_variable = { name = asp_bond_origin_court value = yes } }
+            save_scope_as = asp_bond_event_story
+            story_owner = {
+                set_variable = { name = asp_bond_next_routine_date value = { value = current_date add = asp_bond_cooldown_days } }
+                if = { limit = { NOT = { exists = scope:asp_bond_silent } } trigger_event = asp_personal_bond.1 }
+            }
+        }
+    }
+}
+# Character scope. Work is bounded to current contacts and this owner's recorded contexts, never all characters.
+asp_try_personal_bond_effect = {
+    if = { limit = { is_alive = yes is_ai = no is_adult = yes is_ruler = yes is_landed = yes asp_active_desires < asp_desire_cap OR = { NOT = { has_variable = asp_bond_next_routine_date } asp_bond_cooldown_remaining_days <= 0 } }
+        save_scope_as = asp_bond_observer
+        every_owned_story = { type = asp_personal_bond_context_story
+            if = { limit = { exists = var:asp_bond_context_target var:asp_bond_context_target = { is_alive = yes } }
+                var:asp_bond_context_target = { save_scope_as = asp_bond_refresh_target }
+                story_owner = { asp_bond_observe_context_effect = { TARGET = scope:asp_bond_refresh_target } }
+            }
+        }
+        every_courtier_or_guest = { limit = { is_alive = yes is_adult = yes } save_scope_as = asp_bond_contact scope:asp_bond_observer = { asp_bond_observe_context_effect = { TARGET = scope:asp_bond_contact } } }
+        every_relation = { type = potential_friend save_scope_as = asp_bond_contact scope:asp_bond_observer = { asp_bond_observe_context_effect = { TARGET = scope:asp_bond_contact } } }
+        every_relation = { type = friend save_scope_as = asp_bond_contact scope:asp_bond_observer = { asp_bond_observe_context_effect = { TARGET = scope:asp_bond_contact } } }
+        every_relation = { type = best_friend save_scope_as = asp_bond_contact scope:asp_bond_observer = { asp_bond_observe_context_effect = { TARGET = scope:asp_bond_contact } } }
+        every_relation = { type = lover save_scope_as = asp_bond_contact scope:asp_bond_observer = { asp_bond_observe_context_effect = { TARGET = scope:asp_bond_contact } } }
+        every_relation = { type = soulmate save_scope_as = asp_bond_contact scope:asp_bond_observer = { asp_bond_observe_context_effect = { TARGET = scope:asp_bond_contact } } }
+        random_owned_story = { type = asp_personal_bond_context_story
+            limit = {
+                exists = var:asp_bond_context_target
+                var:asp_bond_context_target = { save_temporary_scope_as = asp_bond_eligible_target }
+                OR = { NOT = { has_variable = asp_bond_consumed_serial } NOT = { var:asp_bond_consumed_serial = var:asp_bond_context_serial } }
+                story_owner = {
+                    OR = { asp_bond_friendship_pursuit_trigger = { TARGET = scope:asp_bond_eligible_target } asp_bond_romance_pursuit_trigger = { TARGET = scope:asp_bond_eligible_target } }
+                    NOT = { any_owned_story = { asp_is_active_story_trigger = yes var:asp_family = flag:personal_bond var:asp_target = scope:asp_bond_eligible_target } }
+                }
+            }
+            var:asp_bond_context_target = { save_scope_as = asp_bond_routine_target }
+            story_owner = {
+                random_list = {
+                    10 = { trigger = { asp_bond_friendship_pursuit_trigger = { TARGET = scope:asp_bond_routine_target } } asp_start_personal_bond_effect = { TARGET = scope:asp_bond_routine_target MODE = friendship } }
+                    10 = { trigger = { asp_bond_romance_pursuit_trigger = { TARGET = scope:asp_bond_routine_target } } modifier = { has_trait = lustful factor = asp_bond_lustful_multiplier } asp_start_personal_bond_effect = { TARGET = scope:asp_bond_routine_target MODE = romance } }
+                }
+            }
+        }
+    }
+}
+asp_personal_bond_check_progress_effect = {
+    if = { limit = { asp_is_active_story_trigger = yes }
+        if = { limit = { var:asp_target = { is_alive = no } } asp_resolve_story_effect = { OUTCOME = impossible REWARDS = normal } }
+        else_if = { limit = { asp_bond_fulfilled_trigger = yes } asp_resolve_story_effect = { OUTCOME = fulfilled REWARDS = normal } }
+    }
+}
+asp_bond_maintain_effect = {
+    if = { limit = { asp_can_manage_story_trigger = yes }
+        if = { limit = { story_owner = { OR = { has_relation_rival = prev.var:asp_target has_relation_nemesis = prev.var:asp_target } } }
+            if = { limit = { NOT = { has_variable = asp_bond_rival_notified } }
+                set_variable = { name = asp_bond_rival_notified value = yes }
+                save_scope_as = asp_bond_event_story
+                story_owner = { if = { limit = { NOT = { exists = scope:asp_bond_silent } } trigger_event = asp_personal_bond.3 } }
+            }
+        }
+        else = { remove_variable = asp_bond_rival_notified }
+        if = { limit = { asp_bond_permanently_incompatible_trigger = yes NOT = { has_variable = asp_bond_incompatible_notified } }
+            set_variable = { name = asp_bond_incompatible_notified value = yes }
+            save_scope_as = asp_bond_event_story
+            story_owner = { if = { limit = { NOT = { exists = scope:asp_bond_silent } } trigger_event = asp_personal_bond.3 } }
+        }
+        else_if = { limit = { NOT = { asp_bond_permanently_incompatible_trigger = yes } } remove_variable = asp_bond_incompatible_notified }
+    }
+    asp_refresh_story_effect = yes
+}
+asp_bond_reinterpret_effect = {
+    save_scope_as = asp_bond_reinterpret_story
+    if = { limit = { asp_can_manage_story_trigger = yes }
+        story_owner = {
+            if = { limit = { asp_bond_event_can_reinterpret_trigger = { STORY = scope:asp_bond_reinterpret_story MODE = $MODE$ } }
+                scope:asp_bond_reinterpret_story = {
+                    set_variable = { name = asp_interpretation value = flag:$MODE$ }
+                    remove_variable = asp_bond_incompatible_notified
+                    asp_retain_story_effect = yes
+                }
+            }
+        }
+    }
+}
+asp_bond_release_incompatible_effect = {
+    if = { limit = { asp_can_manage_story_trigger = yes asp_bond_permanently_incompatible_trigger = yes } asp_resolve_story_effect = { OUTCOME = impossible REWARDS = normal } }
+}
+asp_personal_bond_resolve_effect = {
+    if = { limit = { var:asp_outcome = flag:$OUTCOME$ var:asp_reward_policy = flag:$REWARDS$ }
+        save_scope_as = asp_bond_ending_story
+        var:asp_target = { save_scope_as = asp_bond_memory_target }
+        save_scope_value_as = { name = asp_bond_terminal_mode value = 1 }
+        if = { limit = { var:asp_interpretation = flag:romance } save_scope_value_as = { name = asp_bond_terminal_mode value = 2 } }
+        save_scope_value_as = { name = asp_bond_terminal_outcome value = 3 }
+        if = { limit = { var:asp_outcome = flag:fulfilled } save_scope_value_as = { name = asp_bond_terminal_outcome value = 1 } }
+        else_if = { limit = { var:asp_outcome = flag:impossible } save_scope_value_as = { name = asp_bond_terminal_outcome value = 2 } }
+        story_owner = {
+            if = { limit = { is_alive = yes }
+                if = { limit = { scope:asp_bond_ending_story = { var:asp_outcome = flag:fulfilled } }
+                    if = { limit = { scope:asp_bond_terminal_mode = 1 }
+                        create_character_memory = { type = asp_bond_friendship_memory participants = { target = scope:asp_bond_memory_target } }
+                        if = { limit = { scope:asp_bond_ending_story = { var:asp_reward_policy = flag:normal } } add_diplomacy_lifestyle_xp = asp_bond_friendship_xp }
+                    }
+                    else = { create_character_memory = { type = asp_bond_romance_memory participants = { target = scope:asp_bond_memory_target } } }
+                }
+                else_if = { limit = { scope:asp_bond_ending_story = { var:asp_outcome = flag:impossible } } create_character_memory = { type = asp_bond_loss_memory participants = { target = scope:asp_bond_memory_target } } }
+                else = { create_character_memory = { type = asp_bond_release_memory participants = { target = scope:asp_bond_memory_target } } }
+                if = { limit = { is_ai = no scope:asp_bond_ending_story = { var:asp_reward_policy = flag:normal } NOT = { exists = scope:asp_bond_silent } } trigger_event = asp_personal_bond.2 }
+            }
+        }
+    }
+}
+# Native relation hooks run for either side; reward policy remains in core.
+asp_bond_refresh_owner_effect = {
+    every_owned_story = { limit = { asp_is_active_story_trigger = yes var:asp_family = flag:personal_bond } asp_bond_maintain_effect = yes }
+}
+asp_bond_note_court_transition_effect = {
+    if = { limit = { is_ai = no }
+        every_owned_story = { type = asp_personal_bond_context_story
+            if = { limit = { var:asp_bond_context_target = $TARGET$ }
+                set_variable = { name = asp_bond_context_signature value = -1 }
+                change_variable = { name = asp_bond_context_serial add = 1 }
+            }
+        }
+    }
+}

@@ -2,10 +2,12 @@
 asp_family_check_progress_effect = {
     if = { limit = { var:asp_family = flag:vengeance } asp_vengeance_check_progress_effect = yes }
     else_if = { limit = { var:asp_family = flag:holding_recovery } asp_holding_recovery_check_progress_effect = yes }
+    else_if = { limit = { var:asp_family = flag:personal_bond } asp_personal_bond_check_progress_effect = yes }
     else_if = { limit = { NOT = { asp_has_known_family_trigger = yes } } debug_log = "ASP_DIAGNOSTIC unknown family progress rejected" }
 }
 asp_family_resolve_effect = {
     if = { limit = { var:asp_family = flag:vengeance var:asp_outcome = flag:$OUTCOME$ var:asp_reward_policy = flag:$REWARDS$ } asp_vengeance_resolve_effect = { OUTCOME = $OUTCOME$ REWARDS = $REWARDS$ } }
     else_if = { limit = { var:asp_family = flag:holding_recovery var:asp_outcome = flag:$OUTCOME$ var:asp_reward_policy = flag:$REWARDS$ } asp_holding_recovery_resolve_effect = { OUTCOME = $OUTCOME$ REWARDS = $REWARDS$ } }
+    else_if = { limit = { var:asp_family = flag:personal_bond var:asp_outcome = flag:$OUTCOME$ var:asp_reward_policy = flag:$REWARDS$ } asp_personal_bond_resolve_effect = { OUTCOME = $OUTCOME$ REWARDS = $REWARDS$ } }
     else_if = { limit = { NOT = { asp_has_known_family_trigger = yes } } debug_log = "ASP_DIAGNOSTIC unknown family resolution rejected" }
 }

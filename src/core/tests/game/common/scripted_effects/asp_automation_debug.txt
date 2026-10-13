@@ -124,6 +124,57 @@ asp_test_automation_complete_effect = {
             set_variable = { name = asp_test_automation_result_reload_identity value = var:asp_test_reload_identity }
             debug_log = asp_test_automation_reload_done
         }
+        else_if = { limit = { var:asp_test_automation_operation = flag:bond_regression }
+            set_variable = { name = asp_test_automation_result_b01 value = var:asp_test_bond_b01 }
+            set_variable = { name = asp_test_automation_result_b02 value = var:asp_test_bond_b02 }
+            set_variable = { name = asp_test_automation_result_b03 value = var:asp_test_bond_b03 }
+            set_variable = { name = asp_test_automation_result_b04 value = var:asp_test_bond_b04 }
+            set_variable = { name = asp_test_automation_result_b05 value = var:asp_test_bond_b05 }
+            set_variable = { name = asp_test_automation_result_native_locked value = var:asp_test_bond_native_locked }
+            set_variable = { name = asp_test_automation_result_native_unlocked value = var:asp_test_bond_native_unlocked }
+            set_variable = { name = asp_test_automation_result_native_romance value = var:asp_test_bond_native_romance }
+            set_variable = { name = asp_test_automation_result_friend_stress value = var:asp_test_bond_friend_stress }
+            set_variable = { name = asp_test_automation_result_friend_xp value = var:asp_test_bond_friend_xp }
+            set_variable = { name = asp_test_automation_result_romance_stress value = var:asp_test_bond_romance_stress }
+            set_variable = { name = asp_test_automation_result_romance_xp value = var:asp_test_bond_romance_xp }
+            set_variable = { name = asp_test_automation_result_replay_xp value = var:asp_test_bond_replay_xp }
+            set_variable = { name = asp_test_automation_result_memories value = var:asp_test_bond_memories }
+            set_variable = { name = asp_test_automation_result_death_stress value = var:asp_test_bond_death_stress }
+            set_variable = { name = asp_test_automation_result_temporary_retained value = var:asp_test_bond_temporary_retained }
+            set_variable = { name = asp_test_automation_result_incompatible_stress value = var:asp_test_bond_incompatible_stress }
+            set_variable = { name = asp_test_automation_result_rival_fixed value = var:asp_test_bond_rival_fixed }
+            set_variable = { name = asp_test_automation_result_chance0 value = var:asp_test_bond_chance0 }
+            set_variable = { name = asp_test_automation_result_chance1 value = var:asp_test_bond_chance1 }
+            set_variable = { name = asp_test_automation_result_chance2 value = var:asp_test_bond_chance2 }
+            set_variable = { name = asp_test_automation_result_chance3 value = var:asp_test_bond_chance3 }
+            set_variable = { name = asp_test_automation_result_chance4 value = var:asp_test_bond_chance4 }
+            set_variable = { name = asp_test_automation_result_chance5 value = var:asp_test_bond_chance5 }
+            set_variable = { name = asp_test_automation_result_cooldown value = var:asp_test_bond_cooldown }
+            set_variable = { name = asp_test_automation_result_consumed value = var:asp_test_bond_consumed }
+            set_variable = { name = asp_test_automation_result_fresh value = var:asp_test_bond_fresh }
+            set_variable = { name = asp_test_automation_result_content value = var:asp_test_bond_content }
+            set_variable = { name = asp_test_automation_result_lustful_weight value = var:asp_test_bond_lustful_weight }
+            set_variable = { name = asp_test_automation_result_b06 value = var:asp_test_bond_b06 }
+            set_variable = { name = asp_test_automation_result_b07 value = var:asp_test_bond_b07 }
+            set_variable = { name = asp_test_automation_result_bestfriend_stress value = var:asp_test_bond_bestfriend_stress }
+            set_variable = { name = asp_test_automation_result_bestfriend_xp value = var:asp_test_bond_bestfriend_xp }
+            set_variable = { name = asp_test_automation_result_soulmate_stress value = var:asp_test_bond_soulmate_stress }
+            set_variable = { name = asp_test_automation_result_soulmate_xp value = var:asp_test_bond_soulmate_xp }
+            set_variable = { name = asp_test_automation_result_blocked_cooldown value = var:asp_test_bond_blocked_cooldown }
+            set_variable = { name = asp_test_automation_result_blocked_cap value = var:asp_test_bond_blocked_cap }
+            set_variable = { name = asp_test_automation_result_absence_stress value = var:asp_test_bond_absence_stress }
+            set_variable = { name = asp_test_automation_result_absence_xp value = var:asp_test_bond_absence_xp }
+            set_variable = { name = asp_test_automation_result_early_stress value = var:asp_test_bond_early_stress }
+            set_variable = { name = asp_test_automation_result_early_control value = var:asp_test_bond_early_control }
+            set_variable = { name = asp_test_automation_result_review_release value = var:asp_test_bond_review_release }
+            set_variable = { name = asp_test_automation_result_retained_days value = var:asp_test_bond_retained_days }
+            set_variable = { name = asp_test_automation_result_origin_preserved value = var:asp_test_bond_origin_preserved }
+            set_variable = { name = asp_test_automation_result_no_pledge value = var:asp_test_bond_no_pledge }
+            set_variable = { name = asp_test_automation_result_already_mode value = var:asp_test_bond_already_mode }
+            set_variable = { name = asp_test_automation_result_routine_created value = var:asp_test_bond_routine_created }
+            set_variable = { name = asp_test_automation_result_context_stable value = var:asp_test_bond_context_stable }
+            debug_log = asp_test_automation_bond_done
+        }
         else = { debug_log = asp_test_automation_done }
     }
 }
@@ -167,6 +218,7 @@ asp_test_automation_request_effect = {
                 else_if = { limit = { var:asp_test_automation_operation = flag:lifecycle_regression } debug_log = asp_test_automation_lifecycle_done }
                 else_if = { limit = { var:asp_test_automation_operation = flag:lifecycle_calendar_assert } debug_log = asp_test_automation_calendar_done }
                 else_if = { limit = { var:asp_test_automation_operation = flag:lifecycle_reload_assert } debug_log = asp_test_automation_reload_done }
+                else_if = { limit = { var:asp_test_automation_operation = flag:bond_regression } debug_log = asp_test_automation_bond_done }
                 else = { debug_log = asp_test_automation_done }
             }
         }
@@ -187,6 +239,7 @@ asp_test_automation_request_effect = {
                 if = { limit = { var:asp_test_automation_operation = flag:core_regression } asp_test_core_regression_effect = yes }
                 if = { limit = { var:asp_test_automation_operation = flag:vengeance_regression } asp_test_vengeance_regression_effect = yes }
                 if = { limit = { var:asp_test_automation_operation = flag:recovery_regression } asp_test_holding_recovery_regression_effect = yes }
+                if = { limit = { var:asp_test_automation_operation = flag:bond_regression } asp_test_bond_regression_effect = yes }
                 if = { limit = { var:asp_test_automation_operation = flag:lifecycle_regression } asp_test_lifecycle_regression_effect = yes }
                 if = { limit = { var:asp_test_automation_operation = flag:lifecycle_calendar } asp_test_lifecycle_calendar_setup_effect = yes }
                 if = { limit = { var:asp_test_automation_operation = flag:lifecycle_calendar_assert } asp_test_lifecycle_calendar_assert_effect = yes }

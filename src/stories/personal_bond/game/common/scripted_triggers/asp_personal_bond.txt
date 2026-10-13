@@ -1,0 +1,71 @@
+﻿# Owner character, fixed target. Court connection or native positive relation; never opinion alone.
+asp_bond_connection_trigger = {
+    exists = $TARGET$
+    OR = {
+        $TARGET$ = { OR = { is_courtier_of = prev is_foreign_court_or_pool_guest_of = prev } }
+        has_relation_potential_friend = $TARGET$
+        has_relation_friend = $TARGET$
+        has_relation_best_friend = $TARGET$
+        has_relation_lover = $TARGET$
+        has_relation_soulmate = $TARGET$
+    }
+}
+asp_bond_participants_trigger = {
+    is_alive = yes is_ai = no is_adult = yes is_ruler = yes is_landed = yes
+    exists = $TARGET$ this != $TARGET$
+    $TARGET$ = { is_alive = yes is_adult = yes in_diplomatic_range = prev }
+    asp_bond_connection_trigger = { TARGET = $TARGET$ }
+}
+asp_bond_friendship_pursuit_trigger = {
+    asp_bond_participants_trigger = { TARGET = $TARGET$ }
+    NOR = { has_relation_friend = $TARGET$ has_relation_best_friend = $TARGET$ }
+    can_use_befriend_scheme_trigger = { TARGET = $TARGET$ }
+    can_start_scheme = { type = befriend target_character = $TARGET$ }
+}
+asp_bond_romance_pursuit_trigger = {
+    asp_bond_participants_trigger = { TARGET = $TARGET$ }
+    NOR = { has_relation_lover = $TARGET$ has_relation_soulmate = $TARGET$ }
+    # Aspirations require actual mutual attraction even though vanilla permits cynical player seduction.
+    is_attracted_to_gender_of = $TARGET$
+    $TARGET$ = { is_attracted_to_gender_of = prev }
+    can_start_scheme = { type = seduce target_character = $TARGET$ }
+}
+# Used by fixed-mode entry points; no inference from an unrecognized interpretation.
+asp_bond_candidate_trigger = {
+    asp_bond_participants_trigger = { TARGET = $TARGET$ }
+    asp_active_desires < asp_desire_cap
+    OR = { NOT = { has_variable = asp_bond_next_routine_date } asp_bond_cooldown_remaining_days <= 0 }
+    NOT = { any_owned_story = { asp_is_active_story_trigger = yes var:asp_family = flag:personal_bond var:asp_target = $TARGET$ } }
+    asp_bond_$MODE$_pursuit_trigger = { TARGET = $TARGET$ }
+}
+# Story scope: scheme capacity, imprisonment and range loss are temporary, not incompatibility.
+asp_bond_permanently_incompatible_trigger = {
+    var:asp_interpretation = flag:romance
+    exists = var:asp_target
+    OR = {
+        story_owner = { NOT = { is_attracted_to_gender_of = prev.var:asp_target } }
+        var:asp_target = { NOT = { is_attracted_to_gender_of = prev.story_owner } }
+        var:asp_target = { has_trait = celibate }
+        story_owner = { has_trait = celibate }
+        var:asp_target = { has_opinion_modifier = { modifier = seduce_permanent_blocker_opinion target = prev.story_owner } }
+    }
+}
+asp_bond_fulfilled_trigger = {
+    exists = var:asp_target
+    OR = {
+        AND = { var:asp_interpretation = flag:friendship story_owner = { OR = { has_relation_friend = prev.var:asp_target has_relation_best_friend = prev.var:asp_target } } }
+        AND = { var:asp_interpretation = flag:romance story_owner = { OR = { has_relation_lover = prev.var:asp_target has_relation_soulmate = prev.var:asp_target } } }
+    }
+}
+asp_bond_has_terminal_progress_trigger = { OR = { var:asp_target = { is_alive = no } asp_bond_fulfilled_trigger = yes } }
+asp_bond_event_can_manage_trigger = {
+    trigger_if = { limit = { exists = $STORY$ }
+        $STORY$ = { asp_can_manage_story_trigger = yes story_owner = root var:asp_family = flag:personal_bond }
+    }
+    trigger_else = { always = no }
+}
+asp_bond_event_can_reinterpret_trigger = {
+    asp_bond_event_can_manage_trigger = { STORY = $STORY$ }
+    $STORY$ = { NOT = { var:asp_interpretation = flag:$MODE$ } }
+    asp_bond_$MODE$_pursuit_trigger = { TARGET = $STORY$.var:asp_target }
+}

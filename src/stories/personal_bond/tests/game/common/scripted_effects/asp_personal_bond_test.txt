@@ -1,0 +1,379 @@
+﻿# Shared .1 / registered bond-regression. All characters, perks and relationships below are fixture setup.
+asp_test_bond_clear_effect = {
+    every_owned_story = { limit = { has_variable = asp_schema } asp_resolve_story_effect = { OUTCOME = impossible REWARDS = none } }
+    every_owned_story = { type = asp_personal_bond_context_story end_story = yes }
+    remove_variable = asp_bond_next_routine_date
+    clear_saved_scope = asp_bond_new_story
+    save_scope_as = asp_test_bond_owner
+    save_scope_value_as = { name = asp_bond_force value = yes }
+    save_scope_value_as = { name = asp_bond_silent value = yes }
+    add_stress = { value = 70 subtract = stress }
+}
+asp_test_bond_setup_effect = {
+    asp_test_bond_clear_effect = yes
+    create_character = { name = "Bond Acquaintance" age = 30 gender = male random_traits = no culture = root.culture faith = root.faith employer = root save_scope_as = asp_test_bond_man }
+    create_character = { name = "Bond Acquaintance" age = 30 gender = female random_traits = no culture = root.culture faith = root.faith employer = root save_scope_as = asp_test_bond_woman }
+    set_sexuality = heterosexual
+    scope:asp_test_bond_man = { set_sexuality = heterosexual }
+    scope:asp_test_bond_woman = { set_sexuality = heterosexual }
+    if = { limit = { has_perk = befriend_perk } remove_perk = befriend_perk }
+}
+asp_test_bond_find_effect = {
+    clear_saved_scope = asp_test_bond_story
+    every_owned_story = { limit = { asp_is_active_story_trigger = yes var:asp_family = flag:personal_bond } save_scope_as = asp_test_bond_story }
+}
+asp_test_bond_start_friend_effect = {
+    asp_start_personal_bond_effect = { TARGET = scope:asp_test_bond_man MODE = friendship }
+    asp_test_bond_find_effect = yes
+}
+asp_test_bond_start_romance_effect = {
+    asp_start_personal_bond_effect = { TARGET = scope:asp_test_bond_woman MODE = romance }
+    asp_test_bond_find_effect = yes
+}
+asp_test_bond_regression_effect = {
+    debug_log = "ASP_TEST B01 BEGIN"
+    asp_test_bond_setup_effect = yes
+    set_variable = { name = asp_test_bond_b01 value = 0 }
+    set_variable = { name = asp_test_bond_b02 value = 0 }
+    set_variable = { name = asp_test_bond_b03 value = 0 }
+    set_variable = { name = asp_test_bond_b04 value = 0 }
+    set_variable = { name = asp_test_bond_b05 value = 0 }
+    set_variable = { name = asp_test_bond_native_locked value = 0 }
+    set_variable = { name = asp_test_bond_native_unlocked value = 0 }
+    set_variable = { name = asp_test_bond_native_romance value = 0 }
+    set_variable = { name = asp_test_bond_friend_stress value = 0 }
+    set_variable = { name = asp_test_bond_friend_xp value = 0 }
+    set_variable = { name = asp_test_bond_romance_stress value = 0 }
+    set_variable = { name = asp_test_bond_romance_xp value = 0 }
+    set_variable = { name = asp_test_bond_replay_xp value = 0 }
+    set_variable = { name = asp_test_bond_memories value = 0 }
+    set_variable = { name = asp_test_bond_death_stress value = 0 }
+    set_variable = { name = asp_test_bond_temporary_retained value = 0 }
+    set_variable = { name = asp_test_bond_incompatible_stress value = 0 }
+    set_variable = { name = asp_test_bond_rival_fixed value = 0 }
+    set_variable = { name = asp_test_bond_chance0 value = 0 }
+    set_variable = { name = asp_test_bond_chance1 value = 0 }
+    set_variable = { name = asp_test_bond_chance2 value = 0 }
+    set_variable = { name = asp_test_bond_chance3 value = 0 }
+    set_variable = { name = asp_test_bond_chance4 value = 0 }
+    set_variable = { name = asp_test_bond_chance5 value = 0 }
+    set_variable = { name = asp_test_bond_cooldown value = 0 }
+    set_variable = { name = asp_test_bond_consumed value = 0 }
+    set_variable = { name = asp_test_bond_fresh value = 0 }
+    set_variable = { name = asp_test_bond_content value = 0 }
+    set_variable = { name = asp_test_bond_lustful_weight value = 0 }
+
+    debug_log = "ASP_TEST BOND BEFORE_NATIVE_VALIDITY"
+    if = { limit = { NOT = { can_use_befriend_scheme_trigger = { TARGET = scope:asp_test_bond_man } } } set_variable = { name = asp_test_bond_native_locked value = 1 } }
+    debug_log = "ASP_TEST BOND AFTER_NATIVE_VALIDITY"
+    asp_test_bond_start_friend_effect = yes
+    if = { limit = { asp_active_desires = 0 } set_variable = { name = asp_test_bond_b01 value = 1 } }
+    debug_log = "ASP_TEST BOND BEFORE_UNLOCK"
+    add_perk = befriend_perk
+    debug_log = "ASP_TEST BOND AFTER_UNLOCK"
+    if = { limit = { can_use_befriend_scheme_trigger = { TARGET = scope:asp_test_bond_man } can_start_scheme = { type = befriend target_character = scope:asp_test_bond_man } } set_variable = { name = asp_test_bond_native_unlocked value = 1 } }
+    if = { limit = { can_seduce_scheme_trigger = { OWNER = scope:asp_test_bond_owner TARGET = scope:asp_test_bond_woman } can_start_scheme = { type = seduce target_character = scope:asp_test_bond_woman } } set_variable = { name = asp_test_bond_native_romance value = 1 } }
+    debug_log = "ASP_TEST BOND AFTER_PURSUIT_PROBES"
+    asp_test_bond_start_friend_effect = yes
+    if = { limit = { NOT = { asp_active_desires = 1 } } set_variable = { name = asp_test_bond_b01 value = 0 } }
+    asp_test_bond_clear_effect = yes
+    # A distant ruler has no supported acquaintance context even if the interaction is valid.
+    asp_start_personal_bond_effect = { TARGET = title:d_timbuktu.holder MODE = friendship }
+    asp_start_personal_bond_effect = { TARGET = scope:asp_test_bond_man MODE = romance }
+    if = { limit = { asp_active_desires > 0 } set_variable = { name = asp_test_bond_b01 value = 0 } }
+    set_relation_friend = scope:asp_test_bond_man
+    asp_test_bond_start_friend_effect = yes
+    if = { limit = { asp_active_desires > 0 } set_variable = { name = asp_test_bond_b01 value = 0 } }
+    remove_relation_friend = scope:asp_test_bond_man
+    if = { limit = { var:asp_test_bond_b01 = 1 var:asp_test_bond_native_locked = 1 var:asp_test_bond_native_unlocked = 1 var:asp_test_bond_native_romance = 1 } debug_log = "ASP_TEST B01 PASS" }
+    else = { set_variable = { name = asp_test_bond_b01 value = 0 } debug_log = "ASP_TEST B01 FAIL" }
+    debug_log = "ASP_TEST B02 BEGIN"
+    asp_test_bond_clear_effect = yes
+    asp_test_bond_start_friend_effect = yes
+    set_variable = { name = asp_test_bond_before value = stress }
+    set_variable = { name = asp_test_bond_xp_before value = diplomacy_lifestyle_xp }
+    set_relation_friend = scope:asp_test_bond_man
+    scope:asp_test_bond_story ?= { asp_refresh_story_effect = yes }
+    set_variable = { name = asp_test_bond_friend_stress value = { value = stress subtract = var:asp_test_bond_before } }
+    set_variable = { name = asp_test_bond_friend_xp value = { value = diplomacy_lifestyle_xp subtract = var:asp_test_bond_xp_before } }
+    set_variable = { name = asp_test_bond_xp_before value = diplomacy_lifestyle_xp }
+    every_owned_story = { limit = { asp_is_active_story_trigger = yes } asp_refresh_story_effect = yes }
+    set_variable = { name = asp_test_bond_replay_xp value = { value = diplomacy_lifestyle_xp subtract = var:asp_test_bond_xp_before } }
+    asp_test_bond_clear_effect = yes
+    asp_test_bond_start_romance_effect = yes
+    set_variable = { name = asp_test_bond_before value = stress }
+    set_variable = { name = asp_test_bond_xp_before value = diplomacy_lifestyle_xp }
+    set_relation_lover = scope:asp_test_bond_woman
+    scope:asp_test_bond_story ?= { asp_refresh_story_effect = yes }
+    set_variable = { name = asp_test_bond_romance_stress value = { value = stress subtract = var:asp_test_bond_before } }
+    set_variable = { name = asp_test_bond_romance_xp value = { value = diplomacy_lifestyle_xp subtract = var:asp_test_bond_xp_before } }
+    every_memory = { limit = { OR = { has_memory_type = asp_bond_friendship_memory has_memory_type = asp_bond_romance_memory } } root = { change_variable = { name = asp_test_bond_memories add = 1 } } }
+    if = { limit = { var:asp_test_bond_friend_stress = -10 var:asp_test_bond_friend_xp = 50 var:asp_test_bond_romance_stress = -10 var:asp_test_bond_romance_xp = 0 var:asp_test_bond_replay_xp = 0 var:asp_test_bond_memories = 2 asp_active_desires = 0 } set_variable = { name = asp_test_bond_b02 value = 1 } debug_log = "ASP_TEST B02 PASS" }
+    else = { debug_log = "ASP_TEST B02 FAIL" }
+    debug_log = "ASP_TEST B03 BEGIN"
+    asp_test_bond_clear_effect = yes
+    remove_relation_lover = scope:asp_test_bond_woman
+    asp_test_bond_start_romance_effect = yes
+    set_variable = { name = asp_test_bond_before value = stress }
+    scope:asp_test_bond_woman = { death = { death_reason = death_natural_causes } }
+    every_owned_story = { limit = { asp_is_active_story_trigger = yes } asp_refresh_story_effect = yes }
+    set_variable = { name = asp_test_bond_death_stress value = { value = stress subtract = var:asp_test_bond_before } }
+    set_variable = { name = asp_test_bond_b03 value = 1 }
+    if = { limit = { asp_active_desires > 0 } set_variable = { name = asp_test_bond_b03 value = 0 } }
+    remove_relation_friend = scope:asp_test_bond_man
+    asp_test_bond_clear_effect = yes
+    asp_test_bond_start_friend_effect = yes
+    title:e_byzantium.holder = { add_courtier = scope:asp_test_bond_man }
+    scope:asp_test_bond_story ?= { asp_refresh_story_effect = yes }
+    if = { limit = { asp_active_desires = 1 scope:asp_test_bond_story ?= { var:asp_target = scope:asp_test_bond_man } } set_variable = { name = asp_test_bond_temporary_retained value = 1 } }
+    add_courtier = scope:asp_test_bond_man
+    set_relation_rival = scope:asp_test_bond_man
+    scope:asp_test_bond_story ?= { asp_bond_maintain_effect = yes }
+    asp_test_bond_snapshot_rival_effect = yes
+    asp_test_bond_assert_rival_retained_effect = yes
+    remove_relation_rival = scope:asp_test_bond_man
+    asp_test_bond_clear_effect = yes
+    create_character = { name = "Bond Acquaintance" age = 30 gender = female random_traits = no culture = root.culture faith = root.faith employer = root save_scope_as = asp_test_bond_woman }
+    scope:asp_test_bond_woman = { set_sexuality = heterosexual }
+    asp_test_bond_start_romance_effect = yes
+    scope:asp_test_bond_woman = { set_sexuality = homosexual }
+    set_variable = { name = asp_test_bond_before value = stress }
+    scope:asp_test_bond_story ?= { asp_bond_release_incompatible_effect = yes }
+    set_variable = { name = asp_test_bond_incompatible_stress value = { value = stress subtract = var:asp_test_bond_before } }
+    if = { limit = { var:asp_test_bond_death_stress = 0 var:asp_test_bond_temporary_retained = 1 var:asp_test_bond_rival_fixed = 1 var:asp_test_bond_incompatible_stress = 0 asp_active_desires = 0 var:asp_test_bond_b03 = 1 } debug_log = "ASP_TEST B03 PASS" }
+    else = { set_variable = { name = asp_test_bond_b03 value = 0 } debug_log = "ASP_TEST B03 FAIL" }
+    debug_log = "ASP_TEST B04 BEGIN"
+    asp_test_bond_clear_effect = yes
+    set_variable = { name = asp_test_bond_chance0 value = asp_bond_selection_chance }
+    asp_test_create_story_effect = { CLASS = desire }
+    set_variable = { name = asp_test_bond_chance1 value = asp_bond_selection_chance }
+    asp_test_create_story_effect = { CLASS = desire }
+    set_variable = { name = asp_test_bond_chance2 value = asp_bond_selection_chance }
+    asp_test_create_story_effect = { CLASS = desire }
+    set_variable = { name = asp_test_bond_chance3 value = asp_bond_selection_chance }
+    asp_test_create_story_effect = { CLASS = desire }
+    set_variable = { name = asp_test_bond_chance4 value = asp_bond_selection_chance }
+    asp_test_create_story_effect = { CLASS = desire }
+    set_variable = { name = asp_test_bond_chance5 value = asp_bond_selection_chance }
+
+    asp_test_bond_clear_effect = yes
+    asp_test_bond_start_friend_effect = yes
+    set_variable = { name = asp_test_bond_cooldown value = 0 }
+    if = { limit = { has_variable = asp_bond_next_routine_date } set_variable = { name = asp_test_bond_cooldown value = { value = var:asp_bond_next_routine_date subtract = current_date } } }
+    scope:asp_test_bond_story ?= { asp_resolve_story_effect = { OUTCOME = abandoned REWARDS = normal } }
+    # Advance only the test-owned cooldown stamp; this is not real calendar proof.
+    set_variable = { name = asp_bond_next_routine_date value = current_date }
+    asp_test_bond_start_friend_effect = yes
+    if = { limit = { asp_active_desires = 0 } set_variable = { name = asp_test_bond_consumed value = 1 } }
+    set_relation_potential_friend = scope:asp_test_bond_man
+    asp_test_bond_start_friend_effect = yes
+    if = { limit = { asp_active_desires = 1 } set_variable = { name = asp_test_bond_fresh value = 1 } }
+    if = { limit = { var:asp_test_bond_chance0 = 20 var:asp_test_bond_chance1 = 12 var:asp_test_bond_chance2 = 6 var:asp_test_bond_chance3 = 2 var:asp_test_bond_chance4 = 2 var:asp_test_bond_chance5 = 0 var:asp_test_bond_cooldown = 360 var:asp_test_bond_consumed = 1 var:asp_test_bond_fresh = 1 } set_variable = { name = asp_test_bond_b04 value = 1 } debug_log = "ASP_TEST B04 PASS" }
+    else = { debug_log = "ASP_TEST B04 FAIL" }
+    debug_log = "ASP_TEST B05 BEGIN"
+    asp_test_bond_clear_effect = yes
+    add_trait = content
+    asp_test_bond_start_friend_effect = yes
+    if = { limit = { asp_active_desires = 1 } set_variable = { name = asp_test_bond_content value = 1 } }
+    add_trait = lustful
+    set_variable = { name = asp_test_bond_lustful_weight value = asp_bond_romantic_weight }
+    if = { limit = { var:asp_test_bond_content = 1 var:asp_test_bond_lustful_weight = 15 NOT = { asp_bond_romance_pursuit_trigger = { TARGET = scope:asp_test_bond_man } } } set_variable = { name = asp_test_bond_b05 value = 1 } debug_log = "ASP_TEST B05 PASS" }
+    else = { debug_log = "ASP_TEST B05 FAIL" }
+    asp_test_bond_extended_effect = yes
+    asp_test_bond_clear_effect = yes
+    debug_log = "ASP_TEST BOND SUITE END"
+}
+
+# Supplemental registered coverage keeps mandatory real UI separate from scripted state controls.
+asp_test_bond_extended_effect = {
+    set_variable = { name = asp_test_bond_b06 value = 0 }
+    set_variable = { name = asp_test_bond_b07 value = 0 }
+    set_variable = { name = asp_test_bond_bestfriend_stress value = 0 }
+    set_variable = { name = asp_test_bond_bestfriend_xp value = 0 }
+    set_variable = { name = asp_test_bond_soulmate_stress value = 0 }
+    set_variable = { name = asp_test_bond_soulmate_xp value = 0 }
+    set_variable = { name = asp_test_bond_blocked_cooldown value = 0 }
+    set_variable = { name = asp_test_bond_blocked_cap value = 0 }
+    set_variable = { name = asp_test_bond_absence_stress value = 0 }
+    set_variable = { name = asp_test_bond_absence_xp value = 0 }
+    set_variable = { name = asp_test_bond_early_stress value = 0 }
+    set_variable = { name = asp_test_bond_early_control value = 0 }
+    set_variable = { name = asp_test_bond_review_release value = 0 }
+    set_variable = { name = asp_test_bond_retained_days value = 0 }
+    set_variable = { name = asp_test_bond_origin_preserved value = 0 }
+    set_variable = { name = asp_test_bond_no_pledge value = 0 }
+    set_variable = { name = asp_test_bond_already_mode value = 0 }
+    set_variable = { name = asp_test_bond_routine_created value = 0 }
+    set_variable = { name = asp_test_bond_context_stable value = 0 }
+
+    asp_test_bond_setup_effect = yes
+    add_perk = befriend_perk
+    asp_test_bond_start_friend_effect = yes
+    set_variable = { name = asp_test_bond_before value = stress }
+    set_variable = { name = asp_test_bond_xp_before value = diplomacy_lifestyle_xp }
+    set_relation_best_friend = scope:asp_test_bond_man
+    scope:asp_test_bond_story ?= { asp_refresh_story_effect = yes }
+    set_variable = { name = asp_test_bond_bestfriend_stress value = { value = stress subtract = var:asp_test_bond_before } }
+    set_variable = { name = asp_test_bond_bestfriend_xp value = { value = diplomacy_lifestyle_xp subtract = var:asp_test_bond_xp_before } }
+    asp_test_bond_clear_effect = yes
+    asp_test_bond_start_romance_effect = yes
+    set_variable = { name = asp_test_bond_before value = stress }
+    set_variable = { name = asp_test_bond_xp_before value = diplomacy_lifestyle_xp }
+    set_relation_soulmate = scope:asp_test_bond_woman
+    scope:asp_test_bond_story ?= { asp_refresh_story_effect = yes }
+    set_variable = { name = asp_test_bond_soulmate_stress value = { value = stress subtract = var:asp_test_bond_before } }
+    set_variable = { name = asp_test_bond_soulmate_xp value = { value = diplomacy_lifestyle_xp subtract = var:asp_test_bond_xp_before } }
+    asp_test_bond_setup_effect = yes
+    add_perk = befriend_perk
+    asp_test_bond_start_friend_effect = yes
+    asp_test_bond_start_romance_effect = yes
+    if = { limit = { asp_active_desires = 1 } set_variable = { name = asp_test_bond_blocked_cooldown value = 1 } }
+    scope:asp_test_bond_story ?= { set_variable = { name = asp_origin_date value = { value = current_date subtract = 361 } } if = { limit = { NOT = { asp_can_declare_story_trigger = yes } } story_owner = { set_variable = { name = asp_test_bond_no_pledge value = 1 } } } }
+    asp_test_bond_clear_effect = yes
+    while = { count = 5 asp_test_create_story_effect = { CLASS = desire } }
+    asp_test_bond_start_friend_effect = yes
+    if = { limit = { asp_active_desires = 5 NOT = { any_owned_story = { asp_is_active_story_trigger = yes var:asp_family = flag:personal_bond } } } set_variable = { name = asp_test_bond_blocked_cap value = 1 } }
+    asp_test_bond_clear_effect = yes
+    set_variable = { name = asp_test_bond_before value = stress }
+    add_stress = 5
+    set_variable = { name = asp_test_bond_early_control value = { value = stress subtract = var:asp_test_bond_before } }
+    asp_test_bond_start_friend_effect = yes
+    set_variable = { name = asp_test_bond_before value = stress }
+    scope:asp_test_bond_story ?= { asp_resolve_story_effect = { OUTCOME = abandoned REWARDS = normal } }
+    set_variable = { name = asp_test_bond_early_stress value = { value = stress subtract = var:asp_test_bond_before } }
+    asp_test_bond_clear_effect = yes
+    asp_test_bond_start_friend_effect = yes
+    scope:asp_test_bond_story ?= {
+        set_variable = { name = asp_origin_date value = { value = current_date subtract = 720 } }
+        save_scope_value_as = { name = asp_test_bond_original_date value = var:asp_origin_date }
+        set_variable = { name = asp_next_review_date value = current_date }
+        asp_retain_story_effect = yes
+        save_scope_value_as = { name = asp_test_bond_remaining_days value = { value = var:asp_next_review_date subtract = current_date } }
+        if = { limit = { var:asp_origin_date = scope:asp_test_bond_original_date var:asp_target = scope:asp_test_bond_man } story_owner = { set_variable = { name = asp_test_bond_origin_preserved value = 1 } } }
+        story_owner = { set_variable = { name = asp_test_bond_retained_days value = scope:asp_test_bond_remaining_days } }
+    }
+    set_variable = { name = asp_test_bond_before value = stress }
+    scope:asp_test_bond_story ?= { asp_resolve_story_effect = { OUTCOME = abandoned REWARDS = normal } }
+    set_variable = { name = asp_test_bond_review_release value = { value = stress subtract = var:asp_test_bond_before } }
+    asp_test_bond_clear_effect = yes
+    asp_test_bond_start_friend_effect = yes
+    scope:asp_test_bond_story ?= { set_variable = { name = asp_suspended value = yes } }
+    set_variable = { name = asp_test_bond_before value = stress }
+    set_variable = { name = asp_test_bond_xp_before value = diplomacy_lifestyle_xp }
+    set_relation_friend = scope:asp_test_bond_man
+    scope:asp_test_bond_story ?= { asp_refresh_story_effect = yes }
+    set_variable = { name = asp_test_bond_absence_stress value = { value = stress subtract = var:asp_test_bond_before } }
+    set_variable = { name = asp_test_bond_absence_xp value = { value = diplomacy_lifestyle_xp subtract = var:asp_test_bond_xp_before } }
+    if = { limit = { var:asp_test_bond_bestfriend_stress = -10 var:asp_test_bond_bestfriend_xp = 50 var:asp_test_bond_soulmate_stress = -10 var:asp_test_bond_soulmate_xp = 0 var:asp_test_bond_blocked_cooldown = 1 var:asp_test_bond_blocked_cap = 1 var:asp_test_bond_absence_stress = 0 var:asp_test_bond_absence_xp = 0 var:asp_test_bond_early_stress = var:asp_test_bond_early_control var:asp_test_bond_early_control > 0 var:asp_test_bond_review_release = 0 var:asp_test_bond_retained_days = 360 var:asp_test_bond_origin_preserved = 1 var:asp_test_bond_no_pledge = 1 asp_active_desires = 0 } set_variable = { name = asp_test_bond_b06 value = 1 } debug_log = "ASP_TEST B06 PASS" }
+    else = { debug_log = "ASP_TEST B06 FAIL" }
+    asp_test_bond_setup_effect = yes
+    add_perk = befriend_perk
+    set_relation_friend = scope:asp_test_bond_woman
+    asp_test_bond_start_romance_effect = yes
+    scope:asp_test_bond_story ?= { asp_bond_reinterpret_effect = { MODE = friendship } }
+    if = { limit = { asp_active_desires = 1 scope:asp_test_bond_story ?= { var:asp_interpretation = flag:romance var:asp_target = scope:asp_test_bond_woman var:asp_origin_date = current_date } } set_variable = { name = asp_test_bond_already_mode value = 1 } }
+    asp_test_bond_clear_effect = yes
+    # Exercise the actual routine selector using a single eligible court target, not a world scan.
+    every_courtier_or_guest = { limit = { this != scope:asp_test_bond_woman NOT = { has_trait = incapable } } add_trait = incapable }
+    remove_relation_friend = scope:asp_test_bond_woman
+    asp_try_personal_bond_effect = yes
+    if = { limit = { asp_active_desires = 1 } set_variable = { name = asp_test_bond_routine_created value = 1 } }
+    every_owned_story = { type = asp_personal_bond_context_story if = { limit = { var:asp_bond_context_target = scope:asp_test_bond_woman } save_scope_as = asp_test_bond_context } }
+    scope:asp_test_bond_context ?= { save_scope_value_as = { name = asp_test_bond_context_serial value = var:asp_bond_context_serial } }
+    scope:asp_test_bond_woman = { save_scope_as = asp_test_bond_current_contact }
+    asp_bond_observe_context_effect = { TARGET = scope:asp_test_bond_current_contact }
+    scope:asp_test_bond_context ?= { if = { limit = { var:asp_bond_context_serial = scope:asp_test_bond_context_serial } story_owner = { set_variable = { name = asp_test_bond_context_stable value = 1 } } } }
+    if = { limit = { var:asp_test_bond_already_mode = 1 var:asp_test_bond_routine_created = 1 var:asp_test_bond_context_stable = 1 } set_variable = { name = asp_test_bond_b07 value = 1 } debug_log = "ASP_TEST B07 PASS" }
+    else = { debug_log = "ASP_TEST B07 FAIL" }
+}
+asp_test_bond_gui_setup_effect = {
+    asp_test_bond_setup_effect = yes
+    add_perk = befriend_perk
+    # Potential friendship is controlled success setup, not the desired Friend relation.
+    set_relation_potential_friend = scope:asp_test_bond_man
+    set_variable = { name = asp_test_bond_gui_target value = scope:asp_test_bond_man }
+    clear_saved_scope = asp_bond_silent
+    asp_test_bond_start_friend_effect = yes
+    set_variable = { name = asp_test_bond_gui_story value = scope:asp_test_bond_story }
+    set_variable = { name = asp_test_bond_gui_before_stress value = stress }
+    set_variable = { name = asp_test_bond_gui_before_xp value = diplomacy_lifestyle_xp }
+    set_variable = { name = asp_test_bond_gui_started value = 0 }
+    debug_log = "ASP_TEST BOND GUI_PREPARED"
+}
+asp_test_bond_gui_accelerate_effect = {
+    if = { limit = { exists = var:asp_test_bond_gui_target any_scheme = { scheme_type = befriend scheme_target_character = root.var:asp_test_bond_gui_target } }
+        every_scheme = { limit = { scheme_type = befriend scheme_target_character = root.var:asp_test_bond_gui_target }
+            scheme_owner = { set_variable = { name = asp_test_bond_gui_started value = 1 } }
+            add_scheme_progress = 100
+        }
+        debug_log = "ASP_TEST BOND GUI_EXISTING_SCHEME_ACCELERATED"
+    }
+    else = { debug_log = "ASP_TEST BOND GUI_NO_ACTUAL_SCHEME_FAIL" }
+}
+asp_test_bond_gui_assert_effect = {
+    set_variable = { name = asp_test_bond_gui_stress value = { value = stress subtract = var:asp_test_bond_gui_before_stress } }
+    set_variable = { name = asp_test_bond_gui_xp value = { value = diplomacy_lifestyle_xp subtract = var:asp_test_bond_gui_before_xp } }
+    if = { limit = { var:asp_test_bond_gui_started = 1 has_relation_friend = var:asp_test_bond_gui_target asp_active_desires = 0 var:asp_test_bond_gui_stress = -10 var:asp_test_bond_gui_xp = 50 any_memory = { has_memory_type = asp_bond_friendship_memory has_memory_participant = root.var:asp_test_bond_gui_target } } debug_log = "ASP_TEST BOND GUI_RELATION_REWARD_PASS" }
+    else = { debug_log = "ASP_TEST BOND GUI_RELATION_REWARD_FAIL" }
+    debug_log = asp_test_bond_gui_measurements
+}
+
+# The registered B03 and mandatory actual Keep UI use identical snapshots/assertions.
+asp_test_bond_snapshot_rival_effect = {
+    set_variable = { name = asp_test_bond_render_story value = scope:asp_test_bond_story }
+    set_variable = { name = asp_test_bond_render_target value = scope:asp_test_bond_man }
+    set_variable = { name = asp_test_bond_render_origin value = scope:asp_test_bond_story.var:asp_origin_date }
+    set_variable = { name = asp_test_bond_render_stress value = stress }
+    set_variable = { name = asp_test_bond_render_xp value = diplomacy_lifestyle_xp }
+}
+asp_test_bond_assert_rival_retained_effect = {
+    if = { limit = { exists = var:asp_test_bond_render_story asp_active_desires = 1 stress = var:asp_test_bond_render_stress diplomacy_lifestyle_xp = var:asp_test_bond_render_xp var:asp_test_bond_render_story = { asp_can_manage_story_trigger = yes var:asp_target = root.var:asp_test_bond_render_target var:asp_origin_date = root.var:asp_test_bond_render_origin has_variable = asp_bond_rival_notified } }
+        set_variable = { name = asp_test_bond_rival_fixed value = 1 }
+        debug_log = "ASP_TEST BOND GUI_RIVAL_RETAIN_PASS"
+    }
+    else = { set_variable = { name = asp_test_bond_rival_fixed value = 0 } debug_log = "ASP_TEST BOND GUI_RIVAL_RETAIN_FAIL" }
+}
+asp_test_bond_gui_rival_setup_effect = {
+    asp_test_bond_setup_effect = yes
+    add_perk = befriend_perk
+    asp_test_bond_start_friend_effect = yes
+    clear_saved_scope = asp_bond_silent
+    set_relation_rival = scope:asp_test_bond_man
+    scope:asp_test_bond_story ?= { asp_bond_maintain_effect = yes }
+    asp_test_bond_snapshot_rival_effect = yes
+    debug_log = "ASP_TEST BOND GUI_RIVAL_PREPARED"
+}
+asp_test_bond_gui_retire_effect = {
+    if = { limit = { exists = var:asp_test_bond_gui_story }
+        var:asp_test_bond_gui_story = { asp_resolve_story_effect = { OUTCOME = impossible REWARDS = none } }
+    }
+    set_variable = { name = asp_test_bond_stale_stress value = stress }
+    set_variable = { name = asp_test_bond_stale_xp value = diplomacy_lifestyle_xp }
+    debug_log = "ASP_TEST BOND GUI_EXACT_STORY_RETIRED"
+}
+asp_test_bond_gui_stale_assert_effect = {
+    if = { limit = { NOT = { exists = var:asp_test_bond_gui_story } asp_active_desires = 0 stress = var:asp_test_bond_stale_stress diplomacy_lifestyle_xp = var:asp_test_bond_stale_xp } debug_log = "ASP_TEST BOND GUI_STALE_CLICK_PASS" }
+    else = { debug_log = "ASP_TEST BOND GUI_STALE_CLICK_FAIL" }
+}
+asp_test_bond_gui_management_effect = {
+    if = { limit = { exists = var:asp_test_bond_gui_story }
+        var:asp_test_bond_gui_story = {
+            if = { limit = { asp_can_manage_story_trigger = yes story_owner = root }
+                save_scope_as = asp_selected_story
+                story_owner = { trigger_event = asp_management.2 }
+            }
+        }
+    }
+    debug_log = "ASP_TEST BOND GUI_MANAGEMENT_PREPARED"
+}
+asp_test_bond_gui_loss_effect = {
+    set_variable = { name = asp_test_bond_loss_stress value = stress }
+    set_variable = { name = asp_test_bond_loss_xp value = diplomacy_lifestyle_xp }
+    var:asp_test_bond_gui_target ?= { death = { death_reason = death_natural_causes } }
+    every_owned_story = { limit = { asp_is_active_story_trigger = yes var:asp_family = flag:personal_bond } asp_refresh_story_effect = yes }
+    debug_log = "ASP_TEST BOND GUI_TARGET_LOSS_PREPARED"
+}
+asp_test_bond_gui_loss_assert_effect = {
+    if = { limit = { asp_active_desires = 0 stress = var:asp_test_bond_loss_stress diplomacy_lifestyle_xp = var:asp_test_bond_loss_xp any_memory = { has_memory_type = asp_bond_loss_memory has_memory_participant = root.var:asp_test_bond_gui_target } } debug_log = "ASP_TEST BOND GUI_TARGET_LOSS_PASS" }
+    else = { debug_log = "ASP_TEST BOND GUI_TARGET_LOSS_FAIL" }
+}

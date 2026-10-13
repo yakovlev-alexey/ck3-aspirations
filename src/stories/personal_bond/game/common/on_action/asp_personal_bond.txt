@@ -1,0 +1,11 @@
+﻿on_set_relation_friend = { on_actions = { asp_bond_relation_changed } }
+on_set_relation_best_friend = { on_actions = { asp_bond_relation_changed } }
+on_set_relation_lover = { on_actions = { asp_bond_relation_changed } }
+on_set_relation_soulmate = { on_actions = { asp_bond_relation_changed } }
+on_set_relation_rival = { on_actions = { asp_bond_relation_changed } }
+on_set_relation_nemesis = { on_actions = { asp_bond_relation_changed } }
+asp_bond_relation_changed = { effect = { asp_bond_refresh_owner_effect = yes scope:target ?= { asp_bond_refresh_owner_effect = yes } } }
+on_join_court = { on_actions = { asp_bond_joined_court } }
+on_leave_court = { on_actions = { asp_bond_left_court } }
+asp_bond_joined_court = { effect = { save_scope_as = asp_bond_moving_person scope:new_employer ?= { asp_bond_note_court_transition_effect = { TARGET = scope:asp_bond_moving_person } } } }
+asp_bond_left_court = { effect = { save_scope_as = asp_bond_moving_person scope:old_employer ?= { asp_bond_note_court_transition_effect = { TARGET = scope:asp_bond_moving_person } } } }

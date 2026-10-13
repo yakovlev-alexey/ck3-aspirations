@@ -1,0 +1,13 @@
+﻿namespace = asp_test_personal_bond
+asp_test_personal_bond.1 = { type = character_event hidden = yes immediate = { asp_test_bond_regression_effect = yes } }
+
+asp_test_personal_bond.10 = { type = character_event hidden = yes immediate = { asp_test_bond_gui_setup_effect = yes } }
+asp_test_personal_bond.11 = { type = character_event hidden = yes immediate = { asp_test_bond_gui_accelerate_effect = yes } }
+asp_test_personal_bond.12 = { type = character_event hidden = yes immediate = { asp_test_bond_gui_assert_effect = yes } }
+asp_test_personal_bond.13 = { type = character_event hidden = yes immediate = { asp_test_bond_gui_rival_setup_effect = yes } }
+asp_test_personal_bond.14 = { type = character_event hidden = yes immediate = { asp_test_bond_assert_rival_retained_effect = yes } }
+asp_test_personal_bond.16 = { type = character_event hidden = yes immediate = { asp_test_bond_gui_retire_effect = yes } }
+asp_test_personal_bond.17 = { type = character_event hidden = yes immediate = { asp_test_bond_gui_stale_assert_effect = yes } }
+asp_test_personal_bond.18 = { type = character_event hidden = yes immediate = { asp_test_bond_gui_management_effect = yes } }
+asp_test_personal_bond.20 = { type = character_event hidden = yes immediate = { asp_test_bond_gui_loss_effect = yes } }
+asp_test_personal_bond.21 = { type = character_event hidden = yes immediate = { asp_test_bond_gui_loss_assert_effect = yes } }

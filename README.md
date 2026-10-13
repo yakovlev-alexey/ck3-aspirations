@@ -2,7 +2,7 @@
 
 An English-only, player-character CK3 prototype for contextual vengeance, holding recovery and personal bonds. [Design](docs/design.md) · [Core specification](src/core/SPEC.md) · [Repository contract](docs/repository.md) · [Engine findings](docs/modding-notes.md)
 
-Current status: native core lifecycle/pledges, vengeance and holding recovery with registered disposable regression scenarios on CK3 1.20.0.4. Recovery acceptance includes actual GUI-funded construction, completion and its three-year county modifier. Personal bonds remain later-stage work. See the [automation contract](tools/game_runner/SPEC.md) and [acceptance scenarios](tools/game_runner/tests/scenarios.md).
+Current status: native core lifecycle/pledges, vengeance, holding recovery and personal bonds with registered disposable regression scenarios on CK3 1.20.0.4. Recovery acceptance includes actual GUI-funded construction, completion and its three-year county modifier. Personal-bond acceptance includes actual native Befriend input/outcome with disclosed existing-scheme progress acceleration. See the [automation contract](tools/game_runner/SPEC.md) and [acceptance scenarios](tools/game_runner/tests/scenarios.md).
 
 Use installed PowerShell 7 and Git. No additional dependencies are needed. The installed game is a read-only scripting reference; author native files under `src/core/game/` or the owning `src/stories/<family>/game/` when implementing a family.
 

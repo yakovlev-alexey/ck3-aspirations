@@ -205,7 +205,7 @@ class GameRunner:
         return self._report_operation("advance", days)
 
     def run_scenario(self, name, repeat=1):
-        if name not in ("automation-smoke", "core-regression", "vengeance-regression", "lifecycle-regression", "recovery-regression") or type(repeat) is not int or not 1 <= repeat <= 10:
+        if name not in ("automation-smoke", "core-regression", "vengeance-regression", "lifecycle-regression", "recovery-regression", "bond-regression") or type(repeat) is not int or not 1 <= repeat <= 10:
             raise ValueError("Only registered scenarios with repeat 1 through 10 are implemented")
         if not self.flight.acquire(blocking=False):
             return {"status": "transport_error", "error": "Concurrent operation rejected"}
@@ -232,6 +232,34 @@ class GameRunner:
                         {"name": "baseline_unchanged", "passed": hashlib.sha256(self.config.baseline_save.read_bytes()).hexdigest() == self.baseline_hash},
                     ]
                     run = {"index": index, "initial": initial, "core": core, "duplicate": duplicate, "assertions": assertions, "logs": self._snapshot_logs(index)}
+                    report["runs"].append(run)
+                    if not all(item["passed"] for item in assertions):
+                        report["status"] = "assertion_failed"
+                        break
+                    continue
+                if name == "bond-regression":
+                    bond = self._send("bond_regression")
+                    duplicate = self._send("bond_regression", replay=True)
+                    assertions = [
+                        {"name": "B01_native_pursuit_and_context", "passed": bond["b01"] == 1 and all(bond[x] == 1 for x in ("native_locked", "native_unlocked", "native_romance"))},
+                        {"name": "B02_exact_private_rewards_once", "passed": bond["b02"] == 1 and bond["friend_stress"] == -10 and bond["friend_xp"] == 50 and bond["romance_stress"] == -10 and bond["romance_xp"] == 0 and bond["replay_xp"] == 0 and bond["memories"] == 2},
+                        {"name": "B03_fixed_target_invalidation", "passed": bond["b03"] == 1 and bond["death_stress"] == 0 and bond["temporary_retained"] == 1 and bond["incompatible_stress"] == 0 and bond["rival_fixed"] == 1},
+                        {"name": "B04_cadence_consumption_and_fresh_context", "passed": bond["b04"] == 1 and [bond[f"chance{i}"] for i in range(6)] == [20, 12, 6, 2, 2, 0] and bond["cooldown"] == 360 and bond["consumed"] == 1 and bond["fresh"] == 1},
+                        {"name": "B05_content_and_lustful", "passed": bond["b05"] == 1 and bond["content"] == 1 and bond["lustful_weight"] == 15},
+                        {"name": "B06_modes_cooldown_cap_and_lifecycle", "passed": bond["b06"] == 1 and bond["bestfriend_stress"] == -10 and bond["bestfriend_xp"] == 50 and bond["soulmate_stress"] == -10 and bond["soulmate_xp"] == 0 and bond["blocked_cooldown"] == 1 and bond["blocked_cap"] == 1 and bond["absence_stress"] == 0 and bond["absence_xp"] == 0 and bond["early_stress"] == bond["early_control"] and bond["early_control"] > 0 and bond["review_release"] == 0 and bond["retained_days"] == 360 and bond["origin_preserved"] == 1 and bond["no_pledge"] == 1},
+                        {"name": "B07_reinterpretation_and_real_selector", "passed": bond["b07"] == 1 and bond["already_mode"] == 1 and bond["routine_created"] == 1 and bond["context_stable"] == 1},
+                        {"name": "duplicate_identity_and_measurements", "passed": duplicate == bond},
+                        {"name": "same_baseline_date", "passed": not report["runs"] or initial["date"] == report["runs"][0]["initial"]["date"]},
+                        {"name": "fresh_session", "passed": all(initial["session"] != run["initial"]["session"] for run in report["runs"])},
+                        {"name": "baseline_unchanged", "passed": hashlib.sha256(self.config.baseline_save.read_bytes()).hexdigest() == self.baseline_hash},
+                    ]
+                    run = {"index": index, "initial": initial, "bond": bond, "duplicate": duplicate, "assertions": assertions, "logs": self._snapshot_logs(index)}
+                    errors = Path(run["logs"]) / "error.log"
+                    diagnostics = errors.read_text(encoding="utf-8-sig", errors="replace") if errors.exists() else ""
+                    blocks = re.split(r"(?=\[.*?\]\[E\])", diagnostics)
+                    aspiration_errors = [block for block in blocks if "asp_" in block and any(tag in block for tag in ("Script system error!", "pdx_persistent_reader.cpp", "jomini_script_argument.cpp", "jomini_eventtarget.cpp", "pdx_data_factory.cpp", "Unknown trigger:", "Unknown effect:", "Failed to parse", "Data error in", "triggered but has no valid options"))]
+                    assertions.append({"name": "aspiration_runtime_diagnostics_absent", "passed": not aspiration_errors})
+                    run["aspiration_runtime_error_count"] = len(aspiration_errors)
                     report["runs"].append(run)
                     if not all(item["passed"] for item in assertions):
                         report["status"] = "assertion_failed"

@@ -1,0 +1,57 @@
+﻿namespace = asp_personal_bond
+asp_personal_bond.1 = {
+    type = character_event title = asp_bond_origin_title theme = diplomacy
+    right_portrait = scope:asp_bond_origin_target
+    desc = { first_valid = {
+        triggered_desc = { trigger = { asp_bond_event_can_manage_trigger = { STORY = scope:asp_bond_event_story } scope:asp_bond_event_story ?= { has_variable = asp_bond_origin_court var:asp_interpretation = flag:friendship } } desc = asp_bond_origin_court_friendship }
+        triggered_desc = { trigger = { asp_bond_event_can_manage_trigger = { STORY = scope:asp_bond_event_story } scope:asp_bond_event_story ?= { has_variable = asp_bond_origin_court var:asp_interpretation = flag:romance } } desc = asp_bond_origin_court_romance }
+        triggered_desc = { trigger = { asp_bond_event_can_manage_trigger = { STORY = scope:asp_bond_event_story } scope:asp_bond_event_story ?= { var:asp_interpretation = flag:friendship } } desc = asp_bond_origin_relation_friendship }
+        triggered_desc = { trigger = { asp_bond_event_can_manage_trigger = { STORY = scope:asp_bond_event_story } } desc = asp_bond_origin_relation_romance }
+        desc = asp_management_closed_desc
+    } }
+    option = { name = asp_bond_keep trigger = { asp_bond_event_can_manage_trigger = { STORY = scope:asp_bond_event_story } } }
+    option = { name = asp_bond_choose_friendship trigger = { asp_bond_event_can_reinterpret_trigger = { STORY = scope:asp_bond_event_story MODE = friendship } }
+        custom_tooltip = asp_bond_friendship_condition
+        hidden_effect = { scope:asp_bond_event_story ?= { if = { limit = { story_owner = root } asp_bond_reinterpret_effect = { MODE = friendship } } } }
+    }
+    option = { name = asp_bond_choose_romance trigger = { asp_bond_event_can_reinterpret_trigger = { STORY = scope:asp_bond_event_story MODE = romance } }
+        custom_tooltip = asp_bond_romance_condition
+        hidden_effect = { scope:asp_bond_event_story ?= { if = { limit = { story_owner = root } asp_bond_reinterpret_effect = { MODE = romance } } } }
+    }
+    option = { name = asp_bond_release trigger = { asp_bond_event_can_manage_trigger = { STORY = scope:asp_bond_event_story } }
+        custom_tooltip = asp_bond_release_cost
+        show_as_tooltip = { add_stress = asp_desire_abandonment_stress }
+        hidden_effect = { scope:asp_bond_event_story ?= { if = { limit = { asp_can_manage_story_trigger = yes story_owner = root } asp_resolve_story_effect = { OUTCOME = abandoned REWARDS = normal } } } }
+    }
+    option = { name = asp_close fallback = yes }
+}
+asp_personal_bond.2 = {
+    type = character_event title = asp_bond_terminal_title theme = diplomacy
+    desc = { first_valid = {
+        triggered_desc = { trigger = { scope:asp_bond_terminal_outcome = 1 scope:asp_bond_terminal_mode = 1 } desc = asp_bond_friendship_fulfilled }
+        triggered_desc = { trigger = { scope:asp_bond_terminal_outcome = 1 scope:asp_bond_terminal_mode = 2 } desc = asp_bond_romance_fulfilled }
+        triggered_desc = { trigger = { scope:asp_bond_terminal_outcome = 2 scope:asp_bond_memory_target = { is_alive = no } } desc = asp_bond_target_lost }
+        triggered_desc = { trigger = { scope:asp_bond_terminal_outcome = 2 } desc = asp_bond_incompatible_closed }
+        desc = asp_bond_released
+    } }
+    option = { name = asp_close }
+}
+asp_personal_bond.3 = {
+    type = character_event title = asp_bond_reconsider_title theme = diplomacy
+    desc = { first_valid = {
+        triggered_desc = { trigger = { asp_bond_event_can_manage_trigger = { STORY = scope:asp_bond_event_story } scope:asp_bond_event_story ?= { asp_bond_permanently_incompatible_trigger = yes } } desc = asp_bond_incompatible_desc }
+        triggered_desc = { trigger = { asp_bond_event_can_manage_trigger = { STORY = scope:asp_bond_event_story } } desc = asp_bond_rival_desc }
+        desc = asp_management_closed_desc
+    } }
+    option = { name = asp_bond_keep trigger = { asp_bond_event_can_manage_trigger = { STORY = scope:asp_bond_event_story } } }
+    option = { name = asp_bond_release_free trigger = { asp_bond_event_can_manage_trigger = { STORY = scope:asp_bond_event_story } scope:asp_bond_event_story ?= { asp_bond_permanently_incompatible_trigger = yes } }
+        custom_tooltip = asp_bond_free_condition
+        hidden_effect = { scope:asp_bond_event_story ?= { if = { limit = { story_owner = root } asp_bond_release_incompatible_effect = yes } } }
+    }
+    option = { name = asp_bond_release trigger = { asp_bond_event_can_manage_trigger = { STORY = scope:asp_bond_event_story } scope:asp_bond_event_story ?= { NOT = { asp_bond_permanently_incompatible_trigger = yes } } }
+        custom_tooltip = asp_bond_release_cost
+        show_as_tooltip = { scope:asp_bond_event_story ?= { save_scope_value_as = { name = asp_bond_preview_stress value = asp_abandonment_stress } story_owner = { add_stress = scope:asp_bond_preview_stress } } }
+        hidden_effect = { scope:asp_bond_event_story ?= { if = { limit = { asp_can_manage_story_trigger = yes story_owner = root } asp_resolve_story_effect = { OUTCOME = abandoned REWARDS = normal } } } }
+    }
+    option = { name = asp_close fallback = yes }
+}

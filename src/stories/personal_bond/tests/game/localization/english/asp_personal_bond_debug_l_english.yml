@@ -1,0 +1,2 @@
+﻿l_english:
+ asp_test_bond_gui_measurements:0 "ASP_TEST BOND GUI_MEASURED|started=[GetPlayer.MakeScope.Var('asp_test_bond_gui_started').GetValue|0]|stress=[GetPlayer.MakeScope.Var('asp_test_bond_gui_stress').GetValue|0]|xp=[GetPlayer.MakeScope.Var('asp_test_bond_gui_xp').GetValue|0]"

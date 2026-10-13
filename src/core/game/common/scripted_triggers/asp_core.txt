@@ -50,7 +50,7 @@ asp_family_public_fulfillment_trigger = {
 }
 
 asp_family_has_terminal_progress_trigger = {
-    OR = { AND = { var:asp_family = flag:vengeance asp_vengeance_has_terminal_progress_trigger = yes } AND = { var:asp_family = flag:holding_recovery asp_recovery_has_terminal_progress_trigger = yes } }
+    OR = { AND = { var:asp_family = flag:vengeance asp_vengeance_has_terminal_progress_trigger = yes } AND = { var:asp_family = flag:holding_recovery asp_recovery_has_terminal_progress_trigger = yes } AND = { var:asp_family = flag:personal_bond asp_bond_has_terminal_progress_trigger = yes } }
 }
 
 asp_story_owned_by_event_root_trigger = {

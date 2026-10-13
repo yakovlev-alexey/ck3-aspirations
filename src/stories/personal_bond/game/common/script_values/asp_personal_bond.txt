@@ -1,0 +1,17 @@
+﻿asp_bond_selection_chance = { value = asp_routine_desire_chance }
+asp_bond_cooldown_days = { value = asp_routine_cooldown_months multiply = asp_native_month_days }
+asp_bond_friendship_weight = 10
+asp_bond_lustful_multiplier = 1.5
+asp_bond_romantic_weight = { value = 10 if = { limit = { has_trait = lustful } multiply = asp_bond_lustful_multiplier } }
+asp_bond_friendship_xp = 50
+# Target character, observer saved by the owner. Polling the same signature is not a new incident.
+asp_bond_context_signature = {
+    value = 0
+    if = { limit = { OR = { is_courtier_of = scope:asp_bond_observer is_foreign_court_or_pool_guest_of = scope:asp_bond_observer } } add = 1 }
+    if = { limit = { has_relation_potential_friend = scope:asp_bond_observer } add = 2 }
+    if = { limit = { has_relation_friend = scope:asp_bond_observer } add = 4 }
+    if = { limit = { has_relation_best_friend = scope:asp_bond_observer } add = 8 }
+    if = { limit = { has_relation_lover = scope:asp_bond_observer } add = 16 }
+    if = { limit = { has_relation_soulmate = scope:asp_bond_observer } add = 32 }
+}
+asp_bond_cooldown_remaining_days = { value = var:asp_bond_next_routine_date subtract = current_date }

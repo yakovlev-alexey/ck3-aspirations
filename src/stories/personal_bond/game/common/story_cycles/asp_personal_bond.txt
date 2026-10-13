@@ -1,0 +1,7 @@
+﻿asp_personal_bond_story = {
+    visible = yes icon = { reference = "gfx/interface/icons/traits/diplomat.dds" }
+    visualization = { custom_string_key = "asp_bond_story_information" }
+    effect_group = { days = 1 triggered_effect = { trigger = { has_variable = asp_schema } effect = { asp_bond_maintain_effect = yes } } }
+    on_owner_death = { asp_resolve_story_effect = { OUTCOME = owner_dead REWARDS = none } }
+}
+asp_personal_bond_context_story = { visible = no on_owner_death = { end_story = yes } }

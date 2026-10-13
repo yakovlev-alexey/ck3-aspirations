@@ -24,6 +24,9 @@ CALENDAR_FIELDS = ('calendar_before', 'calendar_after', 'calendar_reviews', 'cal
 RECOVERY_FIELDS = ('h01', 'h02', 'h03', 'h04', 'h05', 'reward_stress', 'reward_xp', 'modifier_count', 'loss_stress', 'loss_control', 'pledge_stress', 'pledge_control', 'pledge_prestige', 'unproven', 'foreign', 'cancelled', 'replayed', 'origin_control', 'token_loss', 'token_terminal', 'cleanup_loss', 'cleanup_terminal', 'token_stress', 'token_xp', 'token_modifier', 'token_replay', 'ai_observer', 'ai_cache_clean')
 
 
+BOND_FIELDS = ('b01', 'b02', 'b03', 'b04', 'b05', 'native_locked', 'native_unlocked', 'native_romance', 'friend_stress', 'friend_xp', 'romance_stress', 'romance_xp', 'replay_xp', 'memories', 'death_stress', 'temporary_retained', 'incompatible_stress', 'rival_fixed', 'chance0', 'chance1', 'chance2', 'chance3', 'chance4', 'chance5', 'cooldown', 'consumed', 'fresh', 'content', 'lustful_weight', 'b06', 'b07', 'bestfriend_stress', 'bestfriend_xp', 'soulmate_stress', 'soulmate_xp', 'blocked_cooldown', 'blocked_cap', 'absence_stress', 'absence_xp', 'early_stress', 'early_control', 'review_release', 'retained_days', 'origin_preserved', 'no_pledge', 'already_mode', 'routine_created', 'context_stable')
+
+
 RELOAD_FIELDS = ("reload_identity",)
 
 
@@ -95,6 +98,8 @@ class Telemetry:
                         allowed.update(VENGEANCE_FIELDS)
                     if self.operation == "recovery_regression":
                         allowed.update(RECOVERY_FIELDS)
+                    if self.operation == "bond_regression":
+                        allowed.update(BOND_FIELDS)
                     if self.operation == "lifecycle_regression":
                         allowed.update(LIFECYCLE_FIELDS)
                     if self.operation == "lifecycle_calendar_assert":
@@ -116,6 +121,8 @@ class Telemetry:
                         required.update(VENGEANCE_FIELDS)
                     if self.operation == "recovery_regression":
                         required.update(RECOVERY_FIELDS)
+                    if self.operation == "bond_regression":
+                        required.update(BOND_FIELDS)
                     if self.operation == "lifecycle_regression":
                         required.update(LIFECYCLE_FIELDS)
                     if self.operation == "lifecycle_calendar_assert":

@@ -71,3 +71,14 @@ asp_repeat_review_days = {
 asp_pledge_success_prestige = 100
 asp_pledge_failure_prestige = -100
 asp_pledge_failure_stress = 15
+
+asp_routine_cooldown_months = 12
+asp_routine_desire_base_chance = 20
+asp_routine_desire_occupancy = {
+    value = 1
+    if = { limit = { asp_active_desires = 1 } value = 0.6 }
+    else_if = { limit = { asp_active_desires = 2 } value = 0.3 }
+    else_if = { limit = { OR = { asp_active_desires = 3 asp_active_desires = 4 } } value = 0.1 }
+    else_if = { limit = { asp_active_desires >= asp_desire_cap } value = 0 }
+}
+asp_routine_desire_chance = { value = asp_routine_desire_base_chance multiply = asp_routine_desire_occupancy }
