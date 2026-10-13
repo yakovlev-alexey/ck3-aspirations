@@ -5,7 +5,7 @@ import subprocess
 import time
 from pathlib import Path
 from .protocol import safe_path
-from .ui import WindowGeometry, validate_frame
+from .ui import UIError, WindowGeometry, validate_frame, _png_dimensions
 
 
 def sha(path):
@@ -79,9 +79,12 @@ def validate_evidence(native, started, output_root):
         raise ValueError('Missing completed repetitions')
     paths = []
     screenshot = safe_path(evidence / 'final.png')
-    raw = screenshot.read_bytes() if screenshot.exists() else b''
-    if len(raw) < 24 or raw[:8] != b'\x89PNG\r\n\x1a\n' or raw[12:16] != b'IHDR' or not int.from_bytes(raw[16:20], 'big') or not int.from_bytes(raw[20:24], 'big'):
-        raise ValueError('Missing actual PNG screenshot')
+    if not screenshot.is_file() or not 0 < screenshot.stat().st_size <= 64 * 1024 * 1024:
+        raise ValueError('Missing or oversized actual PNG screenshot')
+    try:
+        _png_dimensions(screenshot.read_bytes())
+    except UIError as error:
+        raise ValueError('Invalid required PNG screenshot: ' + str(error)) from error
     paths.append(screenshot)
     for run in runs:
         assertions = run.get('assertions', [])

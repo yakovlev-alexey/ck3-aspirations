@@ -129,7 +129,7 @@ class ReviewBoundaryTests(unittest.TestCase):
             (directory / 'error.log').write_text('')
             for value in measurements:
                 (native / f"{identity}-{value['request']}.json").write_text(json.dumps(value))
-        (native / 'final.png').write_bytes(base64.b64decode('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+/l9sAAAAASUVORK5CYII='))
+        (native / 'final.png').write_bytes(base64.b64decode('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAIAAACQd1PeAAAADElEQVR4nGMQcYsCAAEmALW1sxutAAAAAElFTkSuQmCC'))
         result = {'status': 'passed', 'scenario': 'lifecycle-regression', 'repeat': 1, 'evidence': str(native), 'runs': [run]}
         (native / 'report.json').write_text(json.dumps(result))
         return result, logic, calendar

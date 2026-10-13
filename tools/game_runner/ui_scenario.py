@@ -92,18 +92,26 @@ class NativeUIOperations:
         self.capture('save-dialog')
         self.backend.replace_text(candidate.stem)
         self.capture('save-name')
+        if candidate.exists():
+            raise UIError('Disposable UI save appeared before Save; foreign bytes retained')
         self.click(1395, 1154)
         saved = wait_for_saved_campaign(candidate, self.runner.baseline_hash, self.runner.config.request_timeout, clock=self.runner.clock, sleep=self.runner.sleep)
-        entry['sha256'] = saved['sha256']
-        journal.write_text(json.dumps({'saves': entries}), encoding='utf-8')
         retained = self.directory / f'ui-campaign-{self.index}.ck3'
         shutil.copyfile(candidate, retained)
         if hashlib.sha256(retained.read_bytes()).hexdigest() != saved['sha256']:
             raise UIError('Retained UI save bytes disagree with actual native save')
         self.capture('save-result')
+        # Stable bytes alone cannot authorize deletion: validate their native reload.
+        self.save_ownership = candidate, saved['sha256'], journal, entries, entry
         return candidate, saved | {'evidence_path': str(retained)}
 
     def reload_campaign(self, candidate, before):
+        pending = getattr(self, 'save_ownership', None)
+        if pending is None or candidate != pending[0]:
+            raise UIError('Reload requires the pending native save')
+        _, digest, journal, entries, entry = pending
+        if not candidate.is_file() or hashlib.sha256(candidate.read_bytes()).hexdigest() != digest:
+            raise UIError('Pending UI save changed before reload; bytes retained')
         original = self.runner.launch_save
         self.backend.stop()
         self.runner.session = None
@@ -118,10 +126,17 @@ class NativeUIOperations:
         if reloaded['session'] == before['session'] or reloaded['date'] != before['date']:
             raise UIError('Reload did not use a fresh session at the saved native date')
         opened = self.runner._send('ui_open')
+        validate_reload({key: before[key] for key in UI_FIELDS}, {key: opened[key] for key in UI_FIELDS})
+        if (opened['session'], opened['date']) != (reloaded['session'], reloaded['date']):
+            raise UIError('Reopened selector changed the reloaded session or native date')
         self.backend.open_console()
         self.capture('reload-selector')
         self.click(1750, 1077)
         self.capture('reload-story')
+        if not candidate.is_file() or hashlib.sha256(candidate.read_bytes()).hexdigest() != digest:
+            raise UIError('Pending UI save changed during reload; bytes retained')
+        entry['sha256'] = digest
+        journal.write_text(json.dumps({'saves': entries}), encoding='utf-8')
         return reloaded, opened
 
 

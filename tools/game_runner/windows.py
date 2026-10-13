@@ -318,6 +318,7 @@ class WindowsBackend:
         # Let the native frame consume pointer movement before button dispatch.
         time.sleep(0.1)
         self.validate()
+        geometry.require_unchanged(self.geometry())
         self._mouse_input(2)
         try:
             self.validate()

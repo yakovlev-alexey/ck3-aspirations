@@ -139,7 +139,7 @@ class ManagedTests(unittest.TestCase):
         (logs / 'debug.log').write_text('ASP_AUTOMATION|1|123|2|DONE|counter=0|date=43000\n')
         (logs / 'error.log').write_text('')
         (evidence / '123-2.json').write_text(json.dumps(initial))
-        (evidence / 'final.png').write_bytes(base64.b64decode('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+/l9sAAAAASUVORK5CYII='))
+        (evidence / 'final.png').write_bytes(base64.b64decode('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAIAAACQd1PeAAAADElEQVR4nGMQcYsCAAEmALW1sxutAAAAAElFTkSuQmCC'))
         (evidence / 'report.json').write_text(json.dumps(native))
         self.assertEqual(len(session.validate_evidence(native, started, self.root)), 5)
         os.utime(evidence / 'final.png', (started - 10, started - 10))
@@ -225,7 +225,7 @@ class ManagedTests(unittest.TestCase):
             logs.mkdir(parents=True)
             (logs / 'debug.log').write_text('ASP_AUTOMATION|1|123|2|DONE|counter=0|date=43000\n')
             (logs / 'error.log').write_text('')
-            (native / 'final.png').write_bytes(base64.b64decode('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+/l9sAAAAASUVORK5CYII='))
+            (native / 'final.png').write_bytes(base64.b64decode('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAIAAACQd1PeAAAADElEQVR4nGMQcYsCAAEmALW1sxutAAAAAElFTkSuQmCC'))
             initial = {'session': 123, 'request': 2, 'counter': 0, 'date': 43000}
             (native / '123-2.json').write_text(json.dumps(initial))
             result = {'status': 'passed', 'repeat': 1, 'evidence': str(native), 'runs': [{'index': 1, 'initial': initial, 'assertions': [{'name': 'native', 'passed': True}], 'logs': str(logs)}]}

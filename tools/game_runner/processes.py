@@ -112,6 +112,7 @@ def supervise_worker(command, cwd, timeout, audit_path=None):
             raise RuntimeError('Managed worker failed: ' + errors[-2000:])
         return output
     finally:
+        cleanup_error = None
         try:
             job.close()
             if process is not None and process.poll() is None:
@@ -119,7 +120,13 @@ def supervise_worker(command, cwd, timeout, audit_path=None):
                 process.wait(timeout=5)
             audit['processes_stopped'] = True
         except (RuntimeError, OSError, subprocess.TimeoutExpired) as error:
-            raise WorkerCleanupError('Owned process cleanup could not be confirmed: ' + str(error)) from error
+            cleanup_error = WorkerCleanupError('Owned process cleanup could not be confirmed: ' + str(error))
+            raise cleanup_error from error
         finally:
             if audit_path is not None:
-                audit_path.write_text(json.dumps(audit), encoding='utf-8')
+                try:
+                    audit_path.write_text(json.dumps(audit), encoding='utf-8')
+                except OSError as error:
+                    if cleanup_error is not None:
+                        raise WorkerCleanupError(str(cleanup_error) + '; process audit persistence failed: ' + str(error)) from cleanup_error
+                    raise
