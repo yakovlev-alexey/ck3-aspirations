@@ -1,0 +1,49 @@
+﻿# Story scope. Declaration dates are immutable; a settled instance cannot redeclare.
+asp_declare_story_effect = {
+    if = { limit = { asp_can_declare_story_trigger = yes }
+        set_variable = { name = asp_declared value = yes }
+        set_variable = { name = asp_pledge_deadline value = { value = current_date add = asp_pledge_days } }
+        set_variable = { name = asp_pledge_audience value = flag:court_and_realm }
+    }
+}
+# Latch before consequences; no reward/penalty or action event goes to an absent AI owner.
+asp_settle_pledge_effect = {
+    if = { limit = { has_variable = asp_declared NOT = { has_variable = asp_pledge_settled } story_owner = { is_alive = yes is_ai = no } }
+        set_variable = { name = asp_pledge_result value = flag:$RESULT$ }
+        set_variable = { name = asp_pledge_settled value = yes }
+        remove_variable = asp_declared
+        save_scope_as = asp_settling_story
+        asp_pledge_$RESULT$_consequences_effect = yes
+        var:asp_target = { save_scope_as = asp_pledge_event_target }
+        story_owner = { trigger_event = asp_pledge.2 }
+    }
+}
+asp_settle_due_pledge_effect = {
+    if = { limit = { asp_pledge_due_trigger = yes } asp_settle_pledge_effect = { RESULT = expired } }
+}
+asp_withdraw_selected_pledge_effect = {
+    scope:asp_selected_story ?= {
+        if = { limit = { asp_can_manage_story_trigger = yes story_owner = root has_variable = asp_declared }
+            asp_settle_due_pledge_effect = yes
+            asp_settle_pledge_effect = { RESULT = withdrawn }
+        }
+    }
+}
+
+# Select consequences from the call's literal outcome. Native tooltip previews do
+# not retain earlier variable writes, so selection cannot read asp_pledge_result.
+asp_pledge_fulfilled_consequences_effect = {
+    save_scope_value_as = { name = asp_pledge_event_result value = 1 }
+    if = { limit = { NOT = { has_variable = asp_suspended } } story_owner = { add_prestige = asp_pledge_success_prestige } }
+}
+asp_pledge_withdrawn_consequences_effect = {
+    story_owner = { add_prestige = asp_pledge_failure_prestige add_stress = asp_pledge_failure_stress }
+    save_scope_value_as = { name = asp_pledge_event_result value = 2 }
+}
+asp_pledge_expired_consequences_effect = {
+    asp_pledge_withdrawn_consequences_effect = yes
+    save_scope_value_as = { name = asp_pledge_event_result value = 3 }
+}
+asp_pledge_excused_consequences_effect = {
+    save_scope_value_as = { name = asp_pledge_event_result value = 4 }
+}

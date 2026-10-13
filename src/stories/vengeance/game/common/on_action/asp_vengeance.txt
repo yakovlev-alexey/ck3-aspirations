@@ -34,7 +34,7 @@ on_imprison = { on_actions = { asp_vengeance_observe_custody } }
 asp_vengeance_observe_custody = {
     effect = {
         save_scope_as = asp_vengeance_new_prisoner
-        scope:imprisoner ?= { every_owned_story = { limit = { asp_can_manage_story_trigger = yes has_variable = asp_vengeance_victim var:asp_target = scope:asp_vengeance_new_prisoner } asp_vengeance_check_progress_effect = yes } }
+        scope:imprisoner ?= { every_owned_story = { limit = { asp_can_manage_story_trigger = yes has_variable = asp_vengeance_victim var:asp_target = scope:asp_vengeance_new_prisoner } asp_refresh_story_effect = yes } }
     }
 }
 quarterly_playable_pulse = { on_actions = { asp_vengeance_delayed_knowledge } }

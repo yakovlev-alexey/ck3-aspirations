@@ -11,7 +11,7 @@ Approved on 2026-10-12. This living document owns product intent, language, pres
 - [Repository and distribution](repository.md)
 - [Versioned modding findings](modding-notes.md)
 
-Task 1 supplies contracts and packaging tools. Task 2 implements and verifies the core lifecycle and instance-specific management in CK3 1.20.0.4. Task 3 implements and verifies contextual vengeance. Holding recovery, personal bonds, scheduled reviews, pledges and integrated reward paths remain assigned to later stages; the current bundle is a development prototype.
+Task 1 supplies contracts and packaging tools. Task 2 implements and verifies the core lifecycle and instance-specific management in CK3 1.20.0.4. Task 3 implements and verifies contextual vengeance. Task 4 implements first-story reviews, public commitments, suspension/return and explicit full-cap replacement. Holding recovery, personal bonds and combined acceptance remain assigned to later stages; the current bundle is a development prototype.
 
 ## Purpose and scope
 

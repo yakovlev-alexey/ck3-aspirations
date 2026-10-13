@@ -1,6 +1,6 @@
 ﻿namespace = asp_core
 
-# The scheduled-review presentation is allocated here; Task 4 supplies due dispatch and choices.
+# Due notification retains the exact selected story through reconsideration.
 asp_core.1 = {
     type = character_event
     title = asp_core_review_title
@@ -12,9 +12,33 @@ asp_core.1 = {
             scope:asp_selected_story ?= {
                 if = {
                     limit = { asp_can_manage_story_trigger = yes story_owner = root }
-                    story_owner = { trigger_event = asp_management.2 }
+                    story_owner = { trigger_event = asp_management.3 }
                 }
             }
         }
     }
+}
+
+asp_core.2 = {
+    type = character_event
+    window = big_event_window
+    title = asp_replace_title
+    desc = asp_replace_offer_desc
+    theme = intrigue
+    option = {
+        name = asp_replace_1
+        trigger = { asp_vengeance_replacement_cause_valid_trigger = yes scope:asp_replacement_1 ?= { asp_can_manage_story_trigger = yes asp_story_owned_by_event_root_trigger = yes var:asp_class = flag:ambition } }
+        hidden_effect = { scope:asp_replacement_1 ?= { if = { limit = { asp_can_manage_story_trigger = yes story_owner = root } save_scope_as = asp_selected_story story_owner = { trigger_event = asp_management.4 } } } }
+    }
+    option = {
+        name = asp_replace_2
+        trigger = { asp_vengeance_replacement_cause_valid_trigger = yes scope:asp_replacement_2 ?= { asp_can_manage_story_trigger = yes asp_story_owned_by_event_root_trigger = yes var:asp_class = flag:ambition } }
+        hidden_effect = { scope:asp_replacement_2 ?= { if = { limit = { asp_can_manage_story_trigger = yes story_owner = root } save_scope_as = asp_selected_story story_owner = { trigger_event = asp_management.4 } } } }
+    }
+    option = {
+        name = asp_replace_3
+        trigger = { asp_vengeance_replacement_cause_valid_trigger = yes scope:asp_replacement_3 ?= { asp_can_manage_story_trigger = yes asp_story_owned_by_event_root_trigger = yes var:asp_class = flag:ambition } }
+        hidden_effect = { scope:asp_replacement_3 ?= { if = { limit = { asp_can_manage_story_trigger = yes story_owner = root } save_scope_as = asp_selected_story story_owner = { trigger_event = asp_management.4 } } } }
+    }
+    option = { name = asp_replace_cancel }
 }

@@ -75,3 +75,5 @@ asp_test_vengeance.31 = {
 }
 
 asp_test_vengeance.32 = { type = character_event hidden = yes orphan = yes immediate = { imprison = { target = var:asp_test_visual_target type = dungeon } debug_log = "ASP_TEST V04 VISUAL CUSTODY" } }
+
+asp_test_vengeance.2 = { type = character_event hidden = yes immediate = { asp_test_lifecycle_regression_effect = yes } }

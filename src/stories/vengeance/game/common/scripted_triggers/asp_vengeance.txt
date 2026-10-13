@@ -18,5 +18,52 @@ asp_vengeance_can_choose_accountability_trigger = {
     asp_can_manage_story_trigger = yes
     has_variable = asp_vengeance_victim
     has_variable = asp_vengeance_custody_available
-    var:asp_target = { is_alive = yes NOT = { is_imprisoned_by = prev.story_owner } }
+    trigger_if = {
+        limit = { exists = var:asp_target }
+        var:asp_target = { is_alive = yes NOT = { is_imprisoned_by = prev.story_owner } }
+    }
+    trigger_else = { exists = var:asp_target }
+}
+
+asp_vengeance_can_declare_trigger = {
+    has_variable = asp_vengeance_victim
+    OR = { var:asp_interpretation = flag:personal_vengeance var:asp_interpretation = flag:accountability }
+    NOT = { has_variable = asp_vengeance_owner_responsible }
+    trigger_if = {
+        limit = { exists = var:asp_target }
+        var:asp_target = { is_alive = yes NOT = { is_imprisoned_by = prev.story_owner } }
+    }
+    trigger_else = { exists = var:asp_target }
+}
+# Revalidate an already-consumed, event-held incident before touching the chosen old ambition.
+asp_vengeance_replacement_cause_valid_trigger = {
+    is_alive = yes is_ai = no is_adult = yes is_ruler = yes is_landed = yes
+    exists = scope:asp_replacement_cause_owner
+    this = scope:asp_replacement_cause_owner
+    exists = scope:asp_replacement_cause_victim exists = scope:asp_replacement_cause_killer
+    this != scope:asp_replacement_cause_killer
+    scope:asp_replacement_cause_victim = { is_alive = no }
+    scope:asp_replacement_cause_killer = { is_alive = yes NOT = { is_imprisoned_by = root } }
+    in_diplomatic_range = scope:asp_replacement_cause_killer
+    # The qualifying bond was captured by the original death hook; death can remove that relation.
+    asp_vengeance_knows_incident_trigger = { VICTIM = scope:asp_replacement_cause_victim KILLER = scope:asp_replacement_cause_killer }
+    any_in_list = { variable = asp_vengeance_consumed this = scope:asp_replacement_cause_victim }
+    NOT = { any_owned_story = { asp_is_active_story_trigger = yes var:asp_family = flag:vengeance var:asp_target = scope:asp_replacement_cause_killer } }
+}
+
+asp_vengeance_has_terminal_progress_trigger = {
+    has_variable = asp_vengeance_victim
+    OR = {
+        var:asp_target = { is_alive = no }
+        AND = { var:asp_interpretation = flag:accountability has_variable = asp_vengeance_custody_available var:asp_target = { is_imprisoned_by = prev.story_owner } }
+    }
+}
+
+# Caller is the live event character; the Story link may have expired since opening.
+asp_vengeance_event_can_choose_accountability_trigger = {
+    trigger_if = {
+        limit = { exists = $STORY$ }
+        $STORY$ = { asp_vengeance_can_choose_accountability_trigger = yes asp_story_owned_by_event_root_trigger = yes }
+    }
+    trigger_else = { always = no }
 }

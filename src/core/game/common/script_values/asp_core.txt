@@ -49,7 +49,7 @@ asp_fulfillment_stress = {
 asp_abandonment_stress = {
     value = 0
     if = {
-        limit = { NOT = { asp_story_review_due_trigger = yes } }
+        limit = { NOT = { asp_story_free_release_trigger = yes } }
         value = asp_desire_abandonment_stress
         if = { limit = { var:asp_class = flag:ambition } value = asp_ambition_abandonment_stress }
         if = {
@@ -60,3 +60,14 @@ asp_abandonment_stress = {
         }
     }
 }
+
+asp_declare_min_days = { value = asp_declare_min_months multiply = asp_native_month_days }
+asp_pledge_days = { value = asp_pledge_years multiply = asp_native_year_days }
+asp_time_until_pledge_days = { value = var:asp_pledge_deadline subtract = current_date }
+asp_repeat_review_days = {
+    value = asp_desire_repeat_months multiply = asp_native_month_days
+    if = { limit = { var:asp_class = flag:ambition } value = asp_ambition_repeat_years multiply = asp_native_year_days }
+}
+asp_pledge_success_prestige = 100
+asp_pledge_failure_prestige = -100
+asp_pledge_failure_stress = 15

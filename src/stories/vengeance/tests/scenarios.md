@@ -31,3 +31,7 @@ Knowledge capability probe: `event asp_test_vengeance.10` compares explicit publ
 Do not repurpose core `.2` (C04 reload) or `.3` (C03 stale action). Test fixture and debug localization are dev-only. Record fresh report paths and actual screenshots in the ignored task report; never commit saves or logs.
 
 Observed Task 3 results on CK3 1.20.0.4: registered V01-V06 passed, including literal deltas/counts and cached duplicate identity; actual paused vanilla Execute separately passed +100 action Stress/-20 closure/one memory. Corrected native cards and all four distinct terminal meanings render in English. The earlier uppercase getter failure is retained in the ignored report/evidence. V07-V08 remain pending Task 4.
+
+## Task 4 pledge and lifecycle entry
+
+`event asp_test_vengeance.2` executes shared P01-P06 assertions from core’s `lifecycle-regression`; the `.1` V01-V06 entry remains unchanged. Required actual calendar, save/load, review/declaration/replacement UI, switch/return, owner death and succession procedures are documented in [core scenarios](../../../core/tests/scenarios.md). Secret fulfillment withdraws an unexpired public pledge, public fulfillment adds one core +100, and owner-caused impossibility cannot excuse a pledge. No direct-exposure knowledge gap is silently broadened.

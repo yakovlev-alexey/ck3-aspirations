@@ -75,6 +75,22 @@ asp_resolve_story_effect = {
                     }
                     OR = { var:asp_reward_policy = flag:normal var:asp_reward_policy = flag:none }
                 }
+                # Preserve simultaneous pledge-release precedence even when due settlement clears declaration.
+                if = { limit = { has_variable = asp_declared OR = { var:asp_outcome = flag:abandoned var:asp_outcome = flag:forgiven } }
+                    set_variable = { name = asp_terminal_public_release value = yes }
+                }
+                asp_settle_due_pledge_effect = yes
+                if = { limit = { has_variable = asp_declared }
+                    if = { limit = { var:asp_outcome = flag:fulfilled }
+                        if = { limit = { asp_family_public_fulfillment_trigger = yes } asp_settle_pledge_effect = { RESULT = fulfilled } }
+                        else = { asp_settle_pledge_effect = { RESULT = withdrawn } }
+                    }
+                    else_if = { limit = { var:asp_outcome = flag:impossible }
+                        if = { limit = { var:asp_family = flag:vengeance has_variable = asp_vengeance_owner_responsible } asp_settle_pledge_effect = { RESULT = withdrawn } }
+                        else = { asp_settle_pledge_effect = { RESULT = excused } }
+                    }
+                    else_if = { limit = { OR = { var:asp_outcome = flag:abandoned var:asp_outcome = flag:forgiven } } asp_settle_pledge_effect = { RESULT = withdrawn } }
+                }
                 set_variable = { name = asp_resolved value = yes }
                 if = {
                     limit = {
@@ -94,7 +110,7 @@ asp_resolve_story_effect = {
                         story_owner = { add_stress = scope:asp_terminal_stress }
                     }
                     else_if = {
-                        limit = { OR = { var:asp_outcome = flag:abandoned var:asp_outcome = flag:forgiven } }
+                        limit = { OR = { var:asp_outcome = flag:abandoned var:asp_outcome = flag:forgiven } NOT = { has_variable = asp_terminal_public_release } }
                         save_scope_value_as = { name = asp_terminal_stress value = asp_abandonment_stress }
                         story_owner = { add_stress = scope:asp_terminal_stress }
                     }
@@ -131,9 +147,17 @@ asp_refresh_story_effect = {
             set_variable = { name = asp_suspended value = yes }
         }
         else = {
-            # Return/pledge/progress precedence is completed and tested by Task 4.
-            remove_variable = asp_suspended
-            asp_family_check_progress_effect = yes
+            # At equality the pledge is expired, before any objective progress.
+            asp_settle_due_pledge_effect = yes
+            # Terminal processing must be the final effect on a story it can end.
+            # Keep suspension through this branch so absent completion grants no retrospective reward.
+            if = { limit = { asp_family_has_terminal_progress_trigger = yes }
+                asp_family_check_progress_effect = yes
+            }
+            else = {
+                remove_variable = asp_suspended
+                asp_offer_due_review_effect = yes
+            }
         }
     }
     else_if = {
@@ -201,5 +225,40 @@ asp_open_management_effect = {
             }
         }
         trigger_event = asp_management.1
+    }
+}
+
+asp_retain_story_effect = {
+    if = { limit = { asp_can_manage_story_trigger = yes asp_story_review_due_trigger = yes }
+        set_variable = { name = asp_next_review_date value = { value = current_date add = asp_repeat_review_days } }
+        remove_variable = asp_review_notified
+    }
+}
+asp_offer_due_review_effect = {
+    if = { limit = { asp_can_manage_story_trigger = yes asp_story_review_due_trigger = yes NOT = { has_variable = asp_review_notified } }
+        set_variable = { name = asp_review_notified value = yes }
+        save_scope_as = asp_selected_story
+        story_owner = { trigger_event = asp_core.1 }
+    }
+}
+asp_confirm_replacement_effect = {
+    if = { limit = { asp_vengeance_replacement_cause_valid_trigger = yes asp_active_ambitions <= asp_ambition_cap
+        scope:asp_selected_story ?= { asp_can_manage_story_trigger = yes story_owner = root var:asp_class = flag:ambition } }
+        # No mutation of the old story occurs until all new-cause guards pass.
+        scope:asp_selected_story = { asp_resolve_story_effect = { OUTCOME = abandoned REWARDS = normal } }
+        save_scope_as = asp_vengeance_origin_owner
+        scope:asp_replacement_cause_victim = { save_scope_as = asp_vengeance_origin_victim }
+        scope:asp_replacement_cause_killer = { save_scope_as = asp_vengeance_origin_killer }
+        asp_vengeance_create_effect = yes
+        clear_saved_scope = asp_selected_story
+        clear_saved_scope = asp_replacement_cause_owner
+    }
+}
+
+asp_reinterpret_story_effect = {
+    if = { limit = { asp_can_manage_story_trigger = yes var:asp_family = flag:vengeance has_variable = asp_vengeance_victim NOT = { has_variable = asp_declared }
+        var:asp_target = { is_alive = yes NOT = { is_imprisoned_by = prev.story_owner } } }
+        set_variable = { name = asp_interpretation value = flag:$INTERPRETATION$ }
+        asp_retain_story_effect = yes
     }
 }

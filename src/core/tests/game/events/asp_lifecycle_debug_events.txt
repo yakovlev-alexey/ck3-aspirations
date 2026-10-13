@@ -1,0 +1,24 @@
+﻿namespace = asp_test_core
+asp_test_core.30 = { type = character_event hidden = yes immediate = { asp_test_lifecycle_regression_effect = yes } }
+asp_test_core.31 = { type = character_event hidden = yes immediate = { asp_test_lifecycle_calendar_setup_effect = yes } }
+asp_test_core.32 = { type = character_event hidden = yes immediate = { asp_test_lifecycle_calendar_assert_effect = yes } }
+asp_test_core.33 = { type = character_event hidden = yes immediate = { asp_test_lifecycle_reload_assert_effect = yes } }
+asp_test_core.34 = { type = character_event hidden = yes immediate = { asp_test_lifecycle_switch_setup_effect = yes } }
+asp_test_core.35 = { type = character_event hidden = yes immediate = { asp_test_lifecycle_switch_return_assert_effect = yes } }
+asp_test_core.36 = { type = character_event hidden = yes immediate = { asp_test_lifecycle_absence_setup_effect = yes } }
+asp_test_core.37 = { type = character_event hidden = yes immediate = { asp_test_lifecycle_absence_return_assert_effect = yes } }
+asp_test_core.38 = { type = character_event hidden = yes immediate = { asp_test_lifecycle_owner_death_setup_effect = yes } }
+asp_test_core.39 = { type = character_event hidden = yes immediate = { asp_test_lifecycle_owner_death_assert_effect = yes } }
+asp_test_core.40 = { type = character_event hidden = yes immediate = { asp_test_lifecycle_replacement_ui_setup_effect = yes } }
+asp_test_core.41 = { type = character_event hidden = yes immediate = { asp_test_lifecycle_replacement_ui_assert_effect = yes } }
+asp_test_core.42 = { type = character_event hidden = yes immediate = { asp_test_lifecycle_switch_away_assert_effect = yes } }
+asp_test_core.43 = { type = character_event hidden = yes immediate = { asp_test_lifecycle_absence_act_effect = yes } }
+asp_test_core.44 = { type = character_event hidden = yes immediate = { asp_test_lifecycle_review_ui_open_effect = yes } }
+asp_test_core.45 = { type = character_event hidden = yes immediate = { asp_test_lifecycle_review_ui_assert_effect = yes } }
+asp_test_core.46 = { type = character_event hidden = yes immediate = { asp_test_lifecycle_reinterpret_ui_assert_effect = yes } }
+asp_test_core.50 = { type = character_event hidden = yes immediate = { asp_test_lifecycle_ui_birth_effect = yes } }
+asp_test_core.51 = { type = character_event hidden = yes immediate = { asp_test_lifecycle_ui_management_effect = yes } }
+asp_test_core.52 = { type = character_event hidden = yes immediate = { asp_test_lifecycle_ui_declared_assert_effect = yes } }
+asp_test_core.53 = { type = character_event hidden = yes immediate = { asp_test_lifecycle_ui_fulfillment_effect = yes } }
+asp_test_core.54 = { type = character_event hidden = yes immediate = { asp_test_lifecycle_dead_stale_snapshot_effect = yes } }
+asp_test_core.55 = { type = character_event hidden = yes immediate = { asp_test_lifecycle_dead_stale_assert_effect = yes } }

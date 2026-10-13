@@ -26,5 +26,6 @@
             asp_resolve_story_effect = { OUTCOME = fulfilled REWARDS = normal }
         }
     }
+    effect_group = { days = 1 triggered_effect = { trigger = { has_variable = asp_schema } effect = { asp_test_lifecycle_calendar_tick_effect = yes } } }
     on_owner_death = { asp_resolve_story_effect = { OUTCOME = owner_dead REWARDS = none } }
 }

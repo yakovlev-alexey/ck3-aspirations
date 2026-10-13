@@ -1,0 +1,6 @@
+﻿# Vanilla CompositionTypeAll uses type=all with story scope; preserve the native Story GUI context.
+asp_vengeance_story_information = {
+    type = all
+    text = { trigger = { has_variable = asp_declared } localization_key = asp_vengeance_story_information_declared }
+    text = { localization_key = asp_vengeance_story_information_private }
+}

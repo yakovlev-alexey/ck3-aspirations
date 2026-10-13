@@ -1,0 +1,602 @@
+﻿# Disposable fixtures shared by the registered runner and manual lifecycle entries.
+asp_test_lifecycle_pledge_story_effect = {
+    asp_test_vengeance_pair_effect = yes
+    asp_test_vengeance_origin_effect = yes
+    scope:asp_test_vengeance_story = {
+        set_variable = { name = asp_origin_date value = { value = current_date subtract = 360 } }
+        asp_declare_story_effect = yes
+    }
+}
+asp_test_lifecycle_snapshot_effect = {
+    set_variable = { name = asp_test_before value = prestige }
+    set_variable = { name = asp_test_stress_before value = stress }
+}
+asp_test_lifecycle_penalty_control_effect = {
+    set_variable = { name = asp_test_stress_before value = stress }
+    add_stress = 15
+    set_variable = { name = asp_test_penalty_control value = { value = stress subtract = var:asp_test_stress_before } }
+    add_stress = { value = var:asp_test_penalty_control multiply = -1 }
+}
+asp_test_p01_effect = {
+    asp_test_vengeance_clear_effect = yes
+    debug_log = "ASP_TEST P01 BEGIN"
+    set_variable = { name = asp_test_p01 value = 0 }
+    set_variable = { name = asp_test_review_checks value = 0 }
+    asp_test_create_story_effect = { CLASS = desire }
+    scope:asp_new_story = {
+        if = { limit = { asp_story_owned_by_event_root_trigger = yes NOT = { custom_description = { text = asp_story_owned_by_you story_owner = scope:asp_test_target } } } story_owner = { change_variable = { name = asp_test_review_checks add = 1 } } }
+        if = { limit = { asp_time_until_review_days = 720 } story_owner = { change_variable = { name = asp_test_review_checks add = 1 } } }
+        set_variable = { name = asp_origin_date value = { value = current_date subtract = 720 } }
+        set_variable = { name = asp_next_review_date value = current_date }
+        set_variable = { name = asp_test_saved_origin value = var:asp_origin_date }
+        asp_retain_story_effect = yes
+        if = { limit = { asp_time_until_review_days = 360 var:asp_origin_date = var:asp_test_saved_origin asp_abandonment_stress = 0 }
+            story_owner = { change_variable = { name = asp_test_review_checks add = 1 } }
+        }
+    }
+    set_variable = { name = asp_test_stress_before value = stress }
+    scope:asp_new_story = { asp_resolve_story_effect = { OUTCOME = abandoned REWARDS = normal } }
+    set_variable = { name = asp_test_release_delta value = { value = stress subtract = var:asp_test_stress_before } }
+    asp_test_create_story_effect = { CLASS = ambition }
+    scope:asp_new_story = {
+        if = { limit = { asp_time_until_review_days = 2920 } story_owner = { change_variable = { name = asp_test_review_checks add = 1 } } }
+        set_variable = { name = asp_origin_date value = { value = current_date subtract = 2920 } }
+        set_variable = { name = asp_next_review_date value = current_date }
+        set_variable = { name = asp_test_saved_origin value = var:asp_origin_date }
+        asp_retain_story_effect = yes
+        if = { limit = { asp_time_until_review_days = 1095 var:asp_origin_date = var:asp_test_saved_origin asp_abandonment_stress = 0 }
+            story_owner = { change_variable = { name = asp_test_review_checks add = 1 } }
+        }
+    }
+    asp_test_vengeance_clear_effect = yes
+    asp_test_vengeance_pair_effect = yes
+    asp_test_vengeance_origin_effect = yes
+    scope:asp_test_vengeance_story = {
+        set_variable = { name = asp_origin_date value = { value = current_date subtract = 2920 } }
+        set_variable = { name = asp_next_review_date value = current_date }
+        set_variable = { name = asp_test_saved_origin value = var:asp_origin_date }
+        asp_reinterpret_story_effect = { INTERPRETATION = accountability }
+        if = { limit = { var:asp_interpretation = flag:accountability var:asp_origin_date = var:asp_test_saved_origin asp_time_until_review_days = 1095 }
+            story_owner = { change_variable = { name = asp_test_review_checks add = 1 } }
+        }
+    }
+    if = { limit = { var:asp_test_review_checks = 6 var:asp_test_release_delta = 0 } set_variable = { name = asp_test_p01 value = 1 } debug_log = "ASP_TEST P01 PASS" }
+    else = { debug_log = "ASP_TEST P01 FAIL" }
+}
+asp_test_p02_effect = {
+    asp_test_vengeance_clear_effect = yes
+    debug_log = "ASP_TEST P02 BEGIN"
+    set_variable = { name = asp_test_p02 value = 0 }
+    set_variable = { name = asp_test_declare_checks value = 0 }
+    asp_test_vengeance_pair_effect = yes
+    asp_test_vengeance_origin_effect = yes
+    scope:asp_test_vengeance_story = {
+        save_scope_as = asp_selected_story
+        set_variable = { name = asp_origin_date value = { value = current_date subtract = 330 } }
+        root = { if = { limit = { NOT = { asp_event_can_declare_trigger = yes } } change_variable = { name = asp_test_declare_checks add = 1 } } }
+        asp_declare_story_effect = yes
+        if = { limit = { NOT = { has_variable = asp_declared } } story_owner = { change_variable = { name = asp_test_declare_checks add = 1 } } }
+        set_variable = { name = asp_origin_date value = { value = current_date subtract = 360 } }
+        root = { if = { limit = { asp_event_can_declare_trigger = yes asp_vengeance_event_can_choose_accountability_trigger = { STORY = scope:asp_selected_story } } change_variable = { name = asp_test_declare_checks add = 1 } } }
+        asp_declare_story_effect = yes
+        set_variable = { name = asp_test_saved_deadline value = var:asp_pledge_deadline }
+        asp_declare_story_effect = yes
+        if = { limit = { has_variable = asp_declared asp_time_until_pledge_days = 1825 var:asp_pledge_deadline = var:asp_test_saved_deadline }
+            story_owner = { change_variable = { name = asp_test_declare_checks add = 1 } }
+        }
+        asp_settle_pledge_effect = { RESULT = excused }
+        asp_declare_story_effect = yes
+        if = { limit = { NOT = { has_variable = asp_declared } var:asp_pledge_deadline = var:asp_test_saved_deadline }
+            story_owner = { change_variable = { name = asp_test_declare_checks add = 1 } }
+        }
+    }
+    asp_test_vengeance_clear_effect = yes
+    asp_test_vengeance_pair_effect = yes
+    asp_test_vengeance_origin_effect = yes
+    scope:asp_test_vengeance_story = { save_scope_as = asp_selected_story set_variable = { name = asp_origin_date value = { value = current_date subtract = 360 } } }
+    imprison = { target = scope:asp_test_vengeance_killer type = dungeon }
+    if = { limit = { NOT = { asp_event_can_declare_trigger = yes } } change_variable = { name = asp_test_declare_checks add = 1 } }
+    scope:asp_test_vengeance_story ?= {
+        asp_declare_story_effect = yes
+        if = { limit = { NOT = { has_variable = asp_declared } } story_owner = { change_variable = { name = asp_test_declare_checks add = 1 } } }
+    }
+    if = { limit = { var:asp_test_declare_checks = 7 } set_variable = { name = asp_test_p02 value = 1 } debug_log = "ASP_TEST P02 PASS" }
+    else = { debug_log = "ASP_TEST P02 FAIL" }
+}
+asp_test_p03_effect = {
+    asp_test_vengeance_clear_effect = yes
+    debug_log = "ASP_TEST P03 BEGIN"
+    set_variable = { name = asp_test_p03 value = 0 }
+    set_variable = { name = asp_test_settlement_checks value = 0 }
+    asp_test_lifecycle_penalty_control_effect = yes
+    asp_test_lifecycle_pledge_story_effect = yes
+    asp_test_lifecycle_snapshot_effect = yes
+    scope:asp_test_vengeance_story = {
+        set_variable = { name = asp_pledge_deadline value = current_date }
+        asp_refresh_story_effect = yes
+        asp_refresh_story_effect = yes
+        if = { limit = { var:asp_pledge_result = flag:expired has_variable = asp_pledge_settled NOT = { has_variable = asp_declared } }
+            story_owner = { change_variable = { name = asp_test_settlement_checks add = 1 } }
+        }
+    }
+    set_variable = { name = asp_test_penalty_prestige value = { value = prestige subtract = var:asp_test_before } }
+    set_variable = { name = asp_test_penalty_stress value = { value = stress subtract = var:asp_test_stress_before } }
+    if = { limit = { var:asp_test_penalty_prestige = -100 var:asp_test_penalty_stress = var:asp_test_penalty_control } change_variable = { name = asp_test_settlement_checks add = 1 } }
+    asp_test_vengeance_clear_effect = yes
+    asp_test_lifecycle_pledge_story_effect = yes
+    asp_test_lifecycle_snapshot_effect = yes
+    scope:asp_test_vengeance_story = { save_scope_as = asp_selected_story }
+    asp_withdraw_selected_pledge_effect = yes
+    asp_withdraw_selected_pledge_effect = yes
+    if = { limit = { prestige = { value = var:asp_test_before subtract = 100 } stress = { value = var:asp_test_stress_before add = var:asp_test_penalty_control } } change_variable = { name = asp_test_settlement_checks add = 1 } }
+    asp_test_vengeance_clear_effect = yes
+    asp_test_lifecycle_pledge_story_effect = yes
+    asp_test_lifecycle_snapshot_effect = yes
+    scope:asp_test_vengeance_story = { asp_resolve_story_effect = { OUTCOME = abandoned REWARDS = normal } }
+    if = { limit = { prestige = { value = var:asp_test_before subtract = 100 } stress = { value = var:asp_test_stress_before add = var:asp_test_penalty_control } } change_variable = { name = asp_test_settlement_checks add = 1 } }
+    asp_test_vengeance_clear_effect = yes
+    asp_test_lifecycle_pledge_story_effect = yes
+    asp_test_lifecycle_snapshot_effect = yes
+    scope:asp_test_vengeance_killer = { death = { killer = root death_reason = death_duel } }
+    scope:asp_test_vengeance_story ?= { asp_refresh_story_effect = yes }
+    if = { limit = { prestige = { value = var:asp_test_before add = 100 } stress = { value = var:asp_test_stress_before subtract = 20 } } change_variable = { name = asp_test_settlement_checks add = 1 } }
+    asp_test_vengeance_clear_effect = yes
+    asp_test_lifecycle_pledge_story_effect = yes
+    scope:asp_test_vengeance_story = { set_variable = { name = asp_interpretation value = flag:accountability } }
+    asp_test_lifecycle_snapshot_effect = yes
+    imprison = { target = scope:asp_test_vengeance_killer type = dungeon }
+    scope:asp_test_vengeance_story ?= { asp_refresh_story_effect = yes }
+    if = { limit = { prestige = { value = var:asp_test_before add = 200 } stress = { value = var:asp_test_stress_before subtract = 20 } } change_variable = { name = asp_test_settlement_checks add = 1 } }
+    asp_test_vengeance_clear_effect = yes
+    asp_test_lifecycle_pledge_story_effect = yes
+    asp_test_lifecycle_snapshot_effect = yes
+    scope:asp_test_vengeance_killer = { death = { killer = root death_reason = death_murder } }
+    scope:asp_test_vengeance_story ?= { asp_refresh_story_effect = yes }
+    if = { limit = { prestige = { value = var:asp_test_before subtract = 100 } stress = { value = var:asp_test_stress_before add = var:asp_test_penalty_control subtract = 20 } } change_variable = { name = asp_test_settlement_checks add = 1 } }
+    asp_test_vengeance_clear_effect = yes
+    asp_test_lifecycle_pledge_story_effect = yes
+    asp_test_lifecycle_snapshot_effect = yes
+    scope:asp_test_vengeance_killer = { death = { death_reason = death_natural_causes } }
+    scope:asp_test_vengeance_story ?= { asp_refresh_story_effect = yes }
+    if = { limit = { prestige = var:asp_test_before stress = var:asp_test_stress_before } change_variable = { name = asp_test_settlement_checks add = 1 } }
+    asp_test_vengeance_clear_effect = yes
+    asp_test_lifecycle_pledge_story_effect = yes
+    scope:asp_test_vengeance_story = { set_variable = { name = asp_pledge_deadline value = current_date } }
+    asp_test_lifecycle_snapshot_effect = yes
+    scope:asp_test_vengeance_killer = { death = { killer = root death_reason = death_duel } }
+    scope:asp_test_vengeance_story ?= { asp_refresh_story_effect = yes }
+    if = { limit = { prestige = { value = var:asp_test_before subtract = 100 } stress = { value = var:asp_test_stress_before add = var:asp_test_penalty_control subtract = 20 } } change_variable = { name = asp_test_settlement_checks add = 1 } }
+    asp_test_vengeance_clear_effect = yes
+    asp_test_lifecycle_pledge_story_effect = yes
+    scope:asp_test_vengeance_story = { set_variable = { name = asp_interpretation value = flag:accountability } }
+    asp_test_lifecycle_snapshot_effect = yes
+    scope:asp_test_vengeance_killer = { death = { killer = root death_reason = death_duel } }
+    scope:asp_test_vengeance_story ?= { asp_refresh_story_effect = yes }
+    if = { limit = { prestige = { value = var:asp_test_before subtract = 100 } stress = { value = var:asp_test_stress_before add = var:asp_test_penalty_control } } change_variable = { name = asp_test_settlement_checks add = 1 } }
+    if = { limit = { var:asp_test_settlement_checks = 10 } set_variable = { name = asp_test_p03 value = 1 } debug_log = "ASP_TEST P03 PASS" }
+    else = { debug_log = "ASP_TEST P03 FAIL" }
+}
+asp_test_p04_effect = {
+    asp_test_vengeance_clear_effect = yes
+    debug_log = "ASP_TEST P04 BEGIN"
+    asp_test_lifecycle_pledge_story_effect = yes
+    asp_test_lifecycle_snapshot_effect = yes
+    scope:asp_test_vengeance_story = {
+        set_variable = { name = asp_suspended value = yes }
+        set_variable = { name = asp_pledge_deadline value = current_date }
+        asp_refresh_story_effect = yes
+        asp_refresh_story_effect = yes
+    }
+    set_variable = { name = asp_test_return_prestige value = { value = prestige subtract = var:asp_test_before } }
+    set_variable = { name = asp_test_return_stress value = { value = stress subtract = var:asp_test_stress_before } }
+    set_variable = { name = asp_test_p04 value = 0 }
+    if = { limit = { var:asp_test_return_prestige = -100 var:asp_test_return_stress = var:asp_test_penalty_control
+        scope:asp_test_vengeance_story = { has_variable = asp_pledge_settled NOT = { has_variable = asp_declared } NOT = { has_variable = asp_suspended } } }
+        set_variable = { name = asp_test_p04 value = 1 } debug_log = "ASP_TEST P04 PASS"
+    }
+    else = { debug_log = "ASP_TEST P04 FAIL" }
+}
+asp_test_p05_effect = {
+    asp_test_vengeance_clear_effect = yes
+    debug_log = "ASP_TEST P05 BEGIN"
+    asp_test_lifecycle_pledge_story_effect = yes
+    scope:asp_test_vengeance_story = { set_variable = { name = asp_suspended value = yes } }
+    asp_test_lifecycle_snapshot_effect = yes
+    scope:asp_test_vengeance_killer = { death = { killer = root death_reason = death_duel } }
+    scope:asp_test_vengeance_story ?= { asp_refresh_story_effect = yes }
+    scope:asp_test_vengeance_story ?= { asp_refresh_story_effect = yes }
+    set_variable = { name = asp_test_absent_stress value = { value = stress subtract = var:asp_test_stress_before } }
+    set_variable = { name = asp_test_p05 value = 0 }
+    if = { limit = { var:asp_test_absent_stress = 0 prestige = var:asp_test_before asp_active_ambitions = 0
+        any_memory = { has_memory_type = asp_vengeance_personal_memory has_memory_participant = scope:asp_test_vengeance_victim } }
+        set_variable = { name = asp_test_p05 value = 1 }
+    }
+    # Owner-death terminal policy is also tested here; actual native death/succession remains mandatory.
+    asp_test_create_story_effect = { CLASS = ambition }
+    scope:asp_new_story = { save_scope_as = asp_selected_story asp_resolve_story_effect = { OUTCOME = owner_dead REWARDS = none } }
+    scope:asp_selected_story ?= {
+        if = { limit = { OR = { asp_vengeance_can_choose_accountability_trigger = yes asp_vengeance_can_declare_trigger = yes } }
+            root = { set_variable = { name = asp_test_p05 value = 0 } }
+        }
+    }
+    if = { limit = { OR = { asp_event_can_declare_trigger = yes asp_vengeance_event_can_choose_accountability_trigger = { STORY = scope:asp_selected_story } } } set_variable = { name = asp_test_p05 value = 0 } }
+    asp_test_lifecycle_snapshot_effect = yes
+    asp_abandon_selected_story_effect = yes
+    if = { limit = { NOT = { AND = { prestige = var:asp_test_before stress = var:asp_test_stress_before } } } set_variable = { name = asp_test_p05 value = 0 } }
+    set_variable = { name = asp_test_dead_original_owner value = scope:asp_test_vengeance_killer }
+    asp_test_lifecycle_dead_stale_snapshot_effect = yes
+    asp_abandon_selected_story_effect = yes
+    asp_test_lifecycle_dead_stale_assert_effect = yes
+    if = { limit = { var:asp_test_p05 = 1 var:asp_test_stale_succession = 1 asp_active_ambitions = 0 var:asp_test_ending_reward_policy = flag:none } debug_log = "ASP_TEST P05 PASS" }
+    else = { set_variable = { name = asp_test_p05 value = 0 } debug_log = "ASP_TEST P05 FAIL" }
+}
+asp_test_p06_effect = {
+    asp_test_vengeance_clear_effect = yes
+    debug_log = "ASP_TEST P06 BEGIN"
+    set_variable = { name = asp_test_p06 value = 0 }
+    set_variable = { name = asp_test_replacement_checks value = 0 }
+    # Independent same-owner ordinary release control for adjusted Stress.
+    asp_test_create_story_effect = { CLASS = ambition }
+    set_variable = { name = asp_test_stress_before value = stress }
+    scope:asp_new_story = { asp_resolve_story_effect = { OUTCOME = abandoned REWARDS = normal } }
+    set_variable = { name = asp_test_replacement_control value = { value = stress subtract = var:asp_test_stress_before } }
+    while = { count = 3 asp_test_create_story_effect = { CLASS = ambition } }
+    scope:asp_new_story = { save_scope_as = asp_test_replaced_story set_variable = { name = asp_test_saved_id value = var:asp_instance_id } }
+    set_variable = { name = asp_test_before_id value = var:asp_next_instance_id }
+    asp_test_vengeance_pair_effect = yes
+    asp_test_vengeance_origin_effect = yes
+    if = { limit = { asp_active_ambitions = 3 var:asp_next_instance_id = var:asp_test_before_id exists = scope:asp_replacement_cause_victim
+        any_in_list = { variable = asp_vengeance_consumed this = scope:asp_test_vengeance_victim } }
+        change_variable = { name = asp_test_replacement_checks add = 1 }
+    }
+    # Cancellation is deliberately no action: consume prevents another offer.
+    asp_start_vengeance_effect = { VICTIM = scope:asp_test_vengeance_victim KILLER = scope:asp_test_vengeance_killer }
+    if = { limit = { asp_active_ambitions = 3 var:asp_next_instance_id = var:asp_test_before_id } change_variable = { name = asp_test_replacement_checks add = 1 } }
+    scope:asp_test_replaced_story = { save_scope_as = asp_selected_story }
+    # A stale/newly impossible cause must leave the old selected story intact.
+    scope:asp_replacement_cause_killer = { save_scope_as = asp_test_replacement_valid_killer }
+    clear_saved_scope = asp_replacement_cause_killer
+    asp_confirm_replacement_effect = yes
+    if = { limit = { asp_active_ambitions = 3 scope:asp_test_replaced_story ?= { var:asp_instance_id = var:asp_test_saved_id } } change_variable = { name = asp_test_replacement_checks add = 1 } }
+    scope:asp_test_replacement_valid_killer = { save_scope_as = asp_replacement_cause_killer }
+    set_variable = { name = asp_test_stress_before value = stress }
+    asp_confirm_replacement_effect = yes
+    asp_confirm_replacement_effect = yes
+    set_variable = { name = asp_test_replacement_count value = asp_active_ambitions }
+    set_variable = { name = asp_test_replacement_delta value = { value = stress subtract = var:asp_test_stress_before } }
+    set_variable = { name = asp_test_expected_new_id value = { value = var:asp_test_before_id add = 1 } }
+    if = { limit = { var:asp_test_replacement_count = 3 var:asp_next_instance_id = var:asp_test_expected_new_id
+        var:asp_test_replacement_delta = var:asp_test_replacement_control var:asp_test_replacement_checks = 3
+        NOT = { exists = scope:asp_test_replaced_story } exists = scope:asp_vengeance_new_story
+        scope:asp_vengeance_new_story = { var:asp_target = scope:asp_test_vengeance_killer var:asp_vengeance_victim = scope:asp_test_vengeance_victim } }
+        set_variable = { name = asp_test_p06 value = 1 } debug_log = "ASP_TEST P06 PASS"
+    }
+    else = { debug_log = "ASP_TEST P06 FAIL" }
+    # A declared selected old ambition charges its pledge cost, without an ordinary private surcharge.
+    asp_test_vengeance_clear_effect = yes
+    while = { count = 3 asp_test_lifecycle_calendar_story_effect = yes }
+    scope:asp_test_vengeance_story = {
+        set_variable = { name = asp_origin_date value = { value = current_date subtract = 360 } }
+        asp_declare_story_effect = yes
+        save_scope_as = asp_test_replaced_story
+    }
+    asp_test_vengeance_pair_effect = yes
+    asp_test_vengeance_origin_effect = yes
+    scope:asp_test_replaced_story = { save_scope_as = asp_selected_story }
+    asp_test_lifecycle_snapshot_effect = yes
+    asp_confirm_replacement_effect = yes
+    if = { limit = { var:asp_test_p06 = 1 asp_active_ambitions = 3 NOT = { exists = scope:asp_test_replaced_story }
+        prestige = { value = var:asp_test_before subtract = 100 } stress = { value = var:asp_test_stress_before add = var:asp_test_penalty_control } }
+        debug_log = "ASP_TEST P06 DECLARED REPLACEMENT PASS"
+    }
+    else = { set_variable = { name = asp_test_p06 value = 0 } debug_log = "ASP_TEST P06 DECLARED REPLACEMENT FAIL" }
+}
+asp_test_lifecycle_regression_effect = {
+    asp_test_p01_effect = yes
+    asp_test_p02_effect = yes
+    asp_test_p03_effect = yes
+    asp_test_lifecycle_ui_replay_effect = yes
+    asp_test_p04_effect = yes
+    asp_test_p05_effect = yes
+    asp_test_p06_effect = yes
+}
+
+# Shared near-boundary fixtures: real tick_day is required between preparation and assertions.
+asp_test_lifecycle_calendar_setup_effect = {
+    asp_test_vengeance_clear_effect = yes
+    set_variable = { name = asp_test_calendar_before value = current_date }
+    set_variable = { name = asp_test_native_month_timer value = yes months = 12 }
+    set_variable = { name = asp_test_native_repeat_timer value = yes years = 3 }
+    set_variable = { name = asp_test_native_pledge_timer value = yes years = 5 }
+    asp_test_create_story_effect = { CLASS = desire }
+    set_variable = { name = asp_test_calendar_desire value = scope:asp_new_story }
+    scope:asp_new_story = {
+        set_variable = { name = asp_origin_date value = { value = current_date subtract = 719 } }
+        set_variable = { name = asp_next_review_date value = { value = current_date add = 1 } }
+        set_variable = { name = asp_test_original_origin value = var:asp_origin_date }
+        set_variable = { name = asp_test_original_target value = var:asp_target }
+        set_variable = { name = asp_test_original_id value = var:asp_instance_id }
+    }
+    asp_test_lifecycle_calendar_story_effect = yes
+    set_variable = { name = asp_test_calendar_ambition value = scope:asp_test_vengeance_story }
+    scope:asp_test_vengeance_story = {
+        set_variable = { name = asp_origin_date value = { value = current_date subtract = 2919 } }
+        set_variable = { name = asp_next_review_date value = { value = current_date add = 1 } }
+        set_variable = { name = asp_test_original_origin value = var:asp_origin_date }
+        set_variable = { name = asp_test_original_target value = var:asp_target }
+        set_variable = { name = asp_test_original_id value = var:asp_instance_id }
+    }
+    asp_test_lifecycle_calendar_story_effect = yes
+    set_variable = { name = asp_test_calendar_declare_story value = scope:asp_test_vengeance_story }
+    scope:asp_test_vengeance_story = { set_variable = { name = asp_origin_date value = { value = current_date subtract = 359 } } }
+    asp_test_lifecycle_calendar_story_effect = yes
+    scope:asp_test_vengeance_story = { set_variable = { name = asp_origin_date value = { value = current_date subtract = 360 } } asp_declare_story_effect = yes }
+    set_variable = { name = asp_test_calendar_pledge_story value = scope:asp_test_vengeance_story }
+    scope:asp_test_vengeance_story = {
+        set_variable = { name = asp_pledge_deadline value = { value = current_date add = 1 } }
+        set_variable = { name = asp_test_calendar_cost_observer value = yes }
+        set_variable = { name = asp_test_original_deadline value = var:asp_pledge_deadline }
+        set_variable = { name = asp_test_original_origin value = var:asp_origin_date }
+        set_variable = { name = asp_test_original_target value = var:asp_target }
+        set_variable = { name = asp_test_original_id value = var:asp_instance_id }
+    }
+    asp_test_lifecycle_penalty_control_effect = yes
+    set_variable = { name = asp_test_calendar_control value = var:asp_test_penalty_control }
+    set_variable = { name = asp_test_calendar_prestige_before value = prestige }
+    set_variable = { name = asp_test_calendar_stress_before value = stress }
+    if = { limit = {
+        var:asp_test_calendar_desire = { asp_story_age_days = 719 NOT = { asp_story_review_due_trigger = yes } }
+        var:asp_test_calendar_ambition = { asp_story_age_days = 2919 NOT = { asp_story_review_due_trigger = yes } }
+        var:asp_test_calendar_declare_story = { NOT = { asp_can_declare_story_trigger = yes } }
+        var:asp_test_calendar_pledge_story = { has_variable = asp_declared NOT = { asp_pledge_due_trigger = yes } }
+    } debug_log = "ASP_TEST P01 P02 P03 CALENDAR BEFORE PASS" }
+    else = { debug_log = "ASP_TEST P01 P02 P03 CALENDAR BEFORE FAIL" }
+    debug_log = "ASP_TEST LIFECYCLE CALENDAR READY"
+}
+asp_test_lifecycle_calendar_assert_effect = {
+    set_variable = { name = asp_test_calendar_after value = current_date }
+    set_variable = { name = asp_test_calendar_reviews value = 0 }
+    var:asp_test_calendar_desire ?= { if = { limit = { asp_story_age_days = 720 asp_story_review_due_trigger = yes has_variable = asp_review_notified } story_owner = { change_variable = { name = asp_test_calendar_reviews add = 1 } } } }
+    var:asp_test_calendar_ambition ?= { if = { limit = { asp_story_age_days = 2920 asp_story_review_due_trigger = yes has_variable = asp_review_notified } story_owner = { change_variable = { name = asp_test_calendar_reviews add = 1 } } } }
+    set_variable = { name = asp_test_calendar_declare value = 0 }
+    if = { limit = { var:asp_test_calendar_declare_story ?= { asp_story_age_days = 360 asp_can_declare_story_trigger = yes } } set_variable = { name = asp_test_calendar_declare value = 1 } }
+    # Costs are measured immediately around the real daily callback, excluding native day income/losses.
+    if = { limit = { var:asp_test_calendar_reviews = 2 var:asp_test_calendar_declare = 1 var:asp_test_calendar_prestige = -100 var:asp_test_calendar_stress = var:asp_test_calendar_control
+        var:asp_test_calendar_pledge_story ?= { var:asp_pledge_deadline = var:asp_test_original_deadline has_variable = asp_pledge_settled var:asp_pledge_result = flag:expired }
+    } debug_log = "ASP_TEST P01 P02 P03 CALENDAR AFTER PASS" }
+    else = { debug_log = "ASP_TEST P01 P02 P03 CALENDAR AFTER FAIL" }
+}
+asp_test_lifecycle_reload_assert_effect = {
+    set_variable = { name = asp_test_reload_identity value = 0 }
+    set_variable = { name = asp_test_reload_current_date value = current_date }
+    if = { limit = {
+        var:asp_test_reload_current_date = var:asp_test_calendar_before
+        exists = var:asp_test_calendar_desire exists = var:asp_test_calendar_ambition exists = var:asp_test_calendar_pledge_story
+        var:asp_test_calendar_desire ?= { var:asp_instance_id = var:asp_test_original_id var:asp_target = var:asp_test_original_target var:asp_origin_date = var:asp_test_original_origin asp_time_until_review_days = 1 }
+        var:asp_test_calendar_ambition ?= { var:asp_instance_id = var:asp_test_original_id var:asp_target = var:asp_test_original_target var:asp_origin_date = var:asp_test_original_origin asp_time_until_review_days = 1 }
+        var:asp_test_calendar_pledge_story ?= { var:asp_instance_id = var:asp_test_original_id var:asp_target = var:asp_test_original_target var:asp_origin_date = var:asp_test_original_origin var:asp_pledge_deadline = var:asp_test_original_deadline has_variable = asp_declared asp_time_until_pledge_days = 1 }
+    } set_variable = { name = asp_test_reload_identity value = 1 } debug_log = "ASP_TEST LIFECYCLE ACTUAL RELOAD PASS" }
+    else = { debug_log = "ASP_TEST LIFECYCLE ACTUAL RELOAD FAIL" }
+}
+
+asp_test_lifecycle_calendar_story_effect = {
+    asp_test_create_story_effect = { CLASS = ambition }
+    create_character = { name = "Calendar Victim" age = 30 gender = male random_traits = no culture = root.culture faith = root.faith employer = root save_scope_as = asp_test_calendar_victim }
+    scope:asp_test_calendar_victim = { death = { death_reason = death_natural_causes } }
+    scope:asp_new_story = {
+        set_variable = { name = asp_vengeance_victim value = scope:asp_test_calendar_victim }
+        set_variable = { name = asp_interpretation value = flag:personal_vengeance }
+        set_variable = { name = asp_vengeance_custody_available value = yes }
+        save_scope_as = asp_test_vengeance_story
+    }
+}
+asp_test_lifecycle_calendar_tick_effect = {
+    if = { limit = { has_variable = asp_test_calendar_cost_observer story_owner = { is_ai = no } }
+        story_owner = {
+            set_variable = { name = asp_test_calendar_prestige_before value = prestige }
+            set_variable = { name = asp_test_calendar_stress_before value = stress }
+        }
+        asp_refresh_story_effect = yes
+        story_owner = {
+            set_variable = { name = asp_test_calendar_prestige value = { value = prestige subtract = var:asp_test_calendar_prestige_before } }
+            set_variable = { name = asp_test_calendar_stress value = { value = stress subtract = var:asp_test_calendar_stress_before } }
+        }
+    }
+    else = { asp_refresh_story_effect = yes }
+}
+
+# Actual console play switches are required; these fixtures never switch the player themselves.
+asp_test_lifecycle_switch_setup_effect = {
+    asp_test_vengeance_clear_effect = yes
+    asp_test_lifecycle_calendar_story_effect = yes
+    set_variable = { name = asp_test_switch_story value = scope:asp_test_vengeance_story }
+    set_variable = { name = asp_test_switch_target value = scope:asp_test_target }
+    scope:asp_test_vengeance_story = {
+        set_variable = { name = asp_origin_date value = { value = current_date subtract = 360 } }
+        asp_declare_story_effect = yes
+        set_variable = { name = asp_pledge_deadline value = { value = current_date add = 1 } }
+        set_variable = { name = asp_test_original_origin value = var:asp_origin_date }
+        set_variable = { name = asp_test_original_deadline value = var:asp_pledge_deadline }
+    }
+    random_independent_ruler = { limit = { is_alive = yes is_adult = yes is_landed = yes this != root } save_scope_as = asp_test_switch_other }
+    set_variable = { name = asp_test_switch_other value = scope:asp_test_switch_other }
+    scope:asp_test_switch_other = {
+        set_variable = { name = asp_test_switch_original_owner value = root }
+        set_variable = { name = asp_test_switch_other_prestige value = prestige }
+        set_variable = { name = asp_test_switch_other_stress value = stress }
+    }
+    asp_test_lifecycle_penalty_control_effect = yes
+    set_variable = { name = asp_test_switch_control value = var:asp_test_penalty_control }
+    asp_test_lifecycle_snapshot_effect = yes
+    debug_log_scopes = yes
+    scope:asp_test_switch_other = { debug_log_scopes = yes }
+    debug_log = "ASP_TEST P04 SWITCH READY"
+}
+# Called on the new player after the real day advance, immediately before real return.
+asp_test_lifecycle_switch_away_assert_effect = {
+    if = { limit = {
+        has_variable = asp_test_switch_original_owner
+        var:asp_test_switch_original_owner = { is_ai = yes var:asp_test_switch_story ?= { has_variable = asp_suspended has_variable = asp_declared asp_pledge_due_trigger = yes } }
+        asp_active_stories = 0
+    } debug_log = "ASP_TEST P04 ACTUAL AWAY PASS" }
+    else = { debug_log = "ASP_TEST P04 ACTUAL AWAY FAIL" }
+    # Day income is not a pledge consequence. Snapshot both owners at the return boundary.
+    set_variable = { name = asp_test_switch_other_prestige value = prestige }
+    set_variable = { name = asp_test_switch_other_stress value = stress }
+    var:asp_test_switch_original_owner ?= { asp_test_lifecycle_snapshot_effect = yes }
+}
+asp_test_lifecycle_switch_return_assert_effect = {
+    var:asp_test_switch_story ?= { asp_refresh_story_effect = yes }
+    var:asp_test_switch_story ?= { asp_refresh_story_effect = yes }
+    if = { limit = {
+        prestige = { value = var:asp_test_before subtract = 100 }
+        stress = { value = var:asp_test_stress_before add = var:asp_test_switch_control }
+        var:asp_test_switch_story ?= { has_variable = asp_pledge_settled var:asp_pledge_result = flag:expired NOT = { has_variable = asp_suspended } var:asp_origin_date = var:asp_test_original_origin var:asp_pledge_deadline = var:asp_test_original_deadline }
+        var:asp_test_switch_other = { is_ai = yes prestige = var:asp_test_switch_other_prestige stress = var:asp_test_switch_other_stress }
+    } debug_log = "ASP_TEST P04 ACTUAL RETURN PASS" }
+    else = { debug_log = "ASP_TEST P04 ACTUAL RETURN FAIL" }
+}
+asp_test_lifecycle_absence_setup_effect = {
+    asp_test_lifecycle_switch_setup_effect = yes
+    var:asp_test_switch_story = { remove_variable = asp_declared remove_variable = asp_pledge_deadline remove_variable = asp_pledge_audience }
+    debug_log = "ASP_TEST P05 ABSENCE READY"
+}
+# Invoke on the new player: scripted objective completion while the original owner is really AI.
+asp_test_lifecycle_absence_act_effect = {
+    var:asp_test_switch_original_owner ?= {
+        asp_test_lifecycle_snapshot_effect = yes
+        var:asp_test_switch_story = { var:asp_vengeance_victim = { save_scope_as = asp_test_absence_victim } }
+        set_variable = { name = asp_test_absence_victim value = scope:asp_test_absence_victim }
+        var:asp_test_switch_target = { death = { killer = prev death_reason = death_duel } }
+        if = { limit = { var:asp_test_switch_story ?= { has_variable = asp_suspended has_variable = asp_vengeance_owner_responsible } asp_active_ambitions = 1 }
+            debug_log = "ASP_TEST P05 ACTUAL ABSENT OBJECTIVE PASS"
+        }
+        else = { debug_log = "ASP_TEST P05 ACTUAL ABSENT OBJECTIVE FAIL" }
+    }
+}
+asp_test_lifecycle_absence_return_assert_effect = {
+    if = { limit = { asp_active_ambitions = 0 NOT = { exists = var:asp_test_switch_story }
+        prestige = var:asp_test_before stress = var:asp_test_stress_before
+        any_memory = { has_memory_type = asp_vengeance_personal_memory has_memory_participant = root.var:asp_test_absence_victim }
+    } debug_log = "ASP_TEST P05 ACTUAL RETURN PASS" }
+    else = { debug_log = "ASP_TEST P05 ACTUAL RETURN FAIL" }
+}
+asp_test_lifecycle_owner_death_setup_effect = {
+    asp_test_vengeance_clear_effect = yes
+    asp_test_lifecycle_calendar_story_effect = yes
+    scope:asp_test_vengeance_story = { set_variable = { name = asp_origin_date value = { value = current_date subtract = 360 } } asp_declare_story_effect = yes }
+    primary_heir = { set_variable = { name = asp_test_dead_original_owner value = root } }
+    debug_log = "ASP_TEST P05 OWNER DEATH READY"
+}
+asp_test_lifecycle_owner_death_assert_effect = {
+    if = { limit = { has_variable = asp_test_dead_original_owner var:asp_test_dead_original_owner = { is_alive = no asp_active_stories = 0 } asp_active_stories = 0 NOT = { has_variable = asp_next_instance_id } }
+        debug_log = "ASP_TEST P05 ACTUAL DEATH SUCCESSION PASS"
+    }
+    else = { debug_log = "ASP_TEST P05 ACTUAL DEATH SUCCESSION FAIL" }
+}
+asp_test_lifecycle_replacement_ui_setup_effect = {
+    asp_test_vengeance_clear_effect = yes
+    asp_test_create_story_effect = { CLASS = ambition }
+    set_variable = { name = asp_test_ui_first value = scope:asp_new_story }
+    asp_test_create_story_effect = { CLASS = ambition }
+    set_variable = { name = asp_test_ui_second value = scope:asp_new_story }
+    asp_test_create_story_effect = { CLASS = ambition }
+    set_variable = { name = asp_test_ui_third value = scope:asp_new_story }
+    set_variable = { name = asp_test_ui_before_id value = var:asp_next_instance_id }
+    set_variable = { name = asp_test_ui_stress_before value = stress }
+    scope:asp_new_story = { save_scope_value_as = { name = asp_test_ui_base_release value = asp_abandonment_stress } }
+    add_stress = scope:asp_test_ui_base_release
+    set_variable = { name = asp_test_ui_release_control value = { value = stress subtract = var:asp_test_ui_stress_before } }
+    add_stress = { value = var:asp_test_ui_release_control multiply = -1 }
+    asp_test_vengeance_pair_effect = yes
+    asp_test_vengeance_origin_effect = yes
+    debug_log = "ASP_TEST P06 UI READY"
+}
+asp_test_lifecycle_replacement_ui_assert_effect = {
+    if = { limit = { asp_active_ambitions = 3 var:asp_next_instance_id = var:asp_test_ui_before_id stress = var:asp_test_ui_stress_before
+        exists = var:asp_test_ui_first exists = var:asp_test_ui_second exists = var:asp_test_ui_third }
+        debug_log = "ASP_TEST P06 ACTUAL UI CANCEL PASS"
+    }
+    else_if = { limit = { asp_active_ambitions = 3 stress = { value = var:asp_test_ui_stress_before add = var:asp_test_ui_release_control }
+        exists = var:asp_test_ui_first NOT = { exists = var:asp_test_ui_second } exists = var:asp_test_ui_third
+        any_owned_story = { asp_is_active_story_trigger = yes has_variable = asp_vengeance_victim }
+    } debug_log = "ASP_TEST P06 ACTUAL UI REPLACE SECOND PASS" }
+    else = { debug_log = "ASP_TEST P06 ACTUAL UI FAIL" }
+}
+
+asp_test_lifecycle_review_ui_assert_effect = {
+    if = { limit = { var:asp_test_calendar_ambition ?= { asp_time_until_review_days = 1095 var:asp_origin_date = var:asp_test_original_origin asp_story_free_release_trigger = yes } }
+        debug_log = "ASP_TEST P01 ACTUAL RETAIN PASS"
+    }
+    else = { debug_log = "ASP_TEST P01 ACTUAL RETAIN FAIL" }
+}
+asp_test_lifecycle_review_ui_open_effect = {
+    var:asp_test_calendar_ambition ?= { save_scope_as = asp_selected_story story_owner = { trigger_event = asp_management.3 } }
+    debug_log = "ASP_TEST P01 REVIEW UI READY"
+}
+asp_test_lifecycle_reinterpret_ui_assert_effect = {
+    if = { limit = { exists = var:asp_test_calendar_ambition var:asp_test_calendar_ambition = { var:asp_interpretation = flag:accountability var:asp_origin_date = var:asp_test_original_origin asp_time_until_review_days = 1095 asp_story_free_release_trigger = yes } }
+        debug_log = "ASP_TEST P01 ACTUAL REINTERPRET PASS"
+    }
+    else = { debug_log = "ASP_TEST P01 ACTUAL REINTERPRET FAIL" }
+}
+asp_test_lifecycle_ui_birth_effect = {
+    asp_test_vengeance_clear_effect = yes
+    asp_test_vengeance_pair_effect = yes
+    asp_test_vengeance_origin_effect = yes
+    set_variable = { name = asp_test_ui_lifecycle_story value = scope:asp_test_vengeance_story }
+    set_variable = { name = asp_test_ui_lifecycle_target value = scope:asp_test_vengeance_killer }
+    set_variable = { name = asp_test_ui_lifecycle_victim value = scope:asp_test_vengeance_victim }
+    scope:asp_test_vengeance_story = {
+        set_variable = { name = asp_origin_date value = { value = current_date subtract = 360 } }
+        set_variable = { name = asp_test_original_origin value = var:asp_origin_date }
+    }
+    debug_log = "ASP_TEST LIFECYCLE UI BIRTH READY"
+}
+asp_test_lifecycle_ui_management_effect = {
+    var:asp_test_ui_lifecycle_story ?= { save_scope_as = asp_selected_story story_owner = { trigger_event = asp_management.2 } }
+    debug_log = "ASP_TEST LIFECYCLE UI MANAGEMENT READY"
+}
+asp_test_lifecycle_ui_declared_assert_effect = {
+    if = { limit = { exists = var:asp_test_ui_lifecycle_story var:asp_test_ui_lifecycle_story = {
+        has_variable = asp_declared asp_time_until_pledge_days = 1825 var:asp_origin_date = var:asp_test_original_origin var:asp_target = root.var:asp_test_ui_lifecycle_target
+    } } debug_log = "ASP_TEST P02 ACTUAL DECLARATION UI PASS" }
+    else = { debug_log = "ASP_TEST P02 ACTUAL DECLARATION UI FAIL" }
+}
+asp_test_lifecycle_ui_fulfillment_effect = {
+    asp_test_lifecycle_snapshot_effect = yes
+    var:asp_test_ui_lifecycle_target = { death = { killer = root death_reason = death_duel } }
+    var:asp_test_ui_lifecycle_story ?= { asp_refresh_story_effect = yes }
+    var:asp_test_ui_lifecycle_story ?= { asp_refresh_story_effect = yes }
+    if = { limit = { asp_active_ambitions = 0 prestige = { value = var:asp_test_before add = 100 } stress = { value = var:asp_test_stress_before subtract = 20 }
+        any_memory = { has_memory_type = asp_vengeance_personal_memory has_memory_participant = root.var:asp_test_ui_lifecycle_victim } }
+        set_variable = { name = asp_test_ui_replay value = 1 }
+        debug_log = "ASP_TEST P03 UI LIFECYCLE FULFILLED PASS"
+    }
+    else = { debug_log = "ASP_TEST P03 UI LIFECYCLE FULFILLED FAIL" }
+}
+
+# Shares UI setup and postconditions; scripted declaration is not an actual UI pass.
+asp_test_lifecycle_ui_replay_effect = {
+    set_variable = { name = asp_test_ui_replay value = 0 }
+    asp_test_lifecycle_ui_birth_effect = yes
+    var:asp_test_ui_lifecycle_story = { asp_declare_story_effect = yes }
+    asp_test_lifecycle_ui_declared_assert_effect = yes
+    asp_test_lifecycle_ui_fulfillment_effect = yes
+}
+
+asp_test_lifecycle_dead_stale_snapshot_effect = {
+    asp_test_lifecycle_snapshot_effect = yes
+    set_variable = { name = asp_test_dead_prestige value = var:asp_test_dead_original_owner.prestige }
+    set_variable = { name = asp_test_dead_stress value = var:asp_test_dead_original_owner.stress }
+    debug_log = "ASP_TEST P05 STALE SUCCESSION READY"
+}
+asp_test_lifecycle_dead_stale_assert_effect = {
+    if = { limit = {
+        exists = var:asp_test_dead_original_owner
+        has_variable = asp_test_dead_prestige has_variable = asp_test_dead_stress
+        prestige = var:asp_test_before stress = var:asp_test_stress_before asp_active_stories = 0
+        var:asp_test_dead_original_owner = { is_alive = no asp_active_stories = 0 prestige = root.var:asp_test_dead_prestige stress = root.var:asp_test_dead_stress }
+    } set_variable = { name = asp_test_stale_succession value = 1 } debug_log = "ASP_TEST P05 ACTUAL STALE SUCCESSION PASS" }
+    else = { set_variable = { name = asp_test_stale_succession value = 0 } debug_log = "ASP_TEST P05 ACTUAL STALE SUCCESSION FAIL" }
+}

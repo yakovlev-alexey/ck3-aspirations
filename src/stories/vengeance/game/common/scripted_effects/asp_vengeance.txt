@@ -16,22 +16,21 @@ asp_start_vengeance_effect = {
         remove_list_variable = { name = asp_vengeance_pending target = $VICTIM$ }
         if = {
             limit = {
-                asp_active_ambitions < asp_ambition_cap
                 NOT = { any_owned_story = { asp_is_active_story_trigger = yes var:asp_family = flag:vengeance var:asp_target = $KILLER$ } }
             }
             save_scope_as = asp_vengeance_origin_owner
             $VICTIM$ = { save_scope_as = asp_vengeance_origin_victim }
             $KILLER$ = { save_scope_as = asp_vengeance_origin_killer }
             # Only a dev event chain can supply this randomness-only override.
-            if = { limit = { exists = scope:asp_vengeance_force scope:asp_vengeance_force = yes } asp_vengeance_create_effect = yes }
-            else = { random = { chance = asp_vengeance_selection_chance asp_vengeance_create_effect = yes } }
+            if = { limit = { exists = scope:asp_vengeance_force scope:asp_vengeance_force = yes } asp_vengeance_offer_or_create_effect = yes }
+            else = { random = { chance = asp_vengeance_selection_chance asp_vengeance_offer_or_create_effect = yes } }
         }
     }
 }
 asp_vengeance_create_effect = {
     clear_saved_scope = asp_vengeance_new_story
     create_story = { type = asp_vengeance_story save_scope_as = asp_vengeance_new_story }
-    scope:asp_vengeance_new_story = {
+    scope:asp_vengeance_new_story ?= {
         asp_initialize_story_effect = { FAMILY = vengeance CLASS = ambition TARGET = scope:asp_vengeance_origin_killer }
         if = {
             limit = { asp_is_active_story_trigger = yes }
@@ -115,5 +114,23 @@ asp_vengeance_resolve_effect = {
                 }
             }
         }
+    }
+}
+
+asp_vengeance_offer_or_create_effect = {
+    if = { limit = { asp_active_ambitions < asp_ambition_cap } asp_vengeance_create_effect = yes }
+    else = {
+        save_scope_as = asp_replacement_cause_owner
+        scope:asp_vengeance_origin_victim = { save_scope_as = asp_replacement_cause_victim }
+        scope:asp_vengeance_origin_killer = { save_scope_as = asp_replacement_cause_killer }
+        clear_saved_scope = asp_replacement_1
+        clear_saved_scope = asp_replacement_2
+        clear_saved_scope = asp_replacement_3
+        every_owned_story = { limit = { asp_can_manage_story_trigger = yes var:asp_class = flag:ambition }
+            if = { limit = { NOT = { exists = scope:asp_replacement_1 } } save_scope_as = asp_replacement_1 }
+            else_if = { limit = { NOT = { exists = scope:asp_replacement_2 } } save_scope_as = asp_replacement_2 }
+            else_if = { limit = { NOT = { exists = scope:asp_replacement_3 } } save_scope_as = asp_replacement_3 }
+        }
+        trigger_event = asp_core.2
     }
 }

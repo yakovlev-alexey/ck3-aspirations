@@ -221,6 +221,10 @@ asp_management.2 = {
                 desc = asp_management_selected_county_desc
             }
             triggered_desc = {
+                trigger = { scope:asp_selected_story ?= { asp_can_manage_story_trigger = yes has_variable = asp_declared } }
+                desc = asp_management_selected_declared_character_desc
+            }
+            triggered_desc = {
                 trigger = { scope:asp_selected_story ?= { asp_can_manage_story_trigger = yes } }
                 desc = asp_management_selected_character_desc
             }
@@ -232,15 +236,97 @@ asp_management.2 = {
         name = asp_abandon
         if = {
             limit = { scope:asp_selected_story ?= { asp_can_manage_story_trigger = yes story_owner = root } }
-            custom_tooltip = asp_abandon_cost
+            if = { limit = { scope:asp_selected_story = { has_variable = asp_declared } }
+                custom_tooltip = asp_public_release_cost
+                show_as_tooltip = { add_prestige = asp_pledge_failure_prestige add_stress = asp_pledge_failure_stress }
+            }
+            else = { custom_tooltip = asp_abandon_cost }
             show_as_tooltip = {
                 scope:asp_selected_story = {
+                    if = { limit = { NOT = { has_variable = asp_declared } }
                     save_scope_value_as = { name = asp_preview_release_stress value = asp_abandonment_stress }
                     story_owner = { add_stress = scope:asp_preview_release_stress }
+                    }
                 }
             }
         }
         hidden_effect = { asp_abandon_selected_story_effect = yes }
     }
+    option = {
+        name = asp_declare
+        trigger = { asp_event_can_declare_trigger = yes }
+        custom_tooltip = asp_declare_rules
+        hidden_effect = { scope:asp_selected_story ?= { if = { limit = { asp_can_declare_story_trigger = yes story_owner = root } story_owner = { trigger_event = asp_pledge.1 } } } }
+    }
+    option = {
+        name = asp_reconsider
+        trigger = { scope:asp_selected_story ?= { asp_can_manage_story_trigger = yes asp_story_owned_by_event_root_trigger = yes } }
+        hidden_effect = { trigger_event = asp_management.3 }
+    }
+    option = {
+        name = asp_withdraw
+        trigger = { scope:asp_selected_story ?= { asp_can_manage_story_trigger = yes asp_story_owned_by_event_root_trigger = yes has_variable = asp_declared } }
+        custom_tooltip = asp_public_release_cost
+        show_as_tooltip = { add_prestige = asp_pledge_failure_prestige add_stress = asp_pledge_failure_stress }
+        hidden_effect = { asp_withdraw_selected_pledge_effect = yes }
+    }
     option = { name = asp_back hidden_effect = { asp_open_management_effect = yes } }
+}
+
+asp_management.3 = {
+    type = character_event
+    title = asp_core_review_title
+    desc = { first_valid = { triggered_desc = { trigger = { scope:asp_selected_story ?= { asp_can_manage_story_trigger = yes asp_story_owned_by_event_root_trigger = yes } } desc = asp_review_choices_desc } desc = asp_management_closed_desc } }
+    theme = stewardship
+    option = {
+        name = asp_retain
+        trigger = { scope:asp_selected_story ?= { asp_can_manage_story_trigger = yes asp_story_review_due_trigger = yes asp_story_owned_by_event_root_trigger = yes } }
+        custom_tooltip = asp_retain_tooltip
+        hidden_effect = { scope:asp_selected_story ?= { if = { limit = { story_owner = root } asp_retain_story_effect = yes } } }
+    }
+    option = {
+        name = asp_vengeance_personal
+        trigger = { scope:asp_selected_story ?= { asp_can_manage_story_trigger = yes asp_story_owned_by_event_root_trigger = yes has_variable = asp_vengeance_victim NOT = { has_variable = asp_declared } var:asp_interpretation = flag:accountability var:asp_target = { is_alive = yes NOT = { is_imprisoned_by = root } } } }
+        custom_tooltip = asp_vengeance_personal_condition
+        custom_tooltip = asp_reinterpret_tooltip
+        hidden_effect = { scope:asp_selected_story ?= { if = { limit = { story_owner = root } asp_reinterpret_story_effect = { INTERPRETATION = personal_vengeance } } } }
+    }
+    option = {
+        name = asp_vengeance_accountability
+        trigger = { asp_vengeance_event_can_choose_accountability_trigger = { STORY = scope:asp_selected_story } scope:asp_selected_story ?= { NOT = { has_variable = asp_declared } var:asp_interpretation = flag:personal_vengeance } }
+        custom_tooltip = asp_vengeance_accountability_condition
+        custom_tooltip = asp_reinterpret_tooltip
+        hidden_effect = { scope:asp_selected_story ?= { if = { limit = { story_owner = root asp_vengeance_can_choose_accountability_trigger = yes } asp_reinterpret_story_effect = { INTERPRETATION = accountability } } } }
+    }
+    option = {
+        name = asp_abandon
+        trigger = { scope:asp_selected_story ?= { asp_can_manage_story_trigger = yes asp_story_owned_by_event_root_trigger = yes } }
+        if = { limit = { scope:asp_selected_story ?= { has_variable = asp_declared } }
+            custom_tooltip = asp_public_release_cost
+            show_as_tooltip = { add_prestige = asp_pledge_failure_prestige add_stress = asp_pledge_failure_stress }
+        }
+        else = {
+            custom_tooltip = asp_abandon_cost
+            show_as_tooltip = { scope:asp_selected_story ?= { save_scope_value_as = { name = asp_preview_review_stress value = asp_abandonment_stress } story_owner = { add_stress = scope:asp_preview_review_stress } } }
+        }
+        hidden_effect = { asp_abandon_selected_story_effect = yes }
+    }
+    option = { name = asp_close }
+}
+asp_management.4 = {
+    type = character_event
+    title = asp_replace_title
+    desc = { first_valid = { triggered_desc = { trigger = { scope:asp_selected_story ?= { asp_can_manage_story_trigger = yes asp_story_owned_by_event_root_trigger = yes } asp_vengeance_replacement_cause_valid_trigger = yes } desc = asp_replace_desc } desc = asp_replace_invalid_desc } }
+    theme = intrigue
+    option = {
+        name = asp_replace_confirm
+        trigger = { asp_vengeance_replacement_cause_valid_trigger = yes scope:asp_selected_story ?= { asp_can_manage_story_trigger = yes asp_story_owned_by_event_root_trigger = yes var:asp_class = flag:ambition } }
+        if = { limit = { scope:asp_selected_story ?= { has_variable = asp_declared } }
+            custom_tooltip = asp_public_release_cost
+            show_as_tooltip = { add_prestige = asp_pledge_failure_prestige add_stress = asp_pledge_failure_stress }
+        }
+        else = { custom_tooltip = asp_abandon_cost show_as_tooltip = { scope:asp_selected_story ?= { save_scope_value_as = { name = asp_preview_replacement_stress value = asp_abandonment_stress } story_owner = { add_stress = scope:asp_preview_replacement_stress } } } }
+        hidden_effect = { asp_confirm_replacement_effect = yes }
+    }
+    option = { name = asp_replace_cancel }
 }

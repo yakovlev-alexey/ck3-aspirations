@@ -222,9 +222,18 @@ try {
         Write-Text $descriptor $content
         Run-Tool build $root @('-Profile','release') $true | Out-Null
     }
+    Case 'T23 corrupted and duplicate script BOM rejection' {
+        $badPrefixes = @(([string][char]0xEF + [char]0xBB + [char]0xBF), ([string][char]0xFEFF + [char]0xFEFF))
+        foreach ($prefix in $badPrefixes) {
+            $root = New-Fixture ('T23-' + [Guid]::NewGuid().ToString('N'))
+            Write-Text (Join-Path $root 'src/core/game/events/asp_core_events.txt') ($prefix + 'asp_core.1 = {}')
+            $output = Run-Tool build $root @('-Profile','release') $true
+            Assert ($output -match 'Invalid UTF-8 BOM prefix') 'T23: failed for a reason other than the malformed prefix'
+        }
+    }
 } finally {
     # Never recursively remove a linked fixture. Leave disposable roots ignored for inspection.
     Write-Host "Fixtures: $testRoot"
 }
 if ($failures.Count) { Write-Host "$($failures.Count) test cases failed"; exit 1 }
-Write-Host 'All 22 tooling cases passed'; exit 0
+Write-Host 'All 23 tooling cases passed'; exit 0

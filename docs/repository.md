@@ -184,3 +184,7 @@ The optional automation commands use an existing Python runtime; the packaging c
 ## Gameplay regression policy
 
 Every new automatable gameplay behavior check and bug fix must be a reproducible registered runner scenario, or an added assertion in an existing registered scenario, with fixed inputs/setup, native observable assertions, and retained fresh evidence. A shared native fixture alone is insufficient. For genuinely required UI interactions that the bounded runner cannot perform, provide scripted setup and post-action assertions plus the exact mandatory manual steps; do not report a script-only result as an actual click or save/load pass. Keep fixtures in the owning module and update its living SPEC and scenarios in the same change.
+
+Native text validation rejects duplicate BOMs and cp1252-misdecoded BOM prefixes before script definition scanning. Either corrupt prefix can hide a top-level identifier from the engine despite balanced braces; T23 preserves both rejection cases in the existing command integration suite.
+
+On Windows, Python may default to cp1252. Scripted text edits must always read and write with explicit `encoding="utf-8"` for repository Markdown/Python or `encoding="utf-8-sig"` for native BOM files; never rely on host-default `read_text()`/`write_text()` encoding.

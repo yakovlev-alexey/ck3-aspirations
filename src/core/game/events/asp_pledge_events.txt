@@ -1,0 +1,27 @@
+﻿namespace = asp_pledge
+asp_pledge.1 = {
+    type = character_event
+    title = asp_declare_title
+    desc = { first_valid = { triggered_desc = { trigger = { asp_event_can_declare_trigger = yes } desc = asp_declare_desc } desc = asp_management_closed_desc } }
+    theme = intrigue
+    option = {
+        name = asp_declare_confirm
+        trigger = { asp_event_can_declare_trigger = yes }
+        custom_tooltip = asp_declare_rules
+        custom_tooltip = asp_declare_consequences
+        hidden_effect = { scope:asp_selected_story ?= { if = { limit = { asp_can_declare_story_trigger = yes story_owner = root } asp_declare_story_effect = yes } } }
+    }
+    option = { name = asp_replace_cancel }
+}
+asp_pledge.2 = {
+    type = character_event
+    title = asp_pledge_settlement_title
+    desc = { first_valid = {
+        triggered_desc = { trigger = { scope:asp_pledge_event_result = 2 } desc = asp_pledge_withdrawn_desc }
+        triggered_desc = { trigger = { scope:asp_pledge_event_result = 3 } desc = asp_pledge_expired_desc }
+        triggered_desc = { trigger = { scope:asp_pledge_event_result = 4 } desc = asp_pledge_excused_desc }
+        desc = asp_pledge_fulfilled_desc
+    } }
+    theme = intrigue
+    option = { name = asp_close }
+}

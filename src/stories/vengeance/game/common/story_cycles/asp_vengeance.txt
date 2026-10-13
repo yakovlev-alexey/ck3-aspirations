@@ -6,5 +6,6 @@
         character = { variable_name = "asp_target" label = "asp_vengeance_culprit_label" }
         custom_string_key = "asp_vengeance_story_information"
     }
+    effect_group = { days = 1 triggered_effect = { trigger = { has_variable = asp_schema } effect = { asp_refresh_story_effect = yes } } }
     on_owner_death = { asp_resolve_story_effect = { OUTCOME = owner_dead REWARDS = none } }
 }

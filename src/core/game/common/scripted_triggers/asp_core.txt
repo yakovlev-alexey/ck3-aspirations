@@ -27,3 +27,44 @@ asp_can_manage_story_trigger = {
 asp_story_review_due_trigger = {
     asp_time_until_review_days <= 0
 }
+
+# Initial age, independent of retained reminders.
+asp_story_free_release_trigger = { asp_story_age_days >= asp_initial_review_days }
+asp_family_can_declare_trigger = {
+    var:asp_family = flag:vengeance
+    asp_vengeance_can_declare_trigger = yes
+}
+asp_can_declare_story_trigger = {
+    asp_can_manage_story_trigger = yes
+    NOT = { has_variable = asp_declared }
+    NOT = { has_variable = asp_pledge_settled }
+    asp_story_age_days >= asp_declare_min_days
+    asp_family_can_declare_trigger = yes
+}
+asp_pledge_due_trigger = {
+    has_variable = asp_declared
+    has_variable = asp_pledge_deadline
+    asp_time_until_pledge_days <= 0
+}
+asp_family_public_fulfillment_trigger = {
+    var:asp_family = flag:vengeance
+    OR = { var:asp_interpretation = flag:accountability has_variable = asp_vengeance_public_fulfillment }
+}
+
+asp_family_has_terminal_progress_trigger = {
+    var:asp_family = flag:vengeance
+    asp_vengeance_has_terminal_progress_trigger = yes
+}
+
+asp_story_owned_by_event_root_trigger = {
+    custom_description = { text = asp_story_owned_by_you story_owner = root }
+}
+
+# Event-character scope: never enter a weak ended Story while building a tooltip.
+asp_event_can_declare_trigger = {
+    trigger_if = {
+        limit = { exists = scope:asp_selected_story }
+        scope:asp_selected_story = { asp_can_declare_story_trigger = yes asp_story_owned_by_event_root_trigger = yes }
+    }
+    trigger_else = { always = no }
+}

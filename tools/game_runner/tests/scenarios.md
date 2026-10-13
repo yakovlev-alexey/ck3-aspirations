@@ -24,3 +24,11 @@ A04 also requires actual-profile/autosave launch preflight: missing, unsafe YEAR
 C03 selector clicks, C04 actual save/load and visible UI remain separate native acceptance in [core scenarios](../../../src/core/tests/scenarios.md); they are not inferred from A08.
 
 Vengeance registration: `vengeance-regression` invokes shared V01-V06 fixtures. Added standard-library tests cover measured results/replay, incorrect custody prestige despite a PASS flag, hidden origin despite a PASS flag, and incomplete telemetry. Native game evidence and mandatory actual GUI execution are recorded separately in the owning family scenarios/report.
+
+## Registered lifecycle-regression
+
+The bounded `lifecycle-regression` scenario runs shared P01-P06 effects with complete integer telemetry, independently checks costs/counts/absence and UI-replay memory postconditions, and verifies exact cached replay. It snapshots that logic interval, restarts from the same unchanged baseline, prepares shared near-boundary calendar state, verifies its exact saved-state precondition, advances one real native day, and checks review/declaration/expiry measurements plus replay. Separate fresh sessions prevent intentional logic-fixture deaths and delayed native grief from contaminating the calendar test. The precondition is not actual save/load; native Save Game/load and UI/player-switch/succession procedures remain mandatory in core scenarios.
+
+Reports retain both logic and calendar logs, request/session identities, baseline hash, raw deltas and an aspiration parser/runtime diagnostic count. Any such diagnostic in either interval fails the scenario, while known static unused-state and unrelated vanilla frames are classified separately. All operations remain private scenario implementation; there is no arbitrary script API or new framework. CLI and MCP expose only the registered scenario name and existing bounded repeat/day parameters.
+
+Withdrawal tooltip regression: registered P03 covers the four literal settlement outcomes and repeated withdrawal. Mandatory native UI replay uses `.50`/`.51`/`.52`, hovers declared Withdraw, and requires a fresh error-log interval without aspiration tooltip errors; a screenshot alone is insufficient.

@@ -1,6 +1,6 @@
 # Vengeance specification
 
-Status: authoritative living contract migrated from the approved 2026-10-12 design. Task 3 implements the native family; acceptance evidence is recorded below.
+Status: authoritative living contract migrated from the approved 2026-10-12 design. Task 3 implements the native family; acceptance evidence is recorded below. Task 4 first-story lifecycle implementation and native evidence are complete, pending independent stage review.
 
 [Core lifecycle and balancing](../../core/SPEC.md) · [Product intent](../../../docs/design.md) · [Acceptance scenarios](tests/scenarios.md)
 
@@ -46,7 +46,7 @@ Vengeance permits declaration only under core's minimum age and milestone rules;
 
 Origin text names the victim and only a verified known culprit; no hidden-killer disclosure or investigation system. Explain personal vengeance, accountability, forgiveness, all costs and public attribution before commitment. Show unresolved closure distinctly from fulfillment. Use English localization and vanilla art references; no extracted assets.
 
-Required surfaces: death and prisoner on-actions, knowledge predicate/disclosure event, owner-attribution evidence, stories and memories. Knowledge and responsibility probes are prerequisites, not facts inferred from an engine killer reference. CK3 1.20.0.4 source inspected; runtime acceptance pending, no DLC-dependent branch promised. Saved identifiers follow schema 1 and core migration policy.
+Required surfaces: death and prisoner on-actions, knowledge predicate/disclosure event, owner-attribution evidence, stories and memories. Knowledge and responsibility probes are prerequisites, not facts inferred from an engine killer reference. CK3 1.20.0.4 source inspected; Task 3 acceptance is recorded below; Task 4 lifecycle acceptance is separate, and no DLC-dependent branch is promised. Saved identifiers follow schema 1 and core migration policy.
 
 ## Task 3 stable event allocations
 
@@ -66,4 +66,16 @@ Own-act death evidence is recorded on matching stories owned by the supplied kil
 
 ## Task 3 observed acceptance
 
-V01-V06 passed the registered native regression in CK3 1.20.0.4; the documented manual `.1` entry uses identical fixtures. The actual vanilla Execute UI action on a Compassionate player produced +100 Stress, with a separate aspiration -20 and exactly one memory. Native cards show the fixed cause/target, exact chosen condition, age and reflection interval; personal, accountability, forgiveness and impossible terminal descriptions were visually verified. Direct public exposure before observation remains unsupported. Full scheduled reflection, pledge, replacement, switch/return and cross-family acceptance remain their owning later stages. See the family scenarios for reproducible commands and required manual steps.
+V01-V06 passed the registered native regression in CK3 1.20.0.4; the documented manual `.1` entry uses identical fixtures. The actual vanilla Execute UI action on a Compassionate player produced +100 Stress, with a separate aspiration -20 and exactly one memory. Native cards show the fixed cause/target, exact chosen condition, age and reflection interval; personal, accountability, forgiveness and impossible terminal descriptions were visually verified. Direct public exposure before observation remains unsupported. Task 4 acceptance below covers scheduled reflection, pledge, replacement and switch/return; cross-family acceptance remains a later stage. See the family scenarios for reproducible commands and required manual steps.
+
+## Task 4 first-story lifecycle
+
+Core now supplies the family’s review, retention, private reinterpretation, minimum-age declaration, once-only settlement and suspension/return ordering. Family `asp_vengeance_can_declare_trigger` requires an implemented interpretation, a living culprit outside custody and no recorded irreversible owner responsibility. `asp_vengeance_has_terminal_progress_trigger` reports exact dead-target or newly acquired accountability custody to core before terminal dispatch. Imprisonment callbacks use core refresh so they cannot bypass deadline precedence.
+
+A major incident at three ambitions captures an explicit replacement offer using the same 0.4 occupancy tuning value. Origin remains consumed on cancellation. Cause revalidation precedes old-story release and includes exact owner, culprit, verified knowledge, range and duplicate guards; the death hook’s original qualifying bond is retained rather than querying a friendship already removed by native death. Core owns all old-ambition costs and reservation limits.
+
+The family story checks maintenance daily, while AI owners only suspend. Owner attribution continues to be recorded for a former player, without processing their action events or rewards. Private known-secret discovery is not public fulfillment. Public causes retain the Task 3 whitelist; the direct exposure-before-observation gap remains unchanged. Dev `asp_test_vengeance.2` calls the same P01-P06 lifecycle fixture as registered `lifecycle-regression` and core `.30`; it is separate from the stable `.1` family regression.
+
+Origin and reconsideration accountability visibility use character-context `asp_vengeance_event_can_choose_accountability_trigger = { STORY = <event-held reference> }`. It validates the link before entering the Story-scoped family predicate. Ended native modal references cannot expose an eligible action or trigger missing-target/weak-Story errors while rendering.
+
+The existing origin Close option is a native fallback: it appears when no interpretation remains valid, including a queued origin whose exact Story has ended. It never acts on state and does not introduce a close choice while normal interpretations are valid.

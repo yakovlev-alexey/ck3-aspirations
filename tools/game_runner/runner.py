@@ -2,6 +2,7 @@
 import hashlib
 import json
 import os
+import re
 import secrets
 import shutil
 import threading
@@ -204,7 +205,7 @@ class GameRunner:
         return self._report_operation("advance", days)
 
     def run_scenario(self, name, repeat=1):
-        if name not in ("automation-smoke", "core-regression", "vengeance-regression") or type(repeat) is not int or not 1 <= repeat <= 10:
+        if name not in ("automation-smoke", "core-regression", "vengeance-regression", "lifecycle-regression") or type(repeat) is not int or not 1 <= repeat <= 10:
             raise ValueError("Only registered scenarios with repeat 1 through 10 are implemented")
         if not self.flight.acquire(blocking=False):
             return {"status": "transport_error", "error": "Concurrent operation rejected"}
@@ -231,6 +232,55 @@ class GameRunner:
                         {"name": "baseline_unchanged", "passed": hashlib.sha256(self.config.baseline_save.read_bytes()).hexdigest() == self.baseline_hash},
                     ]
                     run = {"index": index, "initial": initial, "core": core, "duplicate": duplicate, "assertions": assertions, "logs": self._snapshot_logs(index)}
+                    report["runs"].append(run)
+                    if not all(item["passed"] for item in assertions):
+                        report["status"] = "assertion_failed"
+                        break
+                    continue
+                if name == "lifecycle-regression":
+                    lifecycle = self._send("lifecycle_regression")
+                    duplicate = self._send("lifecycle_regression", replay=True)
+                    assertions = [
+                        {"name": "P01_review_origin_and_free_release", "passed": lifecycle["p01"] == 1 and lifecycle["release_delta"] == 0},
+                        {"name": "P02_declaration_age_and_custody", "passed": lifecycle["p02"] == 1},
+                        {"name": "P03_settlement_precedence", "passed": lifecycle["p03"] == 1 and lifecycle["ui_replay"] == 1 and lifecycle["penalty_prestige"] == -100 and lifecycle["penalty_stress"] == lifecycle["penalty_control"] and lifecycle["penalty_control"] > 0},
+                        {"name": "P04_return_exactly_once", "passed": lifecycle["p04"] == 1 and lifecycle["return_prestige"] == -100 and lifecycle["return_stress"] == lifecycle["penalty_control"]},
+                        {"name": "P05_absent_fulfillment_no_reward_and_death", "passed": lifecycle["p05"] == 1 and lifecycle["absent_stress"] == 0},
+                        {"name": "P06_explicit_replacement", "passed": lifecycle["p06"] == 1 and lifecycle["replacement_count"] == 3 and lifecycle["replacement_delta"] == lifecycle["replacement_control"] and lifecycle["replacement_control"] > 0},
+                        {"name": "duplicate_identity_and_measurements", "passed": duplicate == lifecycle},
+                        {"name": "same_baseline_date", "passed": not report["runs"] or initial["date"] == report["runs"][0]["initial"]["date"]},
+                        {"name": "fresh_session", "passed": all(initial["session"] != run["initial"]["session"] for run in report["runs"])},
+                        {"name": "baseline_unchanged", "passed": hashlib.sha256(self.config.baseline_save.read_bytes()).hexdigest() == self.baseline_hash},
+                    ]
+                    # Calendar starts from a fresh baseline: logic fixtures intentionally cause deaths.
+                    # Preserve both intervals; do not let their delayed vanilla grief contaminate boundary costs.
+                    logic_logs = self._snapshot_logs(str(index) + "-logic")
+                    self.backend.stop()
+                    self.session = None
+                    self._start()
+                    calendar_setup = self._send("lifecycle_calendar")
+                    reload_precondition = self._send("lifecycle_reload_assert")
+                    calendar_day = self._send("advance", 1)
+                    calendar = self._send("lifecycle_calendar_assert")
+                    calendar_duplicate = self._send("lifecycle_calendar_assert", replay=True)
+                    assertions.extend([
+                        {"name": "exact_saved_state_precondition", "passed": reload_precondition["reload_identity"] == 1},
+                        {"name": "actual_calendar_day", "passed": calendar_day["date"] - calendar_setup["date"] == 1 and calendar["calendar_after"] - calendar["calendar_before"] == 1},
+                        {"name": "P01_actual_review_boundary", "passed": calendar["calendar_reviews"] == 2},
+                        {"name": "P02_actual_minimum_age_boundary", "passed": calendar["calendar_declare"] == 1},
+                        {"name": "P03_actual_deadline_boundary", "passed": calendar["calendar_prestige"] == -100 and calendar["calendar_stress"] == calendar["calendar_control"] and calendar["calendar_control"] > 0},
+                        {"name": "calendar_duplicate_identity", "passed": calendar == calendar_duplicate},
+                    ])
+                    run = {"index": index, "initial": initial, "lifecycle": lifecycle, "duplicate": duplicate, "logic_logs": logic_logs, "reload_precondition": reload_precondition, "calendar_setup": calendar_setup, "calendar_day": calendar_day, "calendar": calendar, "calendar_duplicate": calendar_duplicate, "assertions": assertions, "logs": self._snapshot_logs(index)}
+                    errors = Path(run["logs"]) / "error.log"
+                    diagnostics = errors.read_text(encoding="utf-8-sig", errors="replace") if errors.exists() else ""
+                    logic_errors = Path(logic_logs) / "error.log"
+                    if logic_errors.exists():
+                        diagnostics += "\n" + logic_errors.read_text(encoding="utf-8-sig", errors="replace")
+                    runtime_blocks = re.split(r"(?=\[.*?\]\[E\])", diagnostics)
+                    aspiration_errors = [block for block in runtime_blocks if "asp_" in block and any(tag in block for tag in ("Script system error!", "pdx_persistent_reader.cpp", "Unknown trigger:", "Unknown effect:", "Failed to parse", "Data error in"))]
+                    assertions.append({"name": "aspiration_runtime_diagnostics_absent", "passed": not aspiration_errors})
+                    run["aspiration_runtime_error_count"] = len(aspiration_errors)
                     report["runs"].append(run)
                     if not all(item["passed"] for item in assertions):
                         report["status"] = "assertion_failed"

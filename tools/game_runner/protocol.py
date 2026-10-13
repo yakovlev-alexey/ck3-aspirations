@@ -15,6 +15,15 @@ CORE_FIELDS = (
 VENGEANCE_FIELDS = ('v01', 'v01_created', 'v01_replayed', 'v02', 'v02_hidden', 'v02_known', 'v02_exposed', 'v03', 'v03_personal_delta', 'v03_impossible_delta', 'v03_memories', 'v04', 'v04_stress_delta', 'v04_prestige_delta', 'v04_preexisting', 'v05', 'v05_content', 'v05_exclusions', 'v05_costs', 'v06', 'v06_action_delta', 'v06_closure_delta', 'v06_total_delta')
 
 
+LIFECYCLE_FIELDS = ('p01', 'p02', 'p03', 'p04', 'p05', 'p06', 'release_delta', 'penalty_prestige', 'penalty_stress', 'penalty_control', 'return_prestige', 'return_stress', 'absent_stress', 'replacement_count', 'replacement_delta', 'replacement_control', 'ui_replay')
+
+
+CALENDAR_FIELDS = ('calendar_before', 'calendar_after', 'calendar_reviews', 'calendar_declare', 'calendar_prestige', 'calendar_stress', 'calendar_control')
+
+
+RELOAD_FIELDS = ("reload_identity",)
+
+
 class ProtocolError(RuntimeError):
     pass
 
@@ -81,6 +90,12 @@ class Telemetry:
                         allowed.update(CORE_FIELDS)
                     if self.operation == "vengeance_regression":
                         allowed.update(VENGEANCE_FIELDS)
+                    if self.operation == "lifecycle_regression":
+                        allowed.update(LIFECYCLE_FIELDS)
+                    if self.operation == "lifecycle_calendar_assert":
+                        allowed.update(CALENDAR_FIELDS)
+                    if self.operation == "lifecycle_reload_assert":
+                        allowed.update(RELOAD_FIELDS)
                     if key in result or key not in allowed:
                         raise ValueError("Invalid or duplicate field")
                     if key != "reason" and not re.fullmatch(r"-?\d+(?:\.0+)?", value):
@@ -94,6 +109,12 @@ class Telemetry:
                         required.update(CORE_FIELDS)
                     if self.operation == "vengeance_regression":
                         required.update(VENGEANCE_FIELDS)
+                    if self.operation == "lifecycle_regression":
+                        required.update(LIFECYCLE_FIELDS)
+                    if self.operation == "lifecycle_calendar_assert":
+                        required.update(CALENDAR_FIELDS)
+                    if self.operation == "lifecycle_reload_assert":
+                        required.update(RELOAD_FIELDS)
                     if set(result) != required:
                         raise ValueError("Incomplete measured terminal")
                     if self.terminal is not None:

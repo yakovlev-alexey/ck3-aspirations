@@ -219,6 +219,9 @@ function Test-NativeContent {
         if ($relative -match '^(common|events)/' -and $relative -notmatch '\.txt$') { throw "Native scripts must use .txt: $relative" }
         if ([IO.Path]::GetExtension($file) -notin @('.txt','.asset','.gfx')) { continue }
         $text = [IO.File]::ReadAllText($file, $script:Utf8)
+        # ReadAllText consumes one valid BOM; a remaining BOM or its cp1252 mojibake corrupts native identifiers.
+        $mojibakeBom = [string][char]0xEF + [char]0xBB + [char]0xBF
+        if ($text.StartsWith([string][char]0xFEFF, [StringComparison]::Ordinal) -or $text.StartsWith($mojibakeBom, [StringComparison]::Ordinal)) { throw "Invalid UTF-8 BOM prefix: $relative" }
         if ($Profile -eq 'release' -and ($relative -match '(?i)debug' -or $text -match '\basp_test_')) { throw "Dev fixture in release content: $relative" }
         # Focused definition scan: quoted strings/comments removed; only top-level asp_ assignments (blocks or scalar values).
         # Native hooks, nested invocations and namespaces may legitimately repeat.
