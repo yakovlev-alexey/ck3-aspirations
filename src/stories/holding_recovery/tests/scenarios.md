@@ -35,3 +35,10 @@ For origin safety, prepare `.20`, keep its origin open, end the exact saved Stor
 For management safety, prepare `.20`, choose an interpretation, open the native management selector and select that recovery. End the exact Story while its management window remains open; render and hover the old release option, inspect No Immediate Effects, then click to dismiss. The accepted later-frame interval contains ten Trigger Localization(database/dynamic) notices, matching Task 4's bounded diagnostic policy, and zero other aspiration runtime/parser/data errors. This does not claim a pristine log or justify a new shared guard change.
 
 Registered H03 additionally dispatches the native construction-start child at slot0, verifies token/completion, and reports ongoing0 for its scripted occupancy model. Actual GUI ongoing1/payment is the distinct procedure above. Registered typed conquest/reacquisition and unknown-cause fixtures verify conservative closure; actual GUI Grant confirms `granted`. No real lost-war playthrough is claimed.
+
+
+## Exact Province token ownership regression
+
+A Story's historical started-Province list grants no ownership of a newer Story's token. Title-loss and terminal cleanup may remove pending Story/payer references only when the Province currently points to that exact old Story. Registered H04 models a suspended older AI owner's historical list and a current player's fresh start in the same Province; it tests matching ordinary cleanup, title-loss isolation, no-reward terminal isolation and the newer Story's subsequent one-time reward. This is scripted native state/callback coverage, not an actual player switch or payment claim.
+
+Registered H03 also dispatches the dev native start observer with original AI payer, initialized AI snapshot and absent GUI state; fresh setup must clear cached payer/Province. The AI observer and GUI observer are independent. This assertion does not replace earlier genuine AI payment evidence.

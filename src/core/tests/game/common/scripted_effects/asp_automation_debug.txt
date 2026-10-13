@@ -75,6 +75,16 @@ asp_test_automation_complete_effect = {
             set_variable = { name = asp_test_automation_result_cancelled value = var:asp_test_cancelled }
             set_variable = { name = asp_test_automation_result_replayed value = var:asp_test_replayed }
             set_variable = { name = asp_test_automation_result_origin_control value = var:asp_test_origin_control }
+            set_variable = { name = asp_test_automation_result_token_loss value = var:asp_test_token_loss }
+            set_variable = { name = asp_test_automation_result_token_terminal value = var:asp_test_token_terminal }
+            set_variable = { name = asp_test_automation_result_cleanup_loss value = var:asp_test_cleanup_loss }
+            set_variable = { name = asp_test_automation_result_cleanup_terminal value = var:asp_test_cleanup_terminal }
+            set_variable = { name = asp_test_automation_result_token_stress value = var:asp_test_token_stress }
+            set_variable = { name = asp_test_automation_result_token_xp value = var:asp_test_token_xp }
+            set_variable = { name = asp_test_automation_result_token_modifier value = var:asp_test_token_modifier }
+            set_variable = { name = asp_test_automation_result_token_replay value = var:asp_test_token_replay }
+            set_variable = { name = asp_test_automation_result_ai_observer value = var:asp_test_ai_observer }
+            set_variable = { name = asp_test_automation_result_ai_cache_clean value = var:asp_test_ai_cache_clean }
             debug_log = asp_test_automation_recovery_done
         }
         else_if = {

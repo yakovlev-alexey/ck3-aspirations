@@ -9,7 +9,7 @@ asp_test_recovery_started = { trigger = { county.holder = { OR = { has_variable 
  if = { limit = { exists = scope:character }
   set_variable = { name = asp_probe_started_payer value = 1 }
   set_variable = { name = asp_probe_started_character value = scope:character }
-  scope:character = { if = { limit = { has_variable = asp_probe_ai_before_gold has_variable = asp_test_gui_gold }
+  scope:character = { if = { limit = { has_variable = asp_probe_ai_before_gold }
    set_variable = { name = asp_probe_ai_started_province value = root }
    set_variable = { name = asp_probe_ai_started_character value = this }
    debug_log = "ASP_PROBE AI_NATIVE_START_PAYER"

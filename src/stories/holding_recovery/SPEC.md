@@ -79,3 +79,10 @@ Generated native trigger documentation says `free_building_slots` includes build
 Registered H03 invokes the native child on_action at slot0 with a verified original payer and checks both token and completion. Its scripted occupancy model reports ongoing0 and makes no actual payment claim; actual GUI ongoing1/payment is a separate mandatory acceptance. This covers the specific reserved-slot defect rather than merely rerunning the old direct helper path.
 
 Repeat incidents preserve the active Story's original control/date/serial; the county stores the latest observed damage context. They cannot start a duplicate Story or reset its age. Origin displays the recorded Control, and county management explains both milestones and valid payment.
+
+
+## Exact Province token ownership regression
+
+A Story's historical started-Province list grants no ownership of a newer Story's token. Title-loss and terminal cleanup may remove pending Story/payer references only when the Province currently points to that exact old Story. Registered H04 models a suspended older AI owner's historical list and a current player's fresh start in the same Province; it tests matching ordinary cleanup, title-loss isolation, no-reward terminal isolation and the newer Story's subsequent one-time reward. This is scripted native state/callback coverage, not an actual player switch or payment claim.
+
+Registered H03 also dispatches the dev native start observer with original AI payer, initialized AI snapshot and absent GUI state; fresh setup must clear cached payer/Province. The AI observer and GUI observer are independent. This assertion does not replace earlier genuine AI payment evidence.

@@ -2,7 +2,7 @@
 import re
 import unittest
 from tools.game_runner.tests import test_runner as base
-FIELDS = {"h01":1,"h02":1,"h03":1,"h04":1,"h05":1,"reward_stress":-20,"reward_xp":100,"modifier_count":1,"loss_stress":13,"loss_control":13,"pledge_stress":19,"pledge_control":19,"pledge_prestige":-100,"unproven":0,"foreign":0,"cancelled":0,"replayed":0,"origin_control":69}
+FIELDS = {"h01":1,"h02":1,"h03":1,"h04":1,"h05":1,"reward_stress":-20,"reward_xp":100,"modifier_count":1,"loss_stress":13,"loss_control":13,"pledge_stress":19,"pledge_control":19,"pledge_prestige":-100,"unproven":0,"foreign":0,"cancelled":0,"replayed":0,"origin_control":69,"token_loss":1,"token_terminal":1,"cleanup_loss":1,"cleanup_terminal":1,"token_stress":-20,"token_xp":100,"token_modifier":1,"token_replay":0,"ai_observer":1,"ai_cache_clean":1}
 class Boundary(base.NativeIOBoundary):
     def command(self, command):
         text=(self.config.user_data/"run"/"asp_automation_request.txt").read_text(encoding="utf-8-sig")
@@ -43,3 +43,14 @@ class RecoveryRunnerTests(unittest.TestCase):
         report=self.runner.run_scenario("recovery-regression")
         self.assertEqual(report["status"],"assertion_failed")
         self.assertGreater(report["runs"][0]["aspiration_runtime_error_count"],0)
+
+    def test_old_story_cleanup_cannot_erase_new_token(self):
+        for field in ("token_loss", "token_terminal", "cleanup_loss", "cleanup_terminal"):
+            with self.subTest(field=field):
+                self.backend.override = {field: 0}
+                self.assertEqual(self.runner.run_scenario("recovery-regression")["status"], "assertion_failed")
+    def test_new_story_reward_and_observer_are_independently_measured(self):
+        for field, value in (("token_xp", 0), ("token_replay", 100), ("ai_observer", 0), ("ai_cache_clean", 0)):
+            with self.subTest(field=field):
+                self.backend.override = {field: value}
+                self.assertEqual(self.runner.run_scenario("recovery-regression")["status"], "assertion_failed")

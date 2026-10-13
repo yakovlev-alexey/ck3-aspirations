@@ -31,7 +31,7 @@ asp_test_holding_recovery.12 = {
     else = { debug_log = "ASP_PROBE AI_NO_LEGAL_VACANCY" }
    }
    add_gold = 10000
-   set_variable = { name = asp_probe_ai_before_gold value = gold }
+   asp_test_recovery_prepare_ai_observer_effect = yes
    ai_attempt_to_build_building_effect = yes
   }
   debug_log = "ASP_PROBE AI_SETUP_DONE"

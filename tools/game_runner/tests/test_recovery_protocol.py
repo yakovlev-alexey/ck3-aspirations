@@ -1,8 +1,8 @@
 """Recovery results require every native measurement and exact request identity."""
 import unittest
-from tools.game_runner.protocol import Telemetry, ProtocolError
+from tools.game_runner.protocol import Telemetry, ProtocolError, RECOVERY_FIELDS
 
-FIELDS = ('h01', 'h02', 'h03', 'h04', 'h05', 'reward_stress', 'reward_xp', 'modifier_count', 'loss_stress', 'loss_control', 'pledge_stress', 'pledge_control', 'pledge_prestige', 'unproven', 'foreign', 'cancelled', 'replayed', 'origin_control')
+FIELDS = RECOVERY_FIELDS
 
 class RecoveryProtocolTests(unittest.TestCase):
     def message(self, drop=None):

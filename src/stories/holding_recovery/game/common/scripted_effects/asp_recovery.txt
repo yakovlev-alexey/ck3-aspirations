@@ -135,7 +135,13 @@ asp_holding_recovery_title_lost_effect = {
         set_variable = { name = asp_recovery_lost value = yes }
         set_variable = { name = asp_recovery_loss_type value = flag:$TYPE$ }
         if = { limit = { has_variable = asp_recovery_loss_type var:asp_recovery_loss_type = flag:granted } set_variable = { name = asp_recovery_granted value = yes } }
-        every_in_list = { variable = asp_recovery_started_provinces remove_variable = asp_recovery_work_story remove_variable = asp_recovery_work_payer }
+        save_scope_as = asp_recovery_losing_story
+        every_in_list = { variable = asp_recovery_started_provinces
+            if = { limit = { exists = var:asp_recovery_work_story var:asp_recovery_work_story = scope:asp_recovery_losing_story }
+                remove_variable = asp_recovery_work_story
+                remove_variable = asp_recovery_work_payer
+            }
+        }
     }
 }
 asp_holding_recovery_check_progress_effect = {
@@ -151,7 +157,12 @@ asp_holding_recovery_resolve_effect = {
     if = { limit = { has_variable = asp_recovery_incident var:asp_outcome = flag:$OUTCOME$ var:asp_reward_policy = flag:$REWARDS$ }
         save_scope_as = asp_recovery_ending_story
         var:asp_target = { save_scope_as = asp_recovery_event_county }
-        every_in_list = { variable = asp_recovery_started_provinces remove_variable = asp_recovery_work_story remove_variable = asp_recovery_work_payer }
+        every_in_list = { variable = asp_recovery_started_provinces
+            if = { limit = { exists = var:asp_recovery_work_story var:asp_recovery_work_story = scope:asp_recovery_ending_story }
+                remove_variable = asp_recovery_work_story
+                remove_variable = asp_recovery_work_payer
+            }
+        }
         story_owner = {
             if = { limit = { is_alive = yes }
                 if = { limit = { scope:asp_recovery_ending_story = { var:asp_outcome = flag:fulfilled } }

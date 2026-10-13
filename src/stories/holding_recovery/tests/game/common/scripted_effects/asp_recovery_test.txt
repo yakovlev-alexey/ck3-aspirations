@@ -237,6 +237,8 @@ asp_test_holding_recovery_regression_effect = {
     asp_test_h03_effect = yes
     asp_test_h04_effect = yes
     asp_test_h05_effect = yes
+    asp_test_recovery_instance_isolation_effect = yes
+    asp_test_recovery_ai_observer_effect = yes
 }
 
 # The registered H02 fixture and separately driven real GUI use exactly this measurement helper.
@@ -292,4 +294,101 @@ asp_test_recovery_observe_native_start_effect = {
         set_variable = { name = asp_test_callback_baseline value = scope:asp_test_native_work.var:asp_test_callback_baseline }
         debug_log = asp_test_callback_start_state
     }
+}
+
+# Models a suspended older owner's historical Province list; no actual player switch/payment claim.
+asp_test_recovery_old_story_effect = {
+    title:d_timbuktu.holder = {
+        save_scope_as = asp_test_old_owner
+        create_story = { type = asp_holding_recovery_story save_scope_as = asp_test_old_story }
+    }
+    scope:asp_test_old_story = {
+        set_variable = { name = asp_schema value = 1 }
+        set_variable = { name = asp_owner value = story_owner }
+        set_variable = { name = asp_instance_id value = 9001 }
+        set_variable = { name = asp_family value = flag:holding_recovery }
+        set_variable = { name = asp_class value = flag:ambition }
+        set_variable = { name = asp_target value = scope:asp_test_recovery_county }
+        set_variable = { name = asp_recovery_incident value = 1 }
+        set_variable = { name = asp_suspended value = yes }
+        add_to_variable_list = { name = asp_recovery_started_provinces target = scope:asp_test_recovery_province }
+        if = { limit = { asp_is_active_story_trigger = yes has_variable = asp_suspended story_owner = { is_ai = yes } } debug_log = "ASP_TEST RECOVERY OLD_STATE_VALID" }
+        else = { debug_log = "ASP_TEST RECOVERY OLD_STATE_INVALID" }
+    }
+}
+asp_test_recovery_instance_isolation_effect = {
+    asp_test_recovery_clear_effect = yes
+    asp_test_recovery_legal_setup_effect = yes
+    # Ordinary title-loss cleanup removes the exact matching old references.
+    asp_test_recovery_old_story_effect = yes
+    scope:asp_test_recovery_province = {
+        set_variable = { name = asp_recovery_work_story value = scope:asp_test_old_story }
+        set_variable = { name = asp_recovery_work_payer value = scope:asp_test_old_owner }
+    }
+    scope:asp_test_old_owner = { asp_holding_recovery_title_lost_effect = { COUNTY = scope:asp_test_recovery_county TYPE = conquest } }
+    set_variable = { name = asp_test_cleanup_loss value = 0 }
+    if = { limit = { scope:asp_test_recovery_province = { NOT = { has_variable = asp_recovery_work_story } NOT = { has_variable = asp_recovery_work_payer } } } set_variable = { name = asp_test_cleanup_loss value = 1 } }
+    scope:asp_test_old_story = { asp_resolve_story_effect = { OUTCOME = impossible REWARDS = none } }
+    # Ordinary no-reward terminal cleanup removes an exact matching old token too.
+    asp_test_recovery_old_story_effect = yes
+    scope:asp_test_recovery_province = {
+        set_variable = { name = asp_recovery_work_story value = scope:asp_test_old_story }
+        set_variable = { name = asp_recovery_work_payer value = scope:asp_test_old_owner }
+    }
+    scope:asp_test_old_story = { asp_resolve_story_effect = { OUTCOME = impossible REWARDS = none } }
+    set_variable = { name = asp_test_cleanup_terminal value = 0 }
+    if = { limit = { scope:asp_test_recovery_province = { NOT = { has_variable = asp_recovery_work_story } NOT = { has_variable = asp_recovery_work_payer } } } set_variable = { name = asp_test_cleanup_terminal value = 1 } }
+    # New current-owner recovery/start replaces historical work; old cleanup must not erase it.
+    asp_test_recovery_old_story_effect = yes
+    asp_test_recovery_origin_effect = yes
+    asp_test_recovery_paid_start_effect = yes
+    set_variable = { name = asp_test_token_serial value = scope:asp_test_recovery_province.var:asp_recovery_work_serial }
+    scope:asp_test_old_owner = { asp_holding_recovery_title_lost_effect = { COUNTY = scope:asp_test_recovery_county TYPE = conquest } }
+    set_variable = { name = asp_test_token_loss value = 0 }
+    if = { limit = { scope:asp_test_recovery_province = { has_variable = asp_recovery_work_story has_variable = asp_recovery_work_payer var:asp_recovery_work_story = scope:asp_test_recovery_story var:asp_recovery_work_payer = scope:asp_test_recovery_owner var:asp_recovery_work_serial = scope:asp_test_recovery_owner.var:asp_test_token_serial } } set_variable = { name = asp_test_token_loss value = 1 } }
+    # Re-establish the genuine start path after the title-loss RED failure to isolate terminal RED.
+    asp_test_recovery_paid_start_effect = yes
+    set_variable = { name = asp_test_token_serial value = scope:asp_test_recovery_province.var:asp_recovery_work_serial }
+    scope:asp_test_old_story = { asp_resolve_story_effect = { OUTCOME = impossible REWARDS = none } }
+    set_variable = { name = asp_test_token_terminal value = 0 }
+    if = { limit = { scope:asp_test_recovery_province = { has_variable = asp_recovery_work_story has_variable = asp_recovery_work_payer var:asp_recovery_work_story = scope:asp_test_recovery_story var:asp_recovery_work_payer = scope:asp_test_recovery_owner var:asp_recovery_work_serial = scope:asp_test_recovery_owner.var:asp_test_token_serial } } set_variable = { name = asp_test_token_terminal value = 1 } }
+    scope:asp_test_recovery_county = { change_county_control = 11 }
+    set_variable = { name = asp_test_token_before_stress value = stress }
+    set_variable = { name = asp_test_token_before_xp value = stewardship_lifestyle_xp }
+    asp_test_recovery_paid_finish_effect = yes
+    set_variable = { name = asp_test_token_stress value = { value = stress subtract = var:asp_test_token_before_stress } }
+    set_variable = { name = asp_test_token_xp value = { value = stewardship_lifestyle_xp subtract = var:asp_test_token_before_xp } }
+    set_variable = { name = asp_test_token_modifier value = 0 }
+    if = { limit = { scope:asp_test_recovery_county = { has_county_modifier = asp_holding_recovery_tax_modifier } asp_active_ambitions = 0 } set_variable = { name = asp_test_token_modifier value = 1 } }
+    set_variable = { name = asp_test_token_after_xp value = stewardship_lifestyle_xp }
+    asp_test_recovery_paid_finish_effect = yes
+    set_variable = { name = asp_test_token_replay value = { value = stewardship_lifestyle_xp subtract = var:asp_test_token_after_xp } }
+    if = { limit = { var:asp_test_token_loss = 1 var:asp_test_token_terminal = 1 var:asp_test_cleanup_loss = 1 var:asp_test_cleanup_terminal = 1 var:asp_test_token_stress = -20 var:asp_test_token_xp = 100 var:asp_test_token_modifier = 1 var:asp_test_token_replay = 0 } debug_log = "ASP_TEST RECOVERY INSTANCE_ISOLATION_PASS" }
+    else = { debug_log = "ASP_TEST RECOVERY INSTANCE_ISOLATION_FAIL" }
+}
+asp_test_recovery_ai_observer_effect = {
+    title:d_timbuktu.holder = {
+        save_scope_as = asp_test_ai_owner
+        capital_province = { save_scope_as = asp_test_ai_work }
+        remove_variable = asp_test_gui_gold
+        # Seed stale capture deliberately; a fresh attempt must clear it before any callback.
+        set_variable = { name = asp_probe_ai_started_province value = scope:asp_test_recovery_province }
+        set_variable = { name = asp_probe_ai_started_character value = scope:asp_test_recovery_owner }
+        asp_test_recovery_prepare_ai_observer_effect = yes
+    }
+    set_variable = { name = asp_test_ai_cache_clean value = 0 }
+    if = { limit = { scope:asp_test_ai_owner = { NOT = { has_variable = asp_probe_ai_started_province } NOT = { has_variable = asp_probe_ai_started_character } has_variable = asp_probe_ai_before_gold NOT = { has_variable = asp_test_gui_gold } is_ai = yes } } set_variable = { name = asp_test_ai_cache_clean value = 1 } }
+    scope:asp_test_ai_owner = { save_scope_as = character }
+    scope:asp_test_ai_work = { trigger_event = { on_action = asp_test_recovery_started } }
+    set_variable = { name = asp_test_ai_observer value = 0 }
+    if = { limit = { scope:asp_test_ai_owner = { is_ai = yes has_variable = asp_probe_ai_before_gold NOT = { has_variable = asp_test_gui_gold } var:asp_probe_ai_started_province = scope:asp_test_ai_work var:asp_probe_ai_started_character = this } } set_variable = { name = asp_test_ai_observer value = 1 } }
+    scope:asp_test_ai_owner = { remove_variable = asp_probe_ai_before_gold remove_variable = asp_probe_ai_started_province remove_variable = asp_probe_ai_started_character }
+    if = { limit = { var:asp_test_ai_observer = 1 var:asp_test_ai_cache_clean = 1 } debug_log = "ASP_TEST RECOVERY AI_OBSERVER_PASS" }
+    else = { debug_log = "ASP_TEST RECOVERY AI_OBSERVER_FAIL" }
+}
+# Fresh AI attempt state is independent of GUI state and cannot reuse a prior capture.
+asp_test_recovery_prepare_ai_observer_effect = {
+    remove_variable = asp_probe_ai_started_province
+    remove_variable = asp_probe_ai_started_character
+    set_variable = { name = asp_probe_ai_before_gold value = gold }
 }

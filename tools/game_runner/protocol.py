@@ -21,7 +21,7 @@ LIFECYCLE_FIELDS = ('p01', 'p02', 'p03', 'p04', 'p05', 'p06', 'release_delta', '
 CALENDAR_FIELDS = ('calendar_before', 'calendar_after', 'calendar_reviews', 'calendar_declare', 'calendar_prestige', 'calendar_stress', 'calendar_control')
 
 
-RECOVERY_FIELDS = ('h01', 'h02', 'h03', 'h04', 'h05', 'reward_stress', 'reward_xp', 'modifier_count', 'loss_stress', 'loss_control', 'pledge_stress', 'pledge_control', 'pledge_prestige', 'unproven', 'foreign', 'cancelled', 'replayed', 'origin_control')
+RECOVERY_FIELDS = ('h01', 'h02', 'h03', 'h04', 'h05', 'reward_stress', 'reward_xp', 'modifier_count', 'loss_stress', 'loss_control', 'pledge_stress', 'pledge_control', 'pledge_prestige', 'unproven', 'foreign', 'cancelled', 'replayed', 'origin_control', 'token_loss', 'token_terminal', 'cleanup_loss', 'cleanup_terminal', 'token_stress', 'token_xp', 'token_modifier', 'token_replay', 'ai_observer', 'ai_cache_clean')
 
 
 RELOAD_FIELDS = ("reload_identity",)
