@@ -189,6 +189,32 @@ Keep configuration, disposable baseline copies, reports, fresh logs, screenshots
 
 The optional automation commands use an existing Python runtime; the packaging commands above use PowerShell/.NET only. MCP explicitly supports protocol 2025-11-25 and only the three bounded runner operations. Subprocess lifecycle, strict argument schemas, protocol/tool errors and EOF cleanup are tested without a real game; final integration uses one measured native smoke call. Serial dispatch has no progress or interruptible cancellation. See the [MCP interface and limits](../tools/game_runner/SPEC.md#mcp-stdio-interface).
 
+## Engine-aware static validation
+
+The optional external validator is the CK3 1.20 fork [9mirx0r/xTiger](https://github.com/9mirx0r/xTiger),
+pinned by version, official Windows archive URL and SHA-256 in `tools/xtiger/release.json`.
+`tools/setup-xtiger.ps1` verifies the archive before extracting only the CLI under
+`.local/tools/xtiger/`. `tools/check-xtiger.ps1` validates an already assembled dev or
+release profile against an explicit read-only CK3 installation root. It runs the
+existing source/output check before and after external analysis, checks the pinned
+executable version, rejects invalid JSON/nonzero native exits, and derives command
+success from Error/Fatal counts even when the native executable exits 0. Warnings
+are blocking only with `-FailOnWarning`. Validation has a bounded process timeout.
+
+The tracked config checks English, hides vanilla/other-mod diagnostics and applies
+no suppression baseline or blanket scope override. Per-run raw JSON, stderr and
+summary/provenance stay under `.local/xtiger/`; executable, config and build manifest
+hashes and the installed game version identify the checked inputs. Validator/config
+changes during a run fail rather than recording replacement hashes. Neither validator
+settings nor binaries enter assembled mod content or release archives. No app/MCP
+registration, game launch, playset or user-profile mutation belongs to this command.
+
+Existing assembly, source-contract, targeted localization and gameplay checks remain
+required. The [coverage comparison and usage](quality.md) explains partial syntax,
+encoding, localization and reference overlap. [X01-X11](../tools/tests/scenarios.md)
+test the wrapper's failure, policy, path, archive and transport boundaries through
+the existing tooling suite. Static validation never certifies gameplay or rendering.
+
 ## Gameplay regression policy
 
 Every new automatable gameplay behavior check and bug fix must be a reproducible registered runner scenario, or an added assertion in an existing registered scenario, with fixed inputs/setup, native observable assertions, and retained fresh evidence. A shared native fixture alone is insufficient. For genuinely required UI interactions that the bounded runner cannot perform, provide scripted setup and post-action assertions plus the exact mandatory manual steps; do not report a script-only result as an actual click or save/load pass. Keep fixtures in the owning module and update its living SPEC and scenarios in the same change.

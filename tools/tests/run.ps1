@@ -262,6 +262,7 @@ try {
             } finally { Remove-Item Function:script:Get-Process; Remove-Variable aspGuardProbe -Scope Script }
         }
     }
+    . (Join-Path $PSScriptRoot 'xtiger.ps1')
 } finally {
     # Never recursively remove a linked fixture. Leave disposable roots ignored for inspection.
     Write-Host "Fixtures: $testRoot"
@@ -269,4 +270,4 @@ try {
 if ($failures.Count) { Write-Host "$($failures.Count) test cases failed"; exit 1 }
 & $pwsh -NoProfile -File (Join-Path $PSScriptRoot 'contracts.ps1') -RepositoryRoot $repo
 if ($LASTEXITCODE -ne 0) { exit 1 }
-Write-Host 'All 24 tooling and 17 shared contract cases passed'; exit 0
+Write-Host 'All 24 tooling, 11 xTiger and 17 shared contract cases passed'; exit 0

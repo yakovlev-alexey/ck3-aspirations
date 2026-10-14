@@ -5,6 +5,7 @@ Read the relevant topic before implementing or testing against a CK3 capability.
 | Topic | Read when | Status and boundary |
 | --- | --- | --- |
 | [Native sources](sources.md) | Selecting engine hooks or reference content | Source-inspected; capability presence is not runtime correctness |
+| [Engine-aware static validation](static-validation.md) | Using xTiger, interpreting scope/encoding warnings or considering replacement of tests | Source-inspected tooling and observed CLI diagnostics; no native gameplay certification |
 | [Construction attribution and tokens](construction.md) | Recovery starts, cancellation, completion or title loss | Measured native callbacks/UI plus scripted reservation/token controls; explicit construction pool only |
 | [Story scopes and localization](scopes-localization.md) | Event-held references, card text, weak Story links or mixed targets | Measured rendering and source/regression controls; later-frame evidence remains necessary |
 | [Calendar and lifecycle](calendar-lifecycle.md) | Dates, review, expiry, suspension, return or terminal ordering | Measured numeric durations and registered/native procedures; artificial timestamps remain disclosed |

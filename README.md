@@ -4,7 +4,7 @@ An English-only, player-character CK3 prototype for contextual vengeance, holdin
 
 Current status: native core lifecycle/pledges, vengeance, holding recovery and personal bonds with registered disposable regression scenarios on CK3 1.20.0.4. Recovery acceptance includes actual GUI-funded construction, completion and its three-year county modifier. Personal-bond acceptance includes actual native Befriend input/outcome with disclosed existing-scheme progress acceleration. See the [automation contract](tools/game_runner/SPEC.md) and [acceptance scenarios](tools/game_runner/tests/scenarios.md).
 
-Use installed PowerShell 7 and Git. No additional dependencies are needed. The installed game is a read-only scripting reference; author native files under `src/core/game/` or the owning `src/stories/<family>/game/` when implementing a family.
+Use installed PowerShell 7 and Git. Packaging and tooling tests need no additional dependencies; optional engine-aware validation uses the pinned xTiger CLI. The installed game is a read-only scripting reference; author native files under `src/core/game/` or the owning `src/stories/<family>/game/` when implementing a family.
 
 ```powershell
 pwsh -NoProfile -File tools/tests/run.ps1
@@ -26,6 +26,19 @@ pwsh -NoProfile -File tools/install-dev.ps1 -UserDataPath '<selected CK3 user-da
 Registration writes `mod/aspirations_dev.mod` with the title Aspirations (Development), preserves unrelated files and leaves playset selection to the user. No real-user-data installation occurs in the tooling tests. See [manual installation](packaging/INSTALL.md), [credits and licensing boundary](packaging/CREDITS.md), and [reviewed implementation plan](docs/superpowers/plans/2026-10-12-ck3-aspirations.md).
 
 Native fixture files under module `tests/game/` are dev-only. Release excludes them. Static validation checks assembly, encoding, links, metadata and identifiable duplicate IDs; CK3 runtime scenarios remain the authority for behavior. Source scripts/localization never come from generated output, and extracted game assets are never committed.
+
+Add engine-aware static validation with [xTiger](docs/quality.md). Install once, then
+check each assembled profile against the installed vanilla game:
+
+```powershell
+pwsh -NoProfile -File tools/setup-xtiger.ps1
+pwsh -NoProfile -File tools/check-xtiger.ps1 -Profile dev -GamePath '<CK3 installation root>'
+pwsh -NoProfile -File tools/check-xtiger.ps1 -Profile release -GamePath '<CK3 installation root>'
+```
+
+Error/Fatal diagnostics fail the command; add `-FailOnWarning` for strict warning
+policy. Existing checks run automatically as preflight. Reports and the hash-verified
+validator stay under `.local/`. See [coverage overlap and limits](docs/quality.md#coverage-overlap).
 
 For bounded real-game smoke tests, use the existing Python runtime with standard-library modules only. Put explicit machine configuration and a disposable baseline under `.local/automation/`, select the dev playset, select No Autosave (`NO_AUTOSAVE`) in CK3 settings for the disposable session, and close other CK3 sessions:
 
