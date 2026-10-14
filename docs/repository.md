@@ -31,6 +31,7 @@ ck3-aspirations/
   .gitignore
   docs/
     design.md                       # Purpose, glossary, shared player-facing behavior
+    aspirations-ledger.md           # Family keys, short descriptions, triggers and eligibility filters
     repository.md                   # This repository and packaging contract
     modding-notes.md                 # Compatibility entry point to indexed knowledge
     story-authoring.md              # Shared acceptance checklist, evidence index and template
