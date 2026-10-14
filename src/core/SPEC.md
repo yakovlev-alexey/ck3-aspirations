@@ -3,6 +3,12 @@
 Status: authoritative living contract migrated from the approved 2026-10-12 design. Task 2 native core and C01–C04 gameplay acceptance are complete for the development prototype. Schema: `1`. Core owns cross-story state; family modules cannot mutate one another's private state.
 
 [Product intent](../../docs/design.md) · [Repository contract](../../docs/repository.md) · [Acceptance scenarios](tests/scenarios.md)
+## Editorial presentation contract
+
+Follow the [player-facing writing guide](../../docs/player-facing-writing.md) and [native presentation references](../../docs/knowledge/narrative-presentation.md). Descriptions express motive, reflection and public resolve; option `flavor` describes the character's action. Mechanical objectives, eligibility, review intervals, pledge terms, release costs and stale replacement rules belong in native requirements/effect descriptions or labeled Story cards. Declaration disclosure branches between vengeance and recovery: recovery must never mention a living culprit or custody. Bonds remain private.
+
+Terminal summaries in `asp_pledge.2` read captured numeric result values only: normal success1 reports the existing reward; withdrawal2/expiry3 report the settled cost; excuse4 reports no reward/penalty; suspended fulfillment5 reports no retrospective reward. Their `immediate` blocks contain display-only `custom_tooltip` branches and never replay settlement, write state or traverse an ended Story. Family terminal summaries follow the same boundary. Stress summaries state the base and applicable modifiers, rather than claiming an unmeasured final delta. Saved IDs, payout timing, guards and lifecycle remain unchanged. [I05 editorial acceptance](tests/scenarios.md) requires native hover/outcome comparison in addition to source checks.
+
 ## Core model
 
 Each aspiration has an owner, an originating circumstance, a target, an interpretation, explicit completion conditions, an origin date, a next review date, and a terminal outcome. Public declaration adds an audience, a deadline, and a reward or penalty policy. Store the relevant characters and titles as references, not names or a changing selection of suitable targets.

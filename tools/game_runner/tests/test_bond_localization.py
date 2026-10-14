@@ -11,10 +11,17 @@ class BondLocalizationTests(unittest.TestCase):
             self.assertRegex(line,r'^ asp_(bond_[a-z_]+|personal_bond_story(_desc)?):0 ".*"$')
         values={line.split(':0 ',1)[0].strip():line.split(':0 ',1)[1] for line in lines[1:]}
         for connection in ('court','relation'):
-            self.assertIn(r'\n\nOnly a new Friend or Best Friend',values[f'asp_bond_origin_{connection}_friendship'])
-            self.assertIn(r'\n\nOnly a new Lover or Soulmate',values[f'asp_bond_origin_{connection}_romance'])
+            for mode in ('friendship','romance'):
+                self.assertIn(r'\n\n',values[f'asp_bond_origin_{connection}_{mode}'])
+                self.assertIn("asp_bond_event_story.MakeScope.Var('asp_target').Char.GetShortUIName",values[f'asp_bond_origin_{connection}_{mode}'])
+        # Exact objectives moved from scene prose to effect text; keeping a wish
+        # neither creates the relationship nor grants access to its scheme.
+        self.assertIn('new Friend or Best Friend',values['asp_bond_friendship_condition'])
+        self.assertIn('new Lover or Soulmate',values['asp_bond_romance_condition'])
         for mode in ('friendship','romance'):
-            self.assertIn(r'\n\nPrivate desire.',values[f'asp_bond_management_{mode}'])
+            self.assertIn('no relationship',values[f'asp_bond_{mode}_condition'].lower())
+            self.assertIn('custom_tooltip = asp_bond_'+mode+'_condition', (root/'src/stories/personal_bond/game/events/asp_personal_bond_events.txt').read_text(encoding='utf-8-sig'))
+        self.assertIn('Status: Private desire',values['asp_bond_story_information'])
 
     def test_origin_and_rival_cost_do_not_depend_on_management_scope(self):
         root=Path(__file__).resolve().parents[3]

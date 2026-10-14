@@ -23,6 +23,7 @@ asp_core.2 = {
     type = character_event
     window = big_event_window
     title = asp_replace_title
+    immediate = { custom_tooltip = asp_replace_offer_condition }
     desc = { first_valid = { triggered_desc = { trigger = { exists = scope:asp_replacement_cause_county } desc = asp_recovery_replace_offer_desc } desc = asp_replace_offer_desc } }
     theme = intrigue
     option = {

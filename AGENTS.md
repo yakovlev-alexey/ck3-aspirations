@@ -4,6 +4,8 @@ Read `docs/design.md`, `docs/repository.md`, [the knowledge index](docs/knowledg
 
 Use English for all authored prose, identifiers, comments, tool output, metadata and localization. Only `localization/english/*_l_english.yml` is supported; preserve its UTF-8 BOM and native header. Do not use generic YAML formatters on CK3 localization. PowerShell/Markdown use UTF-8 and LF. No formatter is configured; use syntax checks and inspect diffs.
 
+Before writing or editing player-facing text, read [the writing guide](docs/player-facing-writing.md) and its [native references](docs/knowledge/narrative-presentation.md). Event and decision prose, selection tooltips and option flavor describe the character's motives and actions in roleplay. Put consequences in native Will Happen or Has Happened effect sections; keep exact objectives and progress on Story cards. Verify the separation in the actual game, not only in localization files.
+
 Author ordinary CK3 files in story-owned `game/` folders. Core owns lifecycle and cross-story coordination; stories cannot mutate each other's private state. No transpiler, runtime framework, dependency additions, custom GUI replacements or undocumented identifier changes. Create only categories that are used. Reserve stable event IDs in the owning SPEC before implementation and never repurpose saved IDs.
 
 Use installed PowerShell 7, .NET and Git. Prefer `rg`. Preserve existing user edits; no push, PR, publication, game-install modification, Workshop-source modification or active-playset mutation without explicit authorization. Never redistribute extracted game/Workshop assets or commit secrets, saves, profiles, screenshots, runtime logs, local paths, `.build/`, `.local/`, `dist/` or `.superpowers/`.

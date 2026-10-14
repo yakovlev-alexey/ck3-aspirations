@@ -1,6 +1,6 @@
 # Story authoring and acceptance guide
 
-This guide turns the [repository contract](repository.md#living-specifications-and-ownership) into a review checklist. [Core](../src/core/SPEC.md) and each family's `SPEC.md` remain the behavioral authority. This is neither another product specification nor a script schema. Read the [knowledge index](knowledge/README.md) and relevant topic notes before relying on an engine capability.
+This guide turns the [repository contract](repository.md#living-specifications-and-ownership) into a review checklist. [Core](../src/core/SPEC.md) and each family's `SPEC.md` remain the behavioral authority. This is neither another product specification nor a script schema. Read the [knowledge index](knowledge/README.md) and relevant topic notes before relying on an engine capability. For all player-facing prose, follow the [writing guide](player-facing-writing.md): roleplay belongs in narrative and option flavor; consequences belong in native effect sections.
 
 ## Shared acceptance checklist
 

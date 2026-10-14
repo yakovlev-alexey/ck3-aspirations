@@ -5,9 +5,14 @@ asp_pledge.1 = {
     desc = { first_valid = { triggered_desc = { trigger = { asp_event_can_declare_trigger = yes } desc = { first_valid = { triggered_desc = { trigger = { asp_recovery_event_can_manage_trigger = { STORY = scope:asp_selected_story } } desc = asp_recovery_declare_desc } desc = asp_declare_desc } } } desc = asp_management_closed_desc } }
     theme = intrigue
     option = {
-        name = asp_declare_confirm
+        name = asp_declare_confirm flavor = asp_declare_confirm_flavor
         trigger = { asp_event_can_declare_trigger = yes }
         custom_tooltip = asp_declare_rules
+        if = { limit = { asp_recovery_event_can_manage_trigger = { STORY = scope:asp_selected_story } }
+            custom_tooltip = asp_declare_recovery_rules
+            custom_tooltip = asp_recovery_condition
+        }
+        else = { custom_tooltip = asp_declare_vengeance_rules }
         custom_tooltip = asp_declare_consequences
         hidden_effect = { scope:asp_selected_story ?= { if = { limit = { asp_can_declare_story_trigger = yes story_owner = root } asp_declare_story_effect = yes } } }
     }
@@ -29,5 +34,12 @@ asp_pledge.2 = {
         desc = asp_pledge_fulfilled_desc
     } }
     theme = intrigue
+    # Presentation only: results were settled before this event; never replay effects.
+    immediate = {
+        if = { limit = { scope:asp_pledge_event_result = 5 } custom_tooltip = asp_pledge_absent_happened }
+        else_if = { limit = { scope:asp_pledge_event_result = 1 } custom_tooltip = asp_pledge_reward_happened }
+        else_if = { limit = { scope:asp_pledge_event_result = 4 } custom_tooltip = asp_pledge_excused_happened }
+        else = { custom_tooltip = asp_pledge_cost_happened }
+    }
     option = { name = asp_close }
 }

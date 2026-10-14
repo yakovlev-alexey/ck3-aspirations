@@ -40,6 +40,10 @@ Declaration uses core's age/deadline policy and requires both control below 80 a
 
 ## Presentation and compatibility
 
+Use the [writing guide](../../../docs/player-facing-writing.md). Origin prose must fit both raid and siege without inventing a particular destroyed building. Protection, family standing and income receive distinct roleplay option flavor. Exact Control, construction, funding, ownership, cancellation and supported building rules remain in effect descriptions and labeled cards, with conditional future rewards. Future Stress relief is a base value subject to Stress Loss modifiers. Declaration disclosure is county-specific; it must never describe a living culprit or custody.
+
+The existing captured numeric terminal outcome drives display-only `immediate` summaries for fulfillment1, involuntary/unclassified loss2 and release3. Summaries report the existing memory/reward policy without executing it or traversing an ended Story. Fulfillment summaries state base Stress relief and modifier applicability; normal event emission still excludes absent no-reward completion. Native editorial comparison supplements H01–H05 and core I05, preserving exact one-time resource/modifier measurements and later-frame stale coverage.
+
 Explain incident, recorded control, exact two-part condition and eligible building categories without naming an unavailable building. Show ownership loss and voluntary grant consequences. Use English localization and game-provided art references; no original or extracted art in Task 1.
 
 Required surfaces: siege/raid, construction start/completion, title ownership callbacks, county control and modifiers, stories/memories. Native payment/start/cancellation/completion and actual GUI grant probes establish the implemented callback route; never infer payment from holder substitution. CK3 1.20.0.4 runtime acceptance is recorded in the scenarios. No DLC-dependent branch promised; schema 1 and core migration policy apply.

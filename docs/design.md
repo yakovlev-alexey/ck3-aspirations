@@ -51,7 +51,7 @@ Decisions
     [Declare intention] [Reconsider] [Abandon]
 ```
 
-Show exact conditions and consequences in tooltips, with the personal reason in the main text. No raw variable names, hidden target substitutions, or debug controls in normal play. All player-facing text uses the English glossary and follows the language and localization scope above.
+Follow the [player-facing writing guide](player-facing-writing.md). Event and decision descriptions express the character's circumstances and motives; option flavor describes the character's intended action. Put exact conditions and consequences in native requirement/effect sections, including Will Happen or Has Happened as appropriate. Keep clearly labeled objectives and progress on Story cards. No raw variable names, hidden target substitutions, or debug controls in normal play. All player-facing text uses the English glossary and follows the language and localization scope above.
 
 ## Verification and acceptance
 

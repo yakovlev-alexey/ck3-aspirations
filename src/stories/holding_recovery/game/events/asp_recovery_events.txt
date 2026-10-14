@@ -5,25 +5,25 @@ asp_holding_recovery.1 = {
     desc = { first_valid = { triggered_desc = { trigger = { NOT = { exists = scope:asp_recovery_event_story } } desc = asp_management_closed_desc } desc = asp_recovery_origin_desc } }
     theme = stewardship
     option = {
-        name = asp_recovery_protection
+        name = asp_recovery_protection flavor = asp_recovery_protection_flavor
         trigger = { asp_recovery_event_can_manage_trigger = { STORY = scope:asp_recovery_event_story } }
         custom_tooltip = asp_recovery_condition
         hidden_effect = { scope:asp_recovery_event_story ?= { if = { limit = { asp_can_manage_story_trigger = yes story_owner = root } set_variable = { name = asp_interpretation value = flag:protection } } } }
     }
     option = {
-        name = asp_recovery_family_prestige
+        name = asp_recovery_family_prestige flavor = asp_recovery_family_prestige_flavor
         trigger = { asp_recovery_event_can_manage_trigger = { STORY = scope:asp_recovery_event_story } }
         custom_tooltip = asp_recovery_condition
         hidden_effect = { scope:asp_recovery_event_story ?= { if = { limit = { asp_can_manage_story_trigger = yes story_owner = root } set_variable = { name = asp_interpretation value = flag:family_prestige } } } }
     }
     option = {
-        name = asp_recovery_income
+        name = asp_recovery_income flavor = asp_recovery_income_flavor
         trigger = { asp_recovery_event_can_manage_trigger = { STORY = scope:asp_recovery_event_story } }
         custom_tooltip = asp_recovery_condition
         hidden_effect = { scope:asp_recovery_event_story ?= { if = { limit = { asp_can_manage_story_trigger = yes story_owner = root } set_variable = { name = asp_interpretation value = flag:income } } } }
     }
     option = {
-        name = asp_recovery_release
+        name = asp_recovery_release flavor = asp_abandon_flavor
         trigger = { asp_recovery_event_can_manage_trigger = { STORY = scope:asp_recovery_event_story } }
         custom_tooltip = asp_recovery_release_cost
         show_as_tooltip = { scope:asp_recovery_event_story ?= { if = { limit = { asp_can_manage_story_trigger = yes } save_scope_value_as = { name = asp_recovery_tooltip_cost value = asp_abandonment_stress } story_owner = { add_stress = scope:asp_recovery_tooltip_cost } } } }
@@ -40,5 +40,11 @@ asp_holding_recovery.2 = {
         desc = asp_recovery_fulfilled_desc
     } }
     theme = stewardship
+    # Presentation only: results were settled before this event; never replay effects.
+    immediate = {
+        if = { limit = { scope:asp_recovery_event_outcome = 1 } custom_tooltip = asp_recovery_fulfilled_happened }
+        else_if = { limit = { scope:asp_recovery_event_outcome = 2 } custom_tooltip = asp_recovery_lost_happened }
+        else = { custom_tooltip = asp_recovery_released_happened }
+    }
     option = { name = asp_close }
 }

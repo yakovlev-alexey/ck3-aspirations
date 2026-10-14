@@ -22,8 +22,10 @@ class RecoveryLocalizationTests(unittest.TestCase):
             line = next(line for line in localization.splitlines() if line.startswith(f" {key}:0 "))
             for token in ("Var('asp_target').Title.GetName", "Var('asp_recovery_origin_control').GetValue", "ScriptValue('asp_story_age_days')", "ScriptValue('asp_time_until_review_days')", "Story.Custom('asp_recovery_story_cause')", "Story.Custom('asp_recovery_story_interpretation')"):
                 self.assertIn(token, line)
-            self.assertIn("Control 80", line)
-            self.assertIn("owner-funded", line)
+            self.assertIn("Control to at least 80 AND", line)
+            self.assertIn("begun after this ambition and funded by me", line)
+            for condition in ('Tribal Markets', 'Palisades', 'Pastures', 'Cereal Fields', 'Hill Farms', 'cancelled', 'foreign-funded', 'ownership-interrupted'):
+                self.assertIn(condition, line)
         declared = next(line for line in localization.splitlines() if line.startswith(" asp_recovery_story_information_declared:0 "))
         self.assertIn("ScriptValue('asp_time_until_pledge_days')", declared)
         for cause in ("raid", "siege"):
