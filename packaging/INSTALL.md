@@ -17,4 +17,4 @@ If it does not appear, inspect the local descriptor path and confirm `common/`, 
 
 To uninstall, first disable Aspirations in its disposable playset and close CK3. Remove only the folder and local descriptor you created above; preserve all saves and unrelated mods. A campaign containing active prototype Stories should not be continued with the mod removed.
 
-The manual archive is a local deliverable. Workshop upload source is the assembled release mod root itself, with no enclosing `mod/` layer. No Workshop publication or subscribed-download acceptance has occurred. The public license remains undecided; select and document it before public distribution.
+The manual archive is a local deliverable. Workshop upload source is the assembled release mod root itself, with no enclosing `mod/` layer. No Workshop publication or subscribed-download acceptance has occurred. Authored project content uses the MIT License; [CREDITS.md](CREDITS.md) includes the full license notice and terms.

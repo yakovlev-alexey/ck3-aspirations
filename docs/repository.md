@@ -25,6 +25,7 @@ Select the second organization. Author ordinary CK3 scripts directly; the assemb
 ```text
 ck3-aspirations/
   README.md                         # Setup, commands, and links to current specifications
+  LICENSE                           # MIT License for authored project content
   AGENTS.md                         # Project workflow and source/generated-file boundaries
   .editorconfig
   .gitattributes
@@ -108,7 +109,7 @@ Two modules producing the same destination path are a build error, including cas
 
 Assembly is deterministic and emits an ignored file map containing source-relative path, destination-relative path, and content hash. This map helps trace a game-log filename to its authoring module. Write into a fresh staging directory, validate it, then replace only the selected generated output after validating its resolved absolute path lies inside this repository's `.build/`. Do not delete or mirror over the game, Workshop, or user-data roots. Files removed from source must disappear from the next output. Do not assemble or replace development output while the test game is running; close that test process before updating it.
 
-Source scripts and localization are edited only under `src/`. Generated output is disposable and never edited by hand. `SPEC.md`, authoring assets, local logs, saves, paths, screenshots, tests, and implementation plans do not enter release game content. Release archives contain the release mod output plus concise install instructions and credits. Choose and document licensing before any public release; this design does not assume a license for the user's work.
+Source scripts and localization are edited only under `src/`. Generated output is disposable and never edited by hand. `SPEC.md`, authoring assets, local logs, saves, paths, screenshots, tests, and implementation plans do not enter release game content. Release archives contain the release mod output plus concise install instructions and credits. Authored project content is licensed under the [MIT License](../LICENSE), copyright 2026 Alexey Yakovlev. `packaging/CREDITS.md` includes the same full license notice and terms so manual archives retain them. Game and third-party content remains subject to its respective owners' terms.
 
 ### Steam Workshop distribution
 

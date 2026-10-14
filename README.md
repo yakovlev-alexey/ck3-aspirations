@@ -2,6 +2,8 @@
 
 An English-only, player-character CK3 prototype for contextual vengeance, holding recovery and personal bonds. [Aspirations ledger](docs/aspirations-ledger.md) · [Design](docs/design.md) · [Core specification](src/core/SPEC.md) · [Repository contract](docs/repository.md) · [Engine findings](docs/modding-notes.md)
 
+Licensed under the [MIT License](LICENSE). See [credits](packaging/CREDITS.md) for attribution and the third-party content boundary.
+
 Current status: native core lifecycle/pledges, vengeance, holding recovery and personal bonds with registered disposable regression scenarios on CK3 1.20.0.4. Recovery acceptance includes actual GUI-funded construction, completion and its three-year county modifier. Personal-bond acceptance includes actual native Befriend input/outcome with disclosed existing-scheme progress acceleration. See the [automation contract](tools/game_runner/SPEC.md) and [acceptance scenarios](tools/game_runner/tests/scenarios.md).
 
 Use installed PowerShell 7 and Git. Packaging and tooling tests need no additional dependencies; optional engine-aware validation uses the pinned xTiger CLI. The installed game is a read-only scripting reference; author native files under `src/core/game/` or the owning `src/stories/<family>/game/` when implementing a family.
@@ -74,4 +76,4 @@ Tested game version: CK3 1.20.0.4 Crozier. The supported prototype is single pla
 
 Construction/action acceptance includes disclosed setup and acceleration: the recovery test prepared Control80 and accelerated already paid native construction; the bond test accelerated an already started Befriend scheme. Ordinary construction or scheme duration is not certified. Recovery supports only the explicit Markets/Palisades1–2 and Pastures/Cereal Fields/Hill Farms1 pool. Direct public murder exposure before known-secret observation can be missed. Landless/government expansion, multiplayer, external-mod/RICE compatibility and additional pursuit routes remain outside verified coverage.
 
-Manual deliverable: `dist/aspirations-0.1.0.zip`. Upload source for any future Workshop publication: `.build/release/mod/` itself. No push, PR, Workshop upload or subscribed-download acceptance has occurred. The public license is undecided; see the packaged credits and installation instructions before public distribution.
+Manual deliverable: `dist/aspirations-0.1.0.zip`. Upload source for any future Workshop publication: `.build/release/mod/` itself. No Workshop upload or subscribed-download acceptance has occurred. The project uses the MIT License; the packaged credits include its full notice and terms.
